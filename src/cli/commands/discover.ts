@@ -7,6 +7,7 @@ import { formatOutput, type OutputFormat } from '../format';
 import { compactTimestamp, DEFAULT_VAULT, resolveVaultPath, todayIsoDate } from '../vault';
 import { dedupeDiscoveredWorks, mapWorkToNode, parseOpenAlexAbstract, workToReference } from '../discovery';
 import type { DiscoveredWork } from '../discovery';
+import { rankHypotheses } from '../evidence';
 
 function loadGraph(file: string): GraphData {
   return jsonToGraph(readFileSync(file, 'utf-8'));
@@ -217,6 +218,35 @@ function hasDuplicateReference(data: GraphData, work: DiscoveredWork): boolean {
   });
 }
 
+function buildBriefMarkdown(data: GraphData, top = 10): string {
+  const ranked = rankHypotheses(data).slice(0, top);
+  const refById = new Map(data.references.map((r) => [r.id, r]));
+  const lines: string[] = ['# Discovery Brief', ''];
+  for (const item of ranked) {
+    lines.push(`## ${item.id} — ${item.name}`);
+    if (item.description.trim()) lines.push(`- ${item.description}`);
+    lines.push(`- Trust: ${item.trust.toFixed(2)} | Rank: ${item.rankScore.toFixed(2)} | Evidence: ${item.evidenceCount}`);
+    const refs = item.references.slice(0, 3);
+    for (const ref of refs) {
+      const url = ref.url ?? (ref.doi ? `https://doi.org/${ref.doi}` : '');
+      const summary = ref.aiSummary || ref.abstract || ref.citation || '';
+      lines.push(`- **${ref.title}** (${ref.year})${url ? ` — ${url}` : ''}`);
+      if (summary) lines.push(`  ${summary.slice(0, 220)}`);
+    }
+    if (refs.length === 0) {
+      const fallbackRefs = (data.nodes.find((n) => n.id === item.id)?.referenceIds ?? [])
+        .map((id) => refById.get(id))
+        .filter((r): r is NonNullable<typeof r> => Boolean(r))
+        .slice(0, 1);
+      for (const ref of fallbackRefs) {
+        lines.push(`- **${ref.title}** (${ref.year})`);
+      }
+    }
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
 export function registerDiscoverCommands(program: Command) {
   const discover = program.command('discover').description('AI-driven literature discovery using free/open APIs');
 
@@ -228,6 +258,10 @@ export function registerDiscoverCommands(program: Command) {
     .option('--per-source <n>', 'Max results per query per source', '5')
     .option('--min-map-confidence <n>', 'Minimum confidence to auto-link', '0.14')
     .option('--max-new-refs <n>', 'Maximum new references to apply', '150')
+    .option('--max-new-nodes <n>', 'Maximum new nodes to allow in one run (guard rail)', '20')
+    .option('--max-trust-delta <n>', 'Maximum allowed trust delta in one run', '0.35')
+    .option('--strict', 'Enable strict validation checks', true)
+    .option('--no-strict', 'Disable strict validation checks')
     .option('--dry-run', 'Do not write changes to graph', false)
     .description('Run discovery + mapping + audit + optional apply')
     .action(async (cmdOpts: {
@@ -237,10 +271,14 @@ export function registerDiscoverCommands(program: Command) {
       perSource: string;
       minMapConfidence: string;
       maxNewRefs: string;
+      maxNewNodes: string;
+      maxTrustDelta: string;
+      strict: boolean;
       dryRun: boolean;
     }) => {
       const opts = program.opts();
       const data = loadGraph(opts.file);
+      const beforeTrustByNode = new Map(data.nodes.map((n) => [n.id, n.trust]));
       const vault = resolveVaultPath(cmdOpts.vault);
       const runRoot = join(vault, 'runs', cmdOpts.date);
       const snapshotsDir = join(vault, 'snapshots');
@@ -251,6 +289,8 @@ export function registerDiscoverCommands(program: Command) {
       const perSource = Math.max(1, Number.parseInt(cmdOpts.perSource, 10) || 5);
       const minMapConfidence = Math.max(0, Math.min(1, Number.parseFloat(cmdOpts.minMapConfidence) || 0.14));
       const maxNewRefs = Math.max(1, Number.parseInt(cmdOpts.maxNewRefs, 10) || 150);
+      const maxNewNodes = Math.max(0, Number.parseInt(cmdOpts.maxNewNodes, 10) || 20);
+      const maxTrustDelta = Math.max(0, Number.parseFloat(cmdOpts.maxTrustDelta) || 0.35);
 
       const queries = buildQueries(data.nodes, maxQueries);
       const harvested: DiscoveredWork[] = [];
@@ -265,15 +305,55 @@ export function registerDiscoverCommands(program: Command) {
         return { work, mapping };
       });
 
+      const rejected: Array<{ title: string; reason: string }> = [];
       const accepted = candidates
-        .filter((c) => c.mapping.nodeId && c.mapping.confidence >= minMapConfidence)
-        .filter((c) => !hasDuplicateReference(data, c.work))
+        .filter((c) => {
+          if (!c.mapping.nodeId || c.mapping.confidence < minMapConfidence) {
+            rejected.push({ title: c.work.title, reason: 'low-map-confidence' });
+            return false;
+          }
+          return true;
+        })
+        .filter((c) => {
+          if (hasDuplicateReference(data, c.work)) {
+            rejected.push({ title: c.work.title, reason: 'duplicate' });
+            return false;
+          }
+          return true;
+        })
+        .filter((c) => {
+          if (!cmdOpts.strict) return true;
+          if (c.work.title.trim() === '') {
+            rejected.push({ title: c.work.title, reason: 'missing-title' });
+            return false;
+          }
+          if (!c.work.year || c.work.year <= 0) {
+            rejected.push({ title: c.work.title, reason: 'missing-year' });
+            return false;
+          }
+          if (!c.work.doi && !c.work.url) {
+            rejected.push({ title: c.work.title, reason: 'missing-doi-url' });
+            return false;
+          }
+          const node = data.nodes.find((n) => n.id === c.mapping.nodeId);
+          if (!node) {
+            rejected.push({ title: c.work.title, reason: 'missing-target-node' });
+            return false;
+          }
+          if (node.description.trim() === '') {
+            rejected.push({ title: c.work.title, reason: 'target-node-empty-description' });
+            return false;
+          }
+          return true;
+        })
         .slice(0, maxNewRefs);
 
       const skipped = candidates.length - accepted.length;
       const auditPath = join(runRoot, 'audit.jsonl');
       const candidatesPath = join(runRoot, 'discovery-candidates.json');
       const appliedPath = join(runRoot, 'discovery-applied.json');
+      const rankPath = join(runRoot, 'hypothesis-rank.json');
+      const briefPath = join(runRoot, 'evidence-brief.md');
       const snapshotName = `psi-map-${compactTimestamp()}.json`;
       const snapshotPath = join(snapshotsDir, snapshotName);
 
@@ -291,11 +371,18 @@ export function registerDiscoverCommands(program: Command) {
           sourceApis: c.work.sourceApis,
           mapping: c.mapping,
         })),
+        rejected,
       }, null, 2));
 
       copyFileSync(opts.file, snapshotPath);
 
       const applied: Array<{ refId: string; nodeId: string; title: string; mappingConfidence: number }> = [];
+      const proposedNewNodes = 0;
+      if (proposedNewNodes > maxNewNodes) {
+        console.error(`Run blocked: proposed new nodes ${proposedNewNodes} exceeds max-new-nodes ${maxNewNodes}`);
+        process.exit(1);
+      }
+
       if (!cmdOpts.dryRun) {
         for (const item of accepted) {
           const refId = generateRefId(data);
@@ -307,9 +394,40 @@ export function registerDiscoverCommands(program: Command) {
             node.referenceIds.push(refId);
           }
           applied.push({ refId, nodeId: node.id, title: ref.title, mappingConfidence: item.mapping.confidence });
+          appendFileSync(auditPath, JSON.stringify({
+            ts: new Date().toISOString(),
+            action: 'reference.add-link',
+            refId,
+            nodeId: node.id,
+            title: ref.title,
+            mappingConfidence: item.mapping.confidence,
+            sourceApis: ref.sourceApis,
+          }) + '\n');
+        }
+        let maxObservedTrustDelta = 0;
+        for (const node of data.nodes) {
+          const prev = beforeTrustByNode.get(node.id);
+          if (prev === undefined) continue;
+          const delta = Math.abs(node.trust - prev);
+          if (delta > maxObservedTrustDelta) maxObservedTrustDelta = delta;
+        }
+        if (cmdOpts.strict && maxObservedTrustDelta > maxTrustDelta) {
+          console.error(`Run blocked: max trust delta ${maxObservedTrustDelta.toFixed(3)} exceeds threshold ${maxTrustDelta.toFixed(3)}`);
+          process.exit(1);
         }
         saveGraph(opts.file, data);
       }
+
+      const rank = rankHypotheses(data).map((r) => ({
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        rankScore: r.rankScore,
+        trust: r.trust,
+        evidenceCount: r.evidenceCount,
+      }));
+      writeFileSync(rankPath, JSON.stringify(rank, null, 2));
+      writeFileSync(briefPath, buildBriefMarkdown(data));
 
       writeFileSync(appliedPath, JSON.stringify({
         generatedAt: new Date().toISOString(),
@@ -317,6 +435,8 @@ export function registerDiscoverCommands(program: Command) {
         snapshotPath,
         acceptedCount: accepted.length,
         appliedCount: applied.length,
+        rejectedCount: rejected.length,
+        rejected,
         applied,
       }, null, 2));
 
@@ -331,6 +451,10 @@ export function registerDiscoverCommands(program: Command) {
         acceptedCount: accepted.length,
         appliedCount: applied.length,
         skippedCount: skipped,
+        rejectedCount: rejected.length,
+        strict: cmdOpts.strict,
+        maxNewNodes,
+        maxTrustDelta,
         dryRun: cmdOpts.dryRun,
         minMapConfidence,
       }) + '\n');
@@ -345,9 +469,10 @@ export function registerDiscoverCommands(program: Command) {
         deduped: deduped.length,
         accepted: accepted.length,
         applied: applied.length,
+        rejected: rejected.length,
         skipped,
         dryRun: cmdOpts.dryRun,
-        artifacts: { candidatesPath, appliedPath, auditPath },
+        artifacts: { candidatesPath, appliedPath, auditPath, rankPath, briefPath },
       }, opts.format as OutputFormat));
     });
 }

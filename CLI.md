@@ -358,6 +358,7 @@ Run AI-assisted literature discovery from free/open APIs and write artifacts to 
 npm run mpsi -- discover run
 npm run mpsi -- discover run --vault ~/data/modularpsi --max-queries 20 --per-source 8
 npm run mpsi -- discover run --dry-run
+npm run mpsi -- discover run --strict --max-new-refs 150 --max-new-nodes 20 --max-trust-delta 0.35
 ```
 
 Sources queried: OpenAlex, Semantic Scholar, CrossRef, arXiv.
@@ -365,6 +366,13 @@ Sources queried: OpenAlex, Semantic Scholar, CrossRef, arXiv.
 Default vault base folder: `~/data/modularpsi`
 
 Artifacts written under: `~/data/modularpsi/runs/<date>/`
+
+Key options:
+
+- `--strict` / `--no-strict`: enable/disable hard validation checks (default: strict on)
+- `--max-new-refs <n>`: per-run cap for applied references
+- `--max-new-nodes <n>`: guard rail for proposed node creation
+- `--max-trust-delta <n>`: guard rail for maximum trust drift in one run
 
 ### snapshot create
 

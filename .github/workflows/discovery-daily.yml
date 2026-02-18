@@ -1,0 +1,40 @@
+name: Discovery Daily (Dry Run)
+
+on:
+  schedule:
+    - cron: "20 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install
+        run: npm ci
+
+      - name: Quality Gates
+        run: |
+          npm run test
+          npm run build
+          npm run lint
+
+      - name: Discovery Dry Run
+        run: |
+          npm run mpsi -- -f research/psi-map-2026.json discover run --vault ~/data/modularpsi --strict --dry-run --max-queries 16 --per-source 6
+
+      - name: Upload Discovery Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: discovery-runs
+          path: ~/data/modularpsi/runs/**
+          if-no-files-found: warn
+

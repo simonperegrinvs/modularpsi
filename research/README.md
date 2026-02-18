@@ -38,6 +38,7 @@ npm run mpsi -- -f research/psi-map-2026.json export dot > research/psi-map-2026
 
 # 7) Optional daily discovery run (writes to ~/data/modularpsi)
 npm run mpsi -- -f research/psi-map-2026.json discover run
+npm run mpsi -- -f research/psi-map-2026.json discover run --strict --max-new-refs 150 --max-new-nodes 20
 ```
 
 ## Interface Upgrades Used

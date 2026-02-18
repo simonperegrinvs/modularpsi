@@ -374,6 +374,125 @@ npm run mpsi -- review reject P5
 
 ---
 
+### batch import
+
+Batch import nodes, references, and edges from a JSON file with governance and audit trail.
+
+```
+npm run mpsi -- batch import --input data.json
+npm run mpsi -- batch import --input data.json --review-status draft --snapshot --audit-dir ~/data
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--input <file>` | Yes | JSON file with batch data | |
+| `--review-status <status>` | No | Review status for imported items | `draft` |
+| `--run-id <id>` | No | Run ID for provenance | auto-generated |
+| `--agent <name>` | No | Agent name for provenance | `batch-import` |
+| `--snapshot` | No | Save snapshot before importing | |
+| `--audit-dir <dir>` | No | Directory for audit logs | graph file directory |
+
+Input JSON format:
+```json
+{
+  "nodes": [{ "parentId": "P3", "name": "...", "description": "...", "categoryId": "phenom", "keywords": ["..."] }],
+  "references": [{ "title": "...", "authors": ["..."], "year": 2024, "doi": "10.xxx/yyy", "linkToNodes": ["P5"] }],
+  "edges": [{ "sourceId": "P5", "targetId": "P13", "trust": 0.6, "type": "derivation" }],
+  "provenance": { "searchQuery": "...", "apiSource": "semantic-scholar" }
+}
+```
+
+Features: deduplication (DOI/S2-ID/fuzzy-title), provenance tracking, JSONL audit trail, daily snapshots.
+
+---
+
+### literature search
+
+Search external literature databases (read-only, does not modify graph).
+
+```
+npm run mpsi -- literature search --query "ganzfeld psi" --limit 10
+npm run mpsi -- literature search --query "precognition" --api openalex --year-min 2010
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--query <q>` | Yes | Search query | |
+| `--api <api>` | No | `semantic-scholar` or `openalex` | `semantic-scholar` |
+| `--limit <n>` | No | Max results | `20` |
+| `--year-min <year>` | No | Minimum year | |
+| `--year-max <year>` | No | Maximum year | |
+
+### literature resolve
+
+Resolve a DOI to paper metadata.
+
+```
+npm run mpsi -- literature resolve --doi "10.1037/a0021524"
+```
+
+### literature citations
+
+Get citing or cited-by papers for a DOI.
+
+```
+npm run mpsi -- literature citations --doi "10.1037/a0021524" --direction citing --limit 10
+```
+
+### literature enrich
+
+Enrich an existing reference with external API data (DOI, abstract, S2 ID).
+
+```
+npm run mpsi -- literature enrich --ref-id ref-123
+```
+
+---
+
+### agent status
+
+Show agent run history, pending items, and coverage summary.
+
+```
+npm run mpsi -- agent status
+```
+
+### agent gaps
+
+Identify nodes needing evidence: no references, no description, unclassified trust.
+
+```
+npm run mpsi -- agent gaps
+```
+
+### agent state
+
+Show raw agent state (last run, search cursors, etc.).
+
+```
+npm run mpsi -- agent state
+```
+
+### agent reset
+
+Clear agent state to start fresh.
+
+```
+npm run mpsi -- agent reset
+```
+
+### agent config
+
+View or modify agent configuration.
+
+```
+npm run mpsi -- agent config --show
+npm run mpsi -- agent config --set maxNewRefsPerRun=30
+npm run mpsi -- agent config --set focusKeywords=ganzfeld,precognition,psi
+```
+
+---
+
 ### import \<dir\>
 
 Import a legacy ModularPsi data directory containing `.mpsi`, `.graphml`, and optionally `.xsql` files.

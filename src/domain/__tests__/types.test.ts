@@ -10,6 +10,10 @@ import {
   EDGE_TYPE_IMPLICATION,
   EDGE_TYPE_DERIVATION,
   EDGE_TYPE_POSSIBILITY,
+  EDGE_TYPE_REQUIRES,
+  EDGE_TYPE_CONFOUNDED_BY,
+  EDGE_TYPE_INCOMPATIBLE_WITH,
+  EDGE_TYPE_FAILS_WHEN,
 } from '../types';
 
 describe('trustItem2float', () => {
@@ -75,16 +79,25 @@ describe('parseEdgeType', () => {
     expect(parseEdgeType('implication')).toBe(EDGE_TYPE_IMPLICATION);
     expect(parseEdgeType('derivation')).toBe(EDGE_TYPE_DERIVATION);
     expect(parseEdgeType('possibility')).toBe(EDGE_TYPE_POSSIBILITY);
+    expect(parseEdgeType('requires')).toBe(EDGE_TYPE_REQUIRES);
+    expect(parseEdgeType('confounded-by')).toBe(EDGE_TYPE_CONFOUNDED_BY);
+    expect(parseEdgeType('incompatible-with')).toBe(EDGE_TYPE_INCOMPATIBLE_WITH);
+    expect(parseEdgeType('fails-when')).toBe(EDGE_TYPE_FAILS_WHEN);
   });
 
   it('parses numeric strings', () => {
     expect(parseEdgeType('0')).toBe(EDGE_TYPE_IMPLICATION);
     expect(parseEdgeType('1')).toBe(EDGE_TYPE_DERIVATION);
     expect(parseEdgeType('2')).toBe(EDGE_TYPE_POSSIBILITY);
+    expect(parseEdgeType('3')).toBe(EDGE_TYPE_REQUIRES);
+    expect(parseEdgeType('4')).toBe(EDGE_TYPE_CONFOUNDED_BY);
+    expect(parseEdgeType('5')).toBe(EDGE_TYPE_INCOMPATIBLE_WITH);
+    expect(parseEdgeType('6')).toBe(EDGE_TYPE_FAILS_WHEN);
   });
 
   it('is case-insensitive', () => {
     expect(parseEdgeType('DERIVATION')).toBe(EDGE_TYPE_DERIVATION);
+    expect(parseEdgeType('CONFOUNDEDBY')).toBe(EDGE_TYPE_CONFOUNDED_BY);
   });
 
   it('defaults to implication for unknown input', () => {

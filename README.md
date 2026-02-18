@@ -151,6 +151,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references
 - **Claim-level extraction** — References can store `claims[]` with direction/context/confidence derived from abstracts
 - **Hypothesis cards** — Structured candidate correlations/constraints with support/contradiction links and triage status
+- **Constraint edges** — Edge semantics include `requires`, `confounded-by`, `incompatible-with`, and `fails-when`
 
 ## Tech Stack
 

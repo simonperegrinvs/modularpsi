@@ -152,7 +152,7 @@ npm run mpsi -- edge add --source P1 --target P3 --type derivation
 | `--source <id>` | Yes | Source node ID | |
 | `--target <id>` | Yes | Target node ID | |
 | `--trust <n>` | No | Trust value (-1 to 1) | `-1` |
-| `--type <type>` | No | `implication`, `derivation`, or `possibility` | `implication` |
+| `--type <type>` | No | `implication`, `derivation`, `possibility`, `requires`, `confounded-by`, `incompatible-with`, or `fails-when` | `implication` |
 
 Fails if: self-loop, duplicate edge, or source/target node not found.
 
@@ -168,7 +168,7 @@ npm run mpsi -- edge update P1-P3 --type possibility
 | Option | Description |
 |--------|-------------|
 | `--trust <n>` | New trust value |
-| `--type <type>` | New edge type |
+| `--type <type>` | New edge type (including constraint semantics) |
 
 ### edge delete \<id\>
 

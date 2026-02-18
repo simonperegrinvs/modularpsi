@@ -1,7 +1,7 @@
 import { Command } from 'commander';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { dirname } from 'path';
-import { jsonToGraph } from '../../io/json-io';
+import { graphToJson, jsonToGraph } from '../../io/json-io';
 import { loadAgentState, resetAgentState, saveAgentState } from '../../agent/state';
 import { loadAgentConfig, saveAgentConfig } from '../../agent/config';
 import { searchLiterature, type ApiSource } from '../../agent/search';
@@ -13,6 +13,7 @@ import {
   summarizeDiscovery,
 } from '../../agent/discovery';
 import { runDiscoveryIngestion } from '../../agent/discovery-run';
+import { extractClaimsForReference } from '../../agent/claims';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerAgentCommands(program: Command) {
@@ -264,6 +265,59 @@ export function registerAgentCommands(program: Command) {
         totalEvents: derived.totalEvents,
         processedCandidateIds: derived.processedCandidateIds.length,
         discoveryStats: derived.discoveryStats,
+      }, opts.format as OutputFormat));
+    });
+
+  const claims = agent.command('claims').description('Claim extraction and claim-level utilities');
+
+  claims
+    .command('extract')
+    .option('--ref-id <id>', 'Extract claims for a specific reference')
+    .option('--force', 'Re-extract even when abstract checksum is unchanged')
+    .description('Extract claim-level entries from reference abstracts')
+    .action((cmdOpts: { refId?: string; force?: boolean }) => {
+      const opts = program.opts();
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+
+      const targets = cmdOpts.refId
+        ? data.references.filter((r) => r.id === cmdOpts.refId)
+        : data.references;
+
+      if (cmdOpts.refId && targets.length === 0) {
+        console.error(`Reference ${cmdOpts.refId} not found`);
+        process.exit(1);
+      }
+
+      let updated = 0;
+      let skipped = 0;
+      let noAbstract = 0;
+      const details: Array<{ refId: string; updated: boolean; reason: string; claimsCount: number }> = [];
+
+      for (const ref of targets) {
+        const result = extractClaimsForReference(ref, { force: !!cmdOpts.force });
+        if (result.updated) updated++;
+        else skipped++;
+        if (result.reason === 'no-abstract') noAbstract++;
+        details.push({
+          refId: ref.id,
+          updated: result.updated,
+          reason: result.reason,
+          claimsCount: result.claimsCount,
+        });
+      }
+
+      if (updated > 0) {
+        writeFileSync(opts.file, graphToJson(data));
+      }
+
+      console.log(formatOutput({
+        status: 'ok',
+        totalReferences: targets.length,
+        updated,
+        skipped,
+        noAbstract,
+        force: !!cmdOpts.force,
+        details,
       }, opts.format as OutputFormat));
     });
 }

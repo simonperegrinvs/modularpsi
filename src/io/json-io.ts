@@ -77,6 +77,7 @@ export function jsonToGraph(json: string): GraphData {
     if (!ref.semanticScholarId) ref.semanticScholarId = '';
     if (!ref.openAlexId) ref.openAlexId = '';
     if (!ref.abstract) ref.abstract = '';
+    if (!ref.claims) ref.claims = [];
     if (!ref.processingStatus && ref.reviewStatus === 'approved') ref.processingStatus = 'approved';
     if (!ref.processingStatus && ref.reviewStatus === 'rejected') ref.processingStatus = 'rejected';
     if (!ref.processingStatus && ref.reviewStatus === 'draft') ref.processingStatus = 'imported-draft';

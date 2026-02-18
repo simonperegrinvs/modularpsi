@@ -577,6 +577,23 @@ Rebuild in-file agent discovery tracking (`processedCandidateIds`, `discoverySta
 npm run mpsi -- agent discovery reconcile-state
 ```
 
+### agent claims extract
+
+Extract claim-level entries from reference abstracts and store them on references.
+
+```
+npm run mpsi -- agent claims extract
+npm run mpsi -- agent claims extract --ref-id ref-123
+npm run mpsi -- agent claims extract --ref-id ref-123 --force
+```
+
+When no `--ref-id` is provided, extraction runs for all references.
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--ref-id <id>` | No | Extract for a specific reference | all references |
+| `--force` | No | Re-extract even if abstract checksum is unchanged | false |
+
 ---
 
 ### vault init

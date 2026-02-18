@@ -153,5 +153,6 @@ describe('jsonToGraph backfills', () => {
     });
     const g = jsonToGraph(json);
     expect(g.references[0].processingStatus).toBe('imported-draft');
+    expect(g.references[0].claims).toEqual([]);
   });
 });

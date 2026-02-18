@@ -145,6 +145,19 @@ export interface Provenance {
 export type ReviewStatus = 'draft' | 'pending-review' | 'approved' | 'rejected';
 export type NodeStatus = 'active' | 'stale' | 'merged';
 
+export type ClaimDirection = 'supports' | 'contradicts' | 'null';
+
+export interface ReferenceClaim {
+  claimId: string;
+  text: string;
+  direction: ClaimDirection;
+  contextTags: string[];
+  confidence: number;
+  rationale: string;
+  extractorModel: string;
+  createdAt: string;
+}
+
 // ── Reference ───────────────────────────────────────────────
 export interface Reference {
   id: string;
@@ -163,6 +176,7 @@ export interface Reference {
   semanticScholarId: string;
   openAlexId: string;
   abstract: string;
+  claims?: ReferenceClaim[];
   abstractChecksum?: string;
   discoveryCandidateId?: string;
   processingStatus?: 'imported-draft' | 'approved' | 'rejected';

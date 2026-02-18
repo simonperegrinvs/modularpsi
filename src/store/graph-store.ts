@@ -5,6 +5,7 @@ import type {
   GraphEdge,
   Category,
   Reference,
+  HypothesisCard,
   GraphData,
   GraphPrefix,
   RankDir,
@@ -42,7 +43,7 @@ export interface GraphState {
   edges: GraphEdge[];
   categories: Category[];
   references: Reference[];
-  hypotheses: GraphData['hypotheses'];
+  hypotheses: HypothesisCard[];
   prefix: GraphPrefix;
   rootId: string;
   lastNodeNumber: number;
@@ -91,6 +92,10 @@ export interface GraphState {
   updateNodePosition: (nodeId: string, x: number, y: number) => void;
   addCategory: (category: Category) => void;
   updateCategory: (id: string, updates: Partial<Category>) => void;
+  updateHypothesis: (
+    id: string,
+    updates: Partial<Pick<HypothesisCard, 'statement' | 'linkedNodeIds' | 'supportRefIds' | 'contradictRefIds' | 'constraintEdgeIds' | 'score' | 'status'>>,
+  ) => void;
   setFileHandle: (handle: FileSystemFileHandle | null) => void;
   getGraphData: () => GraphData;
 
@@ -385,6 +390,14 @@ export const useGraphStore = create<GraphState>()(
         set((state) => ({
           categories: state.categories.map((c) =>
             c.id === id ? { ...c, ...updates } : c,
+          ),
+        }));
+      },
+
+      updateHypothesis: (id, updates) => {
+        set((state) => ({
+          hypotheses: state.hypotheses.map((h) =>
+            h.id === id ? { ...h, ...updates, updatedAt: new Date().toISOString() } : h,
           ),
         }));
       },

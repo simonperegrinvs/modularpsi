@@ -707,6 +707,8 @@ npm run mpsi -- agent contradictions --hypothesis hyp-2
 | `--node <id>` | No | Filter node contradiction summary by node ID | mixed nodes only |
 | `--hypothesis <id>` | No | Filter hypothesis contradiction summary by ID | mixed hypotheses only |
 
+UI note: in the web app side panel, when no node/edge is selected, a **Review Queue** view now shows pending hypotheses and contradiction summaries for quick triage.
+
 ---
 
 ### vault init

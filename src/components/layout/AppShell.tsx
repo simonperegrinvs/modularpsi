@@ -7,6 +7,7 @@ import { Legend } from '../graph/Legend';
 import { NodePanel } from '../panels/NodePanel';
 import { EdgePanel } from '../panels/EdgePanel';
 import { SearchDialog } from '../panels/SearchDialog';
+import { ReviewPanel } from '../panels/ReviewPanel';
 import { useGraphStore } from '../../store/graph-store';
 import { undo, redo } from '../../store/history';
 import { saveGraphToFile, loadGraphFromFile } from '../../io/json-io';
@@ -138,9 +139,7 @@ export function AppShell() {
             {selectedNodeId && <NodePanel />}
             {selectedEdgeId && !selectedNodeId && <EdgePanel />}
             {!selectedNodeId && !selectedEdgeId && (
-              <div className="p-4 text-gray-500 text-sm">
-                Click a node or edge to view/edit its properties.
-              </div>
+              <ReviewPanel />
             )}
           </div>
         )}

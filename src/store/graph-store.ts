@@ -11,13 +11,18 @@ import type {
   InteractionMode,
   NodeType,
   EdgeType,
+  GraphFilterState,
+  FocusModeState,
+  ClusterState,
+  ClusterBounds,
+  ReviewStatus,
 } from '../domain/types';
 import {
   DEFAULT_CATEGORIES,
   NODE_TYPE_REGULAR,
+  NODE_TYPE_HOLDER,
   EDGE_TYPE_IMPLICATION,
   EDGE_TYPE_DERIVATION,
-  NODE_TYPE_HOLDER,
 } from '../domain/types';
 import { propagateTrust } from '../domain/trust';
 import {
@@ -26,7 +31,8 @@ import {
   canAddEdge,
   normalizeChooserEdges,
 } from '../domain/validation';
-import { computeLayout } from '../lib/layout';
+import { computeClusteredLayout } from '../lib/layout';
+import { applyFilters, findRecentChanges, computeNodeSizes } from '../lib/graph-utils';
 
 // ── Store State ────────────────────────────────────────────────
 
@@ -53,6 +59,19 @@ export interface GraphState {
   // File handle for saving
   fileHandle: FileSystemFileHandle | null;
 
+  // Filter / Focus / Cluster state
+  filters: GraphFilterState;
+  focusMode: FocusModeState;
+  clusterState: ClusterState;
+  pinnedNodeIds: Set<string>;
+
+  // Derived visible graph (recomputed via recomputeVisibleGraph)
+  visibleNodes: GraphNode[];
+  visibleEdges: GraphEdge[];
+  clusterBounds: ClusterBounds[];
+  recentChangeIds: Set<string>;
+  nodeSizes: Map<string, { width: number; height: number }>;
+
   // Actions
   loadGraph: (data: GraphData) => void;
   addNode: (parentId: string, name?: string, type?: NodeType) => string | null;
@@ -73,6 +92,17 @@ export interface GraphState {
   updateCategory: (id: string, updates: Partial<Category>) => void;
   setFileHandle: (handle: FileSystemFileHandle | null) => void;
   getGraphData: () => GraphData;
+
+  // Filter / Focus / Cluster actions
+  setFilter: (updates: Partial<GraphFilterState>) => void;
+  setEdgeTrustThreshold: (threshold: number) => void;
+  toggleCategoryVisibility: (catId: string) => void;
+  setFocusMode: (centerId: string | null, hops: number) => void;
+  toggleClusterCollapse: (catId: string) => void;
+  togglePinNode: (nodeId: string) => void;
+  unpinAllNodes: () => void;
+  setRecentChangeDays: (days: number) => void;
+  recomputeVisibleGraph: () => void;
 }
 
 // Helper to determine default edge type based on node type and prefix
@@ -82,6 +112,26 @@ function defaultEdgeType(sourceNode: GraphNode, prefix: GraphPrefix): EdgeType {
   }
   // type is NODE_TYPE_HOLDER here
   return EDGE_TYPE_IMPLICATION;
+}
+
+function defaultFilters(): GraphFilterState {
+  return {
+    visibleCategories: new Set<string>(),
+    edgeTrustThreshold: 0,
+    sourceApiFilter: new Set<string>(),
+    dateRange: { from: null, to: null },
+    nodeTypeFilter: new Set<NodeType>(),
+    reviewStatusFilter: new Set<ReviewStatus>(),
+    recentChangeDays: 0,
+  };
+}
+
+function defaultFocusMode(): FocusModeState {
+  return { enabled: false, centerId: null, hops: 2 };
+}
+
+function defaultClusterState(): ClusterState {
+  return { collapsedClusters: new Set<string>() };
 }
 
 export const useGraphStore = create<GraphState>()(
@@ -103,8 +153,20 @@ export const useGraphStore = create<GraphState>()(
       nodePositions: new Map(),
       fileHandle: null,
 
+      // Filter / Focus / Cluster state
+      filters: defaultFilters(),
+      focusMode: defaultFocusMode(),
+      clusterState: defaultClusterState(),
+      pinnedNodeIds: new Set<string>(),
+
+      // Derived visible graph
+      visibleNodes: [],
+      visibleEdges: [],
+      clusterBounds: [],
+      recentChangeIds: new Set<string>(),
+      nodeSizes: new Map(),
+
       loadGraph: (data: GraphData) => {
-        const layout = computeLayout(data.nodes, data.edges, get().rankDir);
         set({
           nodes: data.nodes,
           edges: data.edges,
@@ -113,12 +175,17 @@ export const useGraphStore = create<GraphState>()(
           prefix: data.prefix,
           rootId: data.rootId,
           lastNodeNumber: data.lastNodeNumber,
-          nodePositions: layout.nodePositions,
           selectedNodeId: null,
           selectedEdgeId: null,
           mode: 'normal',
           edgeSourceId: null,
+          filters: defaultFilters(),
+          focusMode: defaultFocusMode(),
+          clusterState: defaultClusterState(),
+          pinnedNodeIds: new Set<string>(),
         });
+        // Recompute after setting data
+        get().recomputeVisibleGraph();
       },
 
       addNode: (parentId: string, name?: string, type?: NodeType) => {
@@ -152,16 +219,15 @@ export const useGraphStore = create<GraphState>()(
         const newNodes = [...state.nodes, newNode];
         const newEdges = [...state.edges, newEdge];
         const { nodes, edges } = propagateTrust(newNodes, newEdges, state.rootId);
-        const layout = computeLayout(nodes, edges, state.rankDir);
 
         set({
           nodes,
           edges,
           lastNodeNumber: nextNum,
-          nodePositions: layout.nodePositions,
           selectedNodeId: newId,
           selectedEdgeId: null,
         });
+        get().recomputeVisibleGraph();
 
         return newId;
       },
@@ -177,15 +243,19 @@ export const useGraphStore = create<GraphState>()(
           (e) => e.sourceId !== nodeId && e.targetId !== nodeId,
         );
         const { nodes, edges } = propagateTrust(newNodes, newEdges, state.rootId);
-        const layout = computeLayout(nodes, edges, state.rankDir);
+
+        // Unpin deleted node
+        const newPinned = new Set(state.pinnedNodeIds);
+        newPinned.delete(nodeId);
 
         set({
           nodes,
           edges,
-          nodePositions: layout.nodePositions,
+          pinnedNodeIds: newPinned,
           selectedNodeId: state.selectedNodeId === nodeId ? null : state.selectedNodeId,
           selectedEdgeId: null,
         });
+        get().recomputeVisibleGraph();
         return { ok: true };
       },
 
@@ -228,15 +298,14 @@ export const useGraphStore = create<GraphState>()(
 
         const newEdges = [...state.edges, newEdge];
         const { nodes, edges } = propagateTrust(state.nodes, newEdges, state.rootId);
-        const layout = computeLayout(nodes, edges, state.rankDir);
 
         set({
           nodes,
           edges,
-          nodePositions: layout.nodePositions,
           selectedEdgeId: edgeId,
           selectedNodeId: null,
         });
+        get().recomputeVisibleGraph();
         return edgeId;
       },
 
@@ -247,14 +316,13 @@ export const useGraphStore = create<GraphState>()(
 
         const newEdges = state.edges.filter((e) => e.id !== edgeId);
         const { nodes, edges } = propagateTrust(state.nodes, newEdges, state.rootId);
-        const layout = computeLayout(nodes, edges, state.rankDir);
 
         set({
           nodes,
           edges,
-          nodePositions: layout.nodePositions,
           selectedEdgeId: state.selectedEdgeId === edgeId ? null : state.selectedEdgeId,
         });
+        get().recomputeVisibleGraph();
         return { ok: true };
       },
 
@@ -282,15 +350,12 @@ export const useGraphStore = create<GraphState>()(
       setMode: (mode) => set({ mode, edgeSourceId: null }),
       setEdgeSource: (nodeId) => set({ edgeSourceId: nodeId }),
       setRankDir: (dir) => {
-        const state = get();
-        const layout = computeLayout(state.nodes, state.edges, dir);
-        set({ rankDir: dir, nodePositions: layout.nodePositions });
+        set({ rankDir: dir });
+        get().recomputeVisibleGraph();
       },
 
       runLayout: () => {
-        const state = get();
-        const layout = computeLayout(state.nodes, state.edges, state.rankDir);
-        set({ nodePositions: layout.nodePositions });
+        get().recomputeVisibleGraph();
       },
 
       runTrustPropagation: () => {
@@ -303,7 +368,10 @@ export const useGraphStore = create<GraphState>()(
         const state = get();
         const newPositions = new Map(state.nodePositions);
         newPositions.set(nodeId, { x, y });
-        set({ nodePositions: newPositions });
+        // Auto-pin dragged nodes
+        const newPinned = new Set(state.pinnedNodeIds);
+        newPinned.add(nodeId);
+        set({ nodePositions: newPositions, pinnedNodeIds: newPinned });
       },
 
       addCategory: (category) => {
@@ -332,6 +400,123 @@ export const useGraphStore = create<GraphState>()(
           categories: state.categories,
           references: state.references,
         };
+      },
+
+      // ── Filter / Focus / Cluster Actions ──────────────────
+
+      setFilter: (updates) => {
+        const state = get();
+        set({ filters: { ...state.filters, ...updates } });
+        get().recomputeVisibleGraph();
+      },
+
+      setEdgeTrustThreshold: (threshold) => {
+        const state = get();
+        set({ filters: { ...state.filters, edgeTrustThreshold: threshold } });
+        get().recomputeVisibleGraph();
+      },
+
+      toggleCategoryVisibility: (catId) => {
+        const state = get();
+        const newCats = new Set(state.filters.visibleCategories);
+        if (newCats.has(catId)) {
+          newCats.delete(catId);
+        } else {
+          newCats.add(catId);
+        }
+        set({ filters: { ...state.filters, visibleCategories: newCats } });
+        get().recomputeVisibleGraph();
+      },
+
+      setFocusMode: (centerId, hops) => {
+        set({
+          focusMode: {
+            enabled: centerId !== null,
+            centerId,
+            hops,
+          },
+        });
+        get().recomputeVisibleGraph();
+      },
+
+      toggleClusterCollapse: (catId) => {
+        const state = get();
+        const newCollapsed = new Set(state.clusterState.collapsedClusters);
+        if (newCollapsed.has(catId)) {
+          newCollapsed.delete(catId);
+        } else {
+          newCollapsed.add(catId);
+        }
+        set({ clusterState: { collapsedClusters: newCollapsed } });
+        get().recomputeVisibleGraph();
+      },
+
+      togglePinNode: (nodeId) => {
+        const state = get();
+        const newPinned = new Set(state.pinnedNodeIds);
+        if (newPinned.has(nodeId)) {
+          newPinned.delete(nodeId);
+        } else {
+          newPinned.add(nodeId);
+        }
+        set({ pinnedNodeIds: newPinned });
+      },
+
+      unpinAllNodes: () => {
+        set({ pinnedNodeIds: new Set<string>() });
+        get().recomputeVisibleGraph();
+      },
+
+      setRecentChangeDays: (days) => {
+        const state = get();
+        set({ filters: { ...state.filters, recentChangeDays: days } });
+        get().recomputeVisibleGraph();
+      },
+
+      recomputeVisibleGraph: () => {
+        const state = get();
+        const { nodes: filtered, edges: filteredEdges } = applyFilters(
+          state.nodes,
+          state.edges,
+          state.filters,
+          state.focusMode,
+        );
+
+        const sizes = computeNodeSizes(filtered, filteredEdges);
+        const recentIds = findRecentChanges(
+          state.nodes,
+          state.edges,
+          state.references,
+          state.filters.recentChangeDays,
+        );
+
+        // Build pinned positions from current positions
+        const pinnedPositions = new Map<string, { x: number; y: number }>();
+        for (const nodeId of state.pinnedNodeIds) {
+          const pos = state.nodePositions.get(nodeId);
+          if (pos) pinnedPositions.set(nodeId, pos);
+        }
+
+        const layout = computeClusteredLayout(
+          filtered,
+          filteredEdges,
+          state.categories,
+          {
+            rankdir: state.rankDir,
+            collapsedClusters: state.clusterState.collapsedClusters,
+            pinnedPositions,
+            nodeSizeOverrides: sizes,
+          },
+        );
+
+        set({
+          visibleNodes: filtered,
+          visibleEdges: filteredEdges,
+          nodePositions: layout.nodePositions,
+          clusterBounds: layout.clusterBounds,
+          recentChangeIds: recentIds,
+          nodeSizes: sizes,
+        });
       },
     }),
     {

@@ -350,6 +350,49 @@ Brief output includes node descriptions when available.
 
 ---
 
+### discover run
+
+Run AI-assisted literature discovery from free/open APIs and write artifacts to vault.
+
+```
+npm run mpsi -- discover run
+npm run mpsi -- discover run --vault ~/data/modularpsi --max-queries 20 --per-source 8
+npm run mpsi -- discover run --dry-run
+```
+
+Sources queried: OpenAlex, Semantic Scholar, CrossRef, arXiv.
+
+Default vault base folder: `~/data/modularpsi`
+
+Artifacts written under: `~/data/modularpsi/runs/<date>/`
+
+### snapshot create
+
+Create an immutable graph snapshot under the vault.
+
+```
+npm run mpsi -- snapshot create
+npm run mpsi -- snapshot create --label before-discovery
+```
+
+### snapshot list
+
+List available snapshots in the vault.
+
+```
+npm run mpsi -- snapshot list --format table
+```
+
+### snapshot rollback \<snapshot\>
+
+Restore current graph file from a vault snapshot.
+
+```
+npm run mpsi -- snapshot rollback psi-map-20260218T181500Z.json
+```
+
+---
+
 ### import \<dir\>
 
 Import a legacy ModularPsi data directory containing `.mpsi`, `.graphml`, and optionally `.xsql` files.

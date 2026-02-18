@@ -57,6 +57,9 @@ See [CLI.md](CLI.md) for complete CLI documentation.
 | `ref unlink <ref-id> <node-id>` | Unlink reference from node |
 | `hypothesis rank` | Evidence-weighted hypothesis ranking |
 | `report brief` | Generate concise evidence briefs |
+| `discover run` | Daily API-driven literature discovery to graph + vault artifacts |
+| `snapshot create` | Snapshot current graph to vault |
+| `snapshot rollback <snapshot>` | Restore graph from vault snapshot |
 | `import <dir>` | Import legacy XML data directory |
 | `export dot` | Export as Graphviz DOT |
 | `export png` | Render as PNG (requires Graphviz) |

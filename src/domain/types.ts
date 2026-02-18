@@ -137,6 +137,18 @@ export interface Reference {
   qualityScore?: number; // 0..1
   effectDirection?: 'supports' | 'null' | 'challenges' | 'mixed';
   replicationStatus?: 'single' | 'independent-replication' | 'failed-replication' | 'multi-lab';
+  sourceApis?: string[];
+  externalIds?: {
+    doi?: string;
+    openAlex?: string;
+    semanticScholar?: string;
+    arxiv?: string;
+  };
+  ingestedAt?: string;
+  aiSummary?: string;
+  aiConfidence?: number; // 0..1
+  mappingConfidence?: number; // 0..1
+  sourceAliases?: string[];
 }
 
 // ── Default Categories (from legacy cats.mpsi) ──────────────

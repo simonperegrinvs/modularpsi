@@ -68,6 +68,9 @@ export function jsonToGraph(json: string): GraphData {
     if (ref.pageEnd === undefined) ref.pageEnd = 0;
     if (ref.volume === undefined) ref.volume = 0;
     if (!ref.domainTags) ref.domainTags = [];
+    if (!ref.sourceApis) ref.sourceApis = [];
+    if (!ref.externalIds) ref.externalIds = {};
+    if (!ref.sourceAliases) ref.sourceAliases = [];
   }
   return data;
 }

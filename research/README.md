@@ -1,6 +1,7 @@
 # 2026 Psi Literature Map (CLI Workflow)
 
 This folder contains a CLI-built research map that extends the legacy graph with modern psi and adjacent constraint literature.
+Daily discovery runs are designed to persist operational artifacts in vault base folder `~/data/modularpsi`.
 
 ## Artifacts
 
@@ -34,6 +35,9 @@ npm run mpsi -- -f research/psi-map-2026.json report brief --top 12 --max-refs 4
 
 # 6) Optional graph export
 npm run mpsi -- -f research/psi-map-2026.json export dot > research/psi-map-2026.dot
+
+# 7) Optional daily discovery run (writes to ~/data/modularpsi)
+npm run mpsi -- -f research/psi-map-2026.json discover run
 ```
 
 ## Interface Upgrades Used

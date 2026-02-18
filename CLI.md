@@ -707,6 +707,21 @@ npm run mpsi -- agent contradictions --hypothesis hyp-2
 | `--node <id>` | No | Filter node contradiction summary by node ID | mixed nodes only |
 | `--hypothesis <id>` | No | Filter hypothesis contradiction summary by ID | mixed hypotheses only |
 
+### agent metrics
+
+Generate calibration metrics report for the operational loop.
+
+```
+npm run mpsi -- agent metrics
+npm run mpsi -- agent metrics --period daily
+npm run mpsi -- agent metrics --period monthly --now 2026-02-18T00:00:00.000Z
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--period <period>` | No | `daily`, `weekly`, `monthly` | `weekly` |
+| `--now <iso>` | No | Override timestamp for reproducible reporting | system time |
+
 UI note: in the web app side panel, when no node/edge is selected, a **Review Queue** view now shows pending hypotheses and contradiction summaries for quick triage.
 
 ---

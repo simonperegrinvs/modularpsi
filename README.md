@@ -132,6 +132,7 @@ npm run mpsi -- review approve <id>
 | `agent claims extract` | Extract claim-level entries from reference abstracts |
 | `agent run-note generate` | Generate structured run notes in `vault/agent-runs` |
 | `agent contradictions` | Surface mixed support/contradiction evidence for nodes/hypotheses |
+| `agent metrics` | Generate daily/weekly/monthly calibration metrics report |
 | **Vault** | |
 | `vault init` | Initialize Obsidian vault directory |
 | `vault sync` | Sync graph to/from vault (`--direction`) |

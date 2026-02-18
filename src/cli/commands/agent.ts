@@ -9,6 +9,7 @@ import {
   deriveStateFromDiscovery,
   listDiscoveryCandidates,
   listDiscoveryDates,
+  readDiscoveryEvents,
   retryDiscoveryCandidate,
   summarizeDiscovery,
 } from '../../agent/discovery';
@@ -16,6 +17,7 @@ import { runDiscoveryIngestion } from '../../agent/discovery-run';
 import { extractClaimsForReference } from '../../agent/claims';
 import { writeRunNote } from '../../agent/run-notes';
 import { summarizeHypothesisContradictions, summarizeNodeContradictions } from '../../agent/contradictions';
+import { buildMetricsReport, type MetricsPeriod } from '../../agent/metrics';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerAgentCommands(program: Command) {
@@ -418,5 +420,24 @@ export function registerAgentCommands(program: Command) {
           mixedHypotheses: hypothesisSummary.length,
         },
       }, opts.format as OutputFormat));
+    });
+
+  agent
+    .command('metrics')
+    .option('--period <period>', 'daily|weekly|monthly', 'weekly')
+    .option('--now <iso>', 'Override current timestamp for reproducible reporting')
+    .description('Generate calibration metrics report for daily/weekly/monthly loop')
+    .action((cmdOpts: { period?: string; now?: string }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+      const period = (cmdOpts.period as MetricsPeriod) ?? 'weekly';
+      if (!['daily', 'weekly', 'monthly'].includes(period)) {
+        console.error(`Invalid period: ${period}`);
+        process.exit(1);
+      }
+      const events = readDiscoveryEvents(baseDir);
+      const report = buildMetricsReport(data, events, period, cmdOpts.now);
+      console.log(formatOutput(report, opts.format as OutputFormat));
     });
 }

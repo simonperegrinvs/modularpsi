@@ -166,6 +166,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Decision audit detail** — Hypothesis propose/triage writes decision metadata (`decisionType`, `aiRationale`, `scoreBreakdown`) to audit logs
 - **UI review surface** — Side panel now includes a hypothesis review queue and contradiction snapshot when nothing is selected
 - **Vault note enrichment** — Synced node/reference markdown now includes hypothesis links and contradiction summaries
+- **Constraint edge styling** — Graph canvas renders each constraint edge type with distinct dash patterns for quick visual differentiation
 
 ## Tech Stack
 

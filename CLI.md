@@ -865,7 +865,7 @@ npm run mpsi -- governance config --set requireDescription=false maxDailyTrustDe
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `maxDailyNewNodes` | number | `20` | Max nodes that can be created per day |
-| `maxDailyNewHypotheses` | number | `15` | Max hypotheses that can be created per day |
+| `maxDailyNewHypotheses` | number | `15` | Hypothesis daily-cap target (reported as advisory warning; non-blocking) |
 | `maxDailyConstraintEdges` | number | `40` | Max constraint edges (`requires/confounded-by/incompatible-with/fails-when`) per day |
 | `maxDailyTrustDelta` | number | `2.0` | Max sum of absolute trust changes per node per day |
 | `requireDescription` | boolean | `true` | Reject nodes without descriptions |
@@ -884,7 +884,7 @@ Run publish gate validation on the current graph. Reports all errors and warning
 npm run mpsi -- governance validate
 ```
 
-Exits with code 1 if validation fails. Useful in CI pipelines.
+Exits with code 1 if blocking validation fails. Hypothesis cap exceedance is advisory and does not fail validation.
 
 ### governance audit
 

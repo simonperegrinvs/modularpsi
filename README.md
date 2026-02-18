@@ -11,11 +11,11 @@ Knowledge graph editor for tracking and evaluating scientific evidence. Build di
 - **Trust propagation** — DFS-based trust calculation from root through edge weights, handles DAGs with cross-links
 - **Literature search** — Search Semantic Scholar, OpenAlex, and CrossRef APIs directly from the CLI
 - **Batch import** — Governance-controlled import with pre-publish validation gate, deduplication, provenance tracking, and JSONL audit trail
-- **Governance guardrails** — Daily node caps, required-field validation, duplicate rejection, configurable via `.mpsi-governance.json`
+- **Governance guardrails** — Daily node caps, required-field validation, duplicate rejection, configurable via `.mpsi-governance.json` (hypothesis cap is advisory)
 - **Snapshots & rollback** — Immutable dated snapshots with diff and rollback; auto-snapshot before every batch import
 - **Review workflow** — Agent-added content starts as `draft`, with approve/reject workflow for human oversight
 - **Obsidian vault sync** — Bidirectional sync to markdown notes with YAML frontmatter and `[[wikilinks]]`
-- **Agent loop** — Automated literature scanning via `run-agent.sh` with conservative auto-node growth controls
+- **Agent loop** — Automated literature scanning via `run-agent.sh` with conservative auto-node growth controls and resilient per-step execution/fallback
 - **Legacy import** — Import data from the original ModularPsi XML format (.mpsi, .graphml)
 - **Export** — Graphviz DOT and PNG export
 

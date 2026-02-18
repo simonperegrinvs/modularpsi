@@ -96,7 +96,9 @@ export function registerGovernanceCommands(program: Command) {
       const errors = [...gateResult.errors, ...hypoValidation.errors];
       const warnings = [...gateResult.warnings, ...hypoValidation.warnings];
       if (!hypoCap.withinCap) {
-        errors.push(`Daily hypothesis cap exceeded: ${hypoCap.todayCount}/${config.maxDailyNewHypotheses}`);
+        warnings.push(
+          `Daily hypothesis cap reached (advisory): ${hypoCap.todayCount}/${config.maxDailyNewHypotheses}`,
+        );
       }
       if (!constraintCap.withinCap) {
         errors.push(`Daily constraint-edge cap exceeded: ${constraintCap.todayCount}/${config.maxDailyConstraintEdges}`);

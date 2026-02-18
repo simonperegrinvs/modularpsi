@@ -77,6 +77,9 @@ export function jsonToGraph(json: string): GraphData {
     if (!ref.semanticScholarId) ref.semanticScholarId = '';
     if (!ref.openAlexId) ref.openAlexId = '';
     if (!ref.abstract) ref.abstract = '';
+    if (!ref.processingStatus && ref.reviewStatus === 'approved') ref.processingStatus = 'approved';
+    if (!ref.processingStatus && ref.reviewStatus === 'rejected') ref.processingStatus = 'rejected';
+    if (!ref.processingStatus && ref.reviewStatus === 'draft') ref.processingStatus = 'imported-draft';
   }
   if (!data.metadata) data.metadata = {};
   if (!data.metadata.schemaVersion) data.metadata.schemaVersion = CURRENT_SCHEMA_VERSION;

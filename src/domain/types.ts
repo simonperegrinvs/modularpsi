@@ -163,6 +163,9 @@ export interface Reference {
   semanticScholarId: string;
   openAlexId: string;
   abstract: string;
+  abstractChecksum?: string;
+  discoveryCandidateId?: string;
+  processingStatus?: 'imported-draft' | 'approved' | 'rejected';
   provenance?: Provenance;
   reviewStatus?: ReviewStatus;
 }

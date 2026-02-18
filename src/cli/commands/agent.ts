@@ -6,6 +6,7 @@ import { loadAgentState, resetAgentState, saveAgentState } from '../../agent/sta
 import { loadAgentConfig, saveAgentConfig } from '../../agent/config';
 import { searchLiterature, type ApiSource } from '../../agent/search';
 import {
+  deriveStateFromDiscovery,
   listDiscoveryCandidates,
   listDiscoveryDates,
   retryDiscoveryCandidate,
@@ -240,6 +241,29 @@ export function registerAgentCommands(program: Command) {
         totalResults: result.totalResults,
         eventsWritten: result.eventsWritten,
         byDecision: result.byDecision,
+      }, opts.format as OutputFormat));
+    });
+
+  discovery
+    .command('reconcile-state')
+    .description('Rebuild processed candidate IDs and discovery stats from the discovery registry')
+    .action(() => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const state = loadAgentState(opts.file);
+      const derived = deriveStateFromDiscovery(baseDir);
+      const nextState = {
+        ...state,
+        processedCandidateIds: derived.processedCandidateIds,
+        discoveryStats: derived.discoveryStats,
+      };
+      saveAgentState(opts.file, nextState);
+      console.log(formatOutput({
+        status: 'ok',
+        totalCandidates: derived.totalCandidates,
+        totalEvents: derived.totalEvents,
+        processedCandidateIds: derived.processedCandidateIds.length,
+        discoveryStats: derived.discoveryStats,
       }, opts.format as OutputFormat));
     });
 }

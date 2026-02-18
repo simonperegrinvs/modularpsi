@@ -119,4 +119,39 @@ describe('jsonToGraph backfills', () => {
     const g = jsonToGraph(json);
     expect(g.nodes[0].trust).toBe(0);
   });
+
+  it('maps reviewStatus to reference processingStatus when missing', () => {
+    const json = JSON.stringify({
+      version: 1,
+      prefix: 'P',
+      rootId: 'P1',
+      lastNodeNumber: 1,
+      nodes: [],
+      edges: [],
+      categories: [],
+      references: [
+        {
+          id: 'ref-1',
+          title: 'A',
+          authors: [],
+          year: 2024,
+          publication: '',
+          publisher: '',
+          citation: '',
+          pageStart: 0,
+          pageEnd: 0,
+          volume: 0,
+          description: '',
+          doi: '',
+          url: '',
+          semanticScholarId: '',
+          openAlexId: '',
+          abstract: '',
+          reviewStatus: 'draft',
+        },
+      ],
+    });
+    const g = jsonToGraph(json);
+    expect(g.references[0].processingStatus).toBe('imported-draft');
+  });
 });

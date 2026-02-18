@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
+  deriveStateFromDiscovery,
   computeCandidateId,
   createDiscoveryEventFromSearchResult,
   decisionForSearchResult,
@@ -114,6 +115,29 @@ describe('discovery registry', () => {
 
     const latest = listDiscoveryCandidates(baseDir, {});
     expect(latest.find((c) => c.candidateId === 'cand-1')?.decision).toBe('queued');
+  });
+
+  it('derives processed candidate IDs and aggregate stats from discovery events', () => {
+    const baseDir = createBaseDir();
+    writeDiscoveryEvent(baseDir, fakeEvent({ candidateId: 'cand-1', decision: 'queued' }));
+    writeDiscoveryEvent(baseDir, fakeEvent({
+      candidateId: 'cand-1',
+      decision: 'imported-draft',
+      timestamp: '2026-02-18T10:10:00.000Z',
+      action: 'decision-update',
+    }));
+    writeDiscoveryEvent(baseDir, fakeEvent({
+      candidateId: 'cand-2',
+      decision: 'duplicate',
+      timestamp: '2026-02-18T10:20:00.000Z',
+      action: 'decision-update',
+    }));
+
+    const derived = deriveStateFromDiscovery(baseDir);
+    expect(derived.totalCandidates).toBe(2);
+    expect(derived.discoveryStats.imported).toBe(1);
+    expect(derived.discoveryStats.duplicate).toBe(1);
+    expect(derived.processedCandidateIds).toEqual(expect.arrayContaining(['cand-1', 'cand-2']));
   });
 });
 

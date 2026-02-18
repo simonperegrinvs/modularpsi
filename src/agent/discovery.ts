@@ -188,6 +188,45 @@ export function summarizeDiscovery(baseDir: string, date?: string): {
   };
 }
 
+export function deriveStateFromDiscovery(baseDir: string): {
+  processedCandidateIds: string[];
+  discoveryStats: {
+    queued: number;
+    parsed: number;
+    imported: number;
+    duplicate: number;
+    rejected: number;
+  };
+  totalCandidates: number;
+  totalEvents: number;
+} {
+  const events = readDiscoveryEvents(baseDir);
+  const latest = latestEventsByCandidate(events);
+
+  const stats = {
+    queued: 0,
+    parsed: 0,
+    imported: 0,
+    duplicate: 0,
+    rejected: 0,
+  };
+
+  for (const item of latest) {
+    if (item.decision === 'queued') stats.queued++;
+    if (item.decision === 'parsed') stats.parsed++;
+    if (item.decision === 'imported-draft') stats.imported++;
+    if (item.decision === 'duplicate') stats.duplicate++;
+    if (item.decision === 'rejected') stats.rejected++;
+  }
+
+  return {
+    processedCandidateIds: latest.map((item) => item.candidateId).slice(-5000),
+    discoveryStats: stats,
+    totalCandidates: latest.length,
+    totalEvents: events.length,
+  };
+}
+
 export function retryDiscoveryCandidate(
   baseDir: string,
   candidateId: string,

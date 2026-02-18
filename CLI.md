@@ -569,6 +569,14 @@ When `--query` is omitted, queries are auto-generated from graph gaps (high-trus
 | `--year-max <year>` | No | Maximum publication year | none |
 | `--run-id <id>` | No | Run ID for provenance | auto-generated |
 
+### agent discovery reconcile-state
+
+Rebuild in-file agent discovery tracking (`processedCandidateIds`, `discoveryStats`) from the append-only discovery registry.
+
+```
+npm run mpsi -- agent discovery reconcile-state
+```
+
 ---
 
 ### vault init

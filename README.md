@@ -121,6 +121,7 @@ npm run mpsi -- review approve <id>
 | `agent discovery list` | List latest discovery candidates with filters |
 | `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
 | `agent discovery ingest` | Run gap/frontier discovery ingestion and append registry events |
+| `agent discovery reconcile-state` | Rebuild discovery state counters from registry events |
 | **Vault** | |
 | `vault init` | Initialize Obsidian vault directory |
 | `vault sync` | Sync graph to/from vault (`--direction`) |
@@ -141,6 +142,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
 - **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)
 - **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
+- **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references
 
 ## Tech Stack
 

@@ -113,7 +113,7 @@ export async function getCitations(
   if (!json.data) return [];
 
   return json.data
-    .map((item) => {
+    .map((item): LiteratureSearchResult | null => {
       const p = direction === 'citing' ? item.citingPaper : item.citedPaper;
       if (!p) return null;
       return {
@@ -125,7 +125,7 @@ export async function getCitations(
         url: p.url ?? undefined,
         semanticScholarId: p.paperId,
         citationCount: p.citationCount ?? 0,
-        source: 'semantic-scholar' as const,
+        source: 'semantic-scholar',
       };
     })
     .filter((r): r is LiteratureSearchResult => r !== null);

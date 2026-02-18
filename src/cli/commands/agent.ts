@@ -109,14 +109,15 @@ export function registerAgentCommands(program: Command) {
       if (cmdOpts.set) {
         const [key, ...rest] = cmdOpts.set.split('=');
         const value = rest.join('=');
+        const configRecord = config as unknown as Record<string, unknown>;
         if (key in config) {
-          const current = (config as Record<string, unknown>)[key];
+          const current = configRecord[key];
           if (typeof current === 'number') {
-            (config as Record<string, unknown>)[key] = parseFloat(value);
+            configRecord[key] = parseFloat(value);
           } else if (Array.isArray(current)) {
-            (config as Record<string, unknown>)[key] = value.split(',').map((s) => s.trim());
+            configRecord[key] = value.split(',').map((s) => s.trim());
           } else {
-            (config as Record<string, unknown>)[key] = value;
+            configRecord[key] = value;
           }
           saveAgentConfig(opts.file, config);
         }

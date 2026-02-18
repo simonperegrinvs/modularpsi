@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/cli", "src/domain", "src/io", "src/lib"]
+  "include": ["src/cli", "src/agent", "src/vault", "src/domain", "src/io", "src/lib"]
 }

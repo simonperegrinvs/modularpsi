@@ -153,14 +153,14 @@ export function getVaultStatus(vaultPath: string): {
     for (const catDir of readdirSync(nodesDir)) {
       categories.push(catDir);
       const catPath = join(nodesDir, catDir);
-      nodeFiles += readdirSync(catPath).filter((f) => f.endsWith('.md')).length;
+      nodeFiles += readdirSync(catPath).filter((f: string) => f.endsWith('.md')).length;
     }
   }
 
   const refsDir = join(vaultPath, 'references');
   if (existsSync(refsDir)) {
     for (const yearDir of readdirSync(refsDir)) {
-      refFiles += readdirSync(join(refsDir, yearDir)).filter((f) => f.endsWith('.md')).length;
+      refFiles += readdirSync(join(refsDir, yearDir)).filter((f: string) => f.endsWith('.md')).length;
     }
   }
 

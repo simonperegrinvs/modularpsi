@@ -33,6 +33,7 @@ export function createEmptyGraph(prefix: 'P' | 'M' = 'P'): GraphData {
     edges: [],
     categories: [...DEFAULT_CATEGORIES],
     references: [],
+    hypotheses: [],
     metadata: {
       schemaVersion: CURRENT_SCHEMA_VERSION,
     },
@@ -82,6 +83,8 @@ export function jsonToGraph(json: string): GraphData {
     if (!ref.processingStatus && ref.reviewStatus === 'rejected') ref.processingStatus = 'rejected';
     if (!ref.processingStatus && ref.reviewStatus === 'draft') ref.processingStatus = 'imported-draft';
   }
+  // Ensure hypotheses collection exists
+  if (!data.hypotheses) data.hypotheses = [];
   if (!data.metadata) data.metadata = {};
   if (!data.metadata.schemaVersion) data.metadata.schemaVersion = CURRENT_SCHEMA_VERSION;
   return data;

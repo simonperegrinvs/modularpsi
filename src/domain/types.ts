@@ -108,6 +108,7 @@ export interface GraphData {
   edges: GraphEdge[];
   categories: Category[];
   references: Reference[];
+  hypotheses: HypothesisCard[];
   metadata?: {
     schemaVersion?: number;
     lastAgentRun?: string;
@@ -182,6 +183,22 @@ export interface Reference {
   processingStatus?: 'imported-draft' | 'approved' | 'rejected';
   provenance?: Provenance;
   reviewStatus?: ReviewStatus;
+}
+
+export type HypothesisStatus = 'draft' | 'pending-review' | 'approved' | 'rejected';
+
+export interface HypothesisCard {
+  id: string;
+  statement: string;
+  linkedNodeIds: string[];
+  supportRefIds: string[];
+  contradictRefIds: string[];
+  constraintEdgeIds: string[];
+  score: number;
+  status: HypothesisStatus;
+  createdAt: string;
+  updatedAt?: string;
+  createdByRunId?: string;
 }
 
 // ── Graph Filter / Focus / Cluster State ────────────────────

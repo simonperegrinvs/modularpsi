@@ -374,6 +374,54 @@ npm run mpsi -- review reject P5
 
 ---
 
+### hypothesis list
+
+List hypothesis cards, optionally filtered by status.
+
+```
+npm run mpsi -- hypothesis list
+npm run mpsi -- hypothesis list --status pending-review
+```
+
+### hypothesis show \<id\>
+
+Show full details for a hypothesis card.
+
+```
+npm run mpsi -- hypothesis show hyp-1
+```
+
+### hypothesis add
+
+Add a new hypothesis card.
+
+```
+npm run mpsi -- hypothesis add --statement "Ganzfeld signal depends on strict blinding"
+npm run mpsi -- hypothesis add --statement "Constraint candidate" --linked-nodes P6,P11 --support-refs ref-1,ref-2 --score 0.62
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--statement <text>` | Yes | Hypothesis statement | |
+| `--linked-nodes <ids>` | No | Comma-separated linked node IDs | empty |
+| `--support-refs <ids>` | No | Comma-separated supporting ref IDs | empty |
+| `--contradict-refs <ids>` | No | Comma-separated contradicting ref IDs | empty |
+| `--constraint-edges <ids>` | No | Comma-separated constraint edge IDs | empty |
+| `--score <n>` | No | Initial score | `0` |
+| `--status <status>` | No | `draft`, `pending-review`, `approved`, `rejected` | `draft` |
+| `--run-id <id>` | No | Provenance run ID | |
+
+### hypothesis update \<id\>
+
+Update one or more fields on an existing hypothesis card.
+
+```
+npm run mpsi -- hypothesis update hyp-1 --status pending-review --score 0.78
+npm run mpsi -- hypothesis update hyp-1 --contradict-refs ref-9
+```
+
+---
+
 ### batch import
 
 Batch import nodes, references, and edges from a JSON file with publish gate validation, governance, and audit trail.

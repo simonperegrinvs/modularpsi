@@ -42,6 +42,7 @@ export interface GraphState {
   edges: GraphEdge[];
   categories: Category[];
   references: Reference[];
+  hypotheses: GraphData['hypotheses'];
   prefix: GraphPrefix;
   rootId: string;
   lastNodeNumber: number;
@@ -142,6 +143,7 @@ export const useGraphStore = create<GraphState>()(
       edges: [],
       categories: [...DEFAULT_CATEGORIES],
       references: [],
+      hypotheses: [],
       prefix: 'P' as GraphPrefix,
       rootId: 'P1',
       lastNodeNumber: 0,
@@ -172,6 +174,7 @@ export const useGraphStore = create<GraphState>()(
           edges: data.edges,
           categories: data.categories,
           references: data.references,
+          hypotheses: data.hypotheses,
           prefix: data.prefix,
           rootId: data.rootId,
           lastNodeNumber: data.lastNodeNumber,
@@ -399,6 +402,7 @@ export const useGraphStore = create<GraphState>()(
           edges: state.edges,
           categories: state.categories,
           references: state.references,
+          hypotheses: state.hypotheses,
         };
       },
 

@@ -15,6 +15,7 @@ describe('createEmptyGraph', () => {
     expect(g.edges).toHaveLength(0);
     expect(g.categories.length).toBeGreaterThan(0);
     expect(g.references).toHaveLength(0);
+    expect(g.hypotheses).toEqual([]);
     expect(g.metadata?.schemaVersion).toBe(1);
   });
 
@@ -89,6 +90,7 @@ describe('jsonToGraph backfills', () => {
     const g = jsonToGraph(json);
     expect(g.categories.length).toBeGreaterThan(0);
     expect(g.references).toEqual([]);
+    expect(g.hypotheses).toEqual([]);
   });
 
   it('backfills missing metadata.schemaVersion for legacy graphs', () => {

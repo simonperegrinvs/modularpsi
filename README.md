@@ -93,6 +93,11 @@ npm run mpsi -- review approve <id>
 | `review pending` | List draft/pending-review items |
 | `review approve <id>` | Approve a node or reference |
 | `review reject <id>` | Reject a node or reference |
+| **Hypotheses** | |
+| `hypothesis list` | List hypothesis cards (`--status` filter) |
+| `hypothesis show <id>` | Show a hypothesis card |
+| `hypothesis add` | Add a hypothesis card |
+| `hypothesis update <id>` | Update statement/links/score/status |
 | **Batch** | |
 | `batch import` | Import from JSON with publish gate, dedup, provenance, audit trail |
 | **Governance** | |
@@ -145,6 +150,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
 - **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references
 - **Claim-level extraction** — References can store `claims[]` with direction/context/confidence derived from abstracts
+- **Hypothesis cards** — Structured candidate correlations/constraints with support/contradiction links and triage status
 
 ## Tech Stack
 

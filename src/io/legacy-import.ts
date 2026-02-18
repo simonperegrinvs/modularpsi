@@ -326,5 +326,6 @@ export function importLegacyData(files: Map<string, string>): GraphData {
     edges: propagated.edges,
     categories,
     references,
+    hypotheses: [],
   };
 }

@@ -1,0 +1,949 @@
+{
+  "version": 1,
+  "prefix": "P",
+  "rootId": "P1",
+  "lastNodeNumber": 46,
+  "nodes": [
+    {
+      "id": "P12",
+      "name": "Radiational Psi",
+      "description": "Psi have field properties and have radiational behavior",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.2,
+      "referenceIds": []
+    },
+    {
+      "id": "P13",
+      "name": "Non-local Psi",
+      "description": "Psi have non-local behavior.",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P14",
+      "name": "Unconscious Psi",
+      "description": "Psi is a unconscious process",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P15",
+      "name": "Magnetic Influence",
+      "description": "Magnetism have influence over psi phenomena",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P16",
+      "name": "Friend Psi",
+      "description": "Nonintentional psi would be greater when helping a friend than when helping a stranger.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.12800000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P17",
+      "name": "Cost-effetive psi",
+      "description": "Nonintentional psi would be greater when the cost of helping was low than when the cost of helping was high.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.12800000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P18",
+      "name": "Psi Conductive Variables",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P19",
+      "name": "Good Luck Belief",
+      "description": "Belief in good luck is psi conductive.",
+      "categoryId": "cultural",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P20",
+      "name": "Unintentional Psi",
+      "description": "Psi phenomena can occour unintentionaly",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P21",
+      "name": "Openness",
+      "description": "Openness would correlate positively with psi.",
+      "categoryId": "cultural",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P22",
+      "name": "Defensiveness (negative)",
+      "description": "Neuroticism/Defensiveness would correlate negatively with psi.",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P23",
+      "name": "ELF",
+      "description": "",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.16000000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P25",
+      "name": "Holographic",
+      "description": "",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P26",
+      "name": "Sensorial Noise (negative)",
+      "description": "",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P27",
+      "name": "Belief in Psi",
+      "description": "Belief in Psi is psi conductive.",
+      "categoryId": "cultural",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P28",
+      "name": "Extraversion",
+      "description": "Extraversion is psi conductive",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P29",
+      "name": "Defensiveness",
+      "description": "Defensiveness if psi-conductive",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P30",
+      "name": "Goal-Oriented",
+      "description": "Psi process is intrinsically goal-oriented\r\r\r\r\r\r\r\r\r\r\r\r\nand that it, thereby, acts independently of task complexity",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P31",
+      "name": "Tag Scanning",
+      "description": "The activity of extrasensorially scanning the potentially relevant environment for potentially relevant information would, even if done unconsciously, seem to be formidable and costly in terms of processing capacity.",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P32",
+      "name": "Needsubserving",
+      "description": "Nonintentional psi is needsubserving",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.48,
+      "referenceIds": []
+    },
+    {
+      "id": "P34",
+      "name": "Psychosis",
+      "description": "Paranormal experiences are sign of psychosis",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.4,
+      "referenceIds": []
+    },
+    {
+      "id": "P35",
+      "name": "Causality",
+      "description": "a paranormal belief system could for some people, be used, as a cognitive defence against acceptance of the uncertainty of life events by creating meaningfulness out of coincidences or it could be indicative of psychopathology.",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "2"
+      ]
+    },
+    {
+      "id": "P36",
+      "name": "Cognitive Bias",
+      "description": "paranormal belief systems help sustain psychic integrity and to do so they operate in practice as a cognitive bias",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "3"
+      ]
+    },
+    {
+      "id": "P37",
+      "name": "Illusion of Control",
+      "description": "Persons who believe they can control an event they in reality cannot control, might then be expected to show a healthier psychological\nfunctioning than persons who (rightly) do not think they can control chance events",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "4"
+      ]
+    },
+    {
+      "id": "P38",
+      "name": "Reasoning Skills",
+      "description": "It has been suggested that paranormal beliefs might be correlated with reasoning ability, especially when the reasoning task contains apparent paranormal content",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P39",
+      "name": "Tachyon",
+      "description": "",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.08000000000000002,
+      "referenceIds": []
+    },
+    {
+      "id": "P40",
+      "name": "Local Sideral Time",
+      "description": "The local sidereal time (the time at which a particular part of the sky is directly overhead) may correlate with psi score",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P41",
+      "name": "Shannon Entropy",
+      "description": "The gradient of Shannon entropy of targets (images or videos) may correlate with psi",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P42",
+      "name": "Quality of Randomness",
+      "description": "The Quality of Randomness of the target may affect psi score.",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P1",
+      "name": "Second Proposition",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P43",
+      "name": "Emotional Bound",
+      "description": "Emotional bount between people is conductive to \"extrassensorial communication\"",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P2",
+      "name": "Non-Psi Hypothesis",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P44",
+      "name": "Inacurate Recall",
+      "description": "Cognitive Psychologists that people recall of everyday events can be highly inaccurate. Once a particular interpretation is placed in the event, features of the experience consistent with that interpretation tend to be recalled but inconsistente features will tend to be forgotten",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P3",
+      "name": "Psi Hypothesis",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P45",
+      "name": "Subconcious perception",
+      "description": "",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P5",
+      "name": "Human Psi",
+      "description": "Some humans can produce psi phenomena.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P46",
+      "name": "New Proposition",
+      "description": "",
+      "categoryId": "na",
+      "keywords": [],
+      "type": 0,
+      "trust": -1,
+      "referenceIds": []
+    },
+    {
+      "id": "P6",
+      "name": "All Humans",
+      "description": "All Humans can produce psi phenomena.\r\r\r\r\r\r\r\r\r\r\r\n\r\r\r\r\r\r\r\r\r\r\r\nSome surveys points that a great percentage of people acknoledged some psi experience.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P7",
+      "name": "Gifted Human",
+      "description": "Only some gifted people can produce psi phenomena",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.16000000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P8",
+      "name": "Animal Psi",
+      "description": "Some animals can produce psi phenomena",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P9",
+      "name": "Evolutive Psi",
+      "description": "Psi was created in the evolutionary process",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    }
+  ],
+  "edges": [
+    {
+      "id": "P12-P39",
+      "sourceId": "P12",
+      "targetId": "P39",
+      "trust": 0.4,
+      "type": 0,
+      "combinedTrust": 0.08000000000000002
+    },
+    {
+      "id": "P12-P23",
+      "sourceId": "P12",
+      "targetId": "P23",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.16000000000000003
+    },
+    {
+      "id": "P13-P25",
+      "sourceId": "P13",
+      "targetId": "P25",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P14-P9",
+      "sourceId": "P14",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P14-P31",
+      "sourceId": "P14",
+      "targetId": "P31",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P18-P42",
+      "sourceId": "P18",
+      "targetId": "P42",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P43",
+      "sourceId": "P18",
+      "targetId": "P43",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P18-P26",
+      "sourceId": "P18",
+      "targetId": "P26",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P18-P27",
+      "sourceId": "P18",
+      "targetId": "P27",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P18-P28",
+      "sourceId": "P18",
+      "targetId": "P28",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P29",
+      "sourceId": "P18",
+      "targetId": "P29",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P19",
+      "sourceId": "P18",
+      "targetId": "P19",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P21",
+      "sourceId": "P18",
+      "targetId": "P21",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P22",
+      "sourceId": "P18",
+      "targetId": "P22",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P40",
+      "sourceId": "P18",
+      "targetId": "P40",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P41",
+      "sourceId": "P18",
+      "targetId": "P41",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P20-P32",
+      "sourceId": "P20",
+      "targetId": "P32",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.48
+    },
+    {
+      "id": "P20-P9",
+      "sourceId": "P20",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P34-P46",
+      "sourceId": "P34",
+      "targetId": "P46",
+      "trust": -1,
+      "type": 0,
+      "combinedTrust": -1
+    },
+    {
+      "id": "P1-P2",
+      "sourceId": "P1",
+      "targetId": "P2",
+      "trust": 1,
+      "type": 0,
+      "combinedTrust": 1
+    },
+    {
+      "id": "P1-P3",
+      "sourceId": "P1",
+      "targetId": "P3",
+      "trust": 1,
+      "type": 0,
+      "combinedTrust": 1
+    },
+    {
+      "id": "P2-P44",
+      "sourceId": "P2",
+      "targetId": "P44",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P34",
+      "sourceId": "P2",
+      "targetId": "P34",
+      "trust": 0.4,
+      "type": 0,
+      "combinedTrust": 0.4
+    },
+    {
+      "id": "P2-P45",
+      "sourceId": "P2",
+      "targetId": "P45",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P35",
+      "sourceId": "P2",
+      "targetId": "P35",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P36",
+      "sourceId": "P2",
+      "targetId": "P36",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P37",
+      "sourceId": "P2",
+      "targetId": "P37",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P38",
+      "sourceId": "P2",
+      "targetId": "P38",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P30",
+      "sourceId": "P3",
+      "targetId": "P30",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P20",
+      "sourceId": "P3",
+      "targetId": "P20",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P12",
+      "sourceId": "P3",
+      "targetId": "P12",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.2
+    },
+    {
+      "id": "P3-P13",
+      "sourceId": "P3",
+      "targetId": "P13",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P14",
+      "sourceId": "P3",
+      "targetId": "P14",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P15",
+      "sourceId": "P3",
+      "targetId": "P15",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P18",
+      "sourceId": "P3",
+      "targetId": "P18",
+      "trust": 1,
+      "type": 0,
+      "combinedTrust": 1
+    },
+    {
+      "id": "P3-P5",
+      "sourceId": "P3",
+      "targetId": "P5",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P8",
+      "sourceId": "P3",
+      "targetId": "P8",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P5-P6",
+      "sourceId": "P5",
+      "targetId": "P6",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P5-P7",
+      "sourceId": "P5",
+      "targetId": "P7",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.16000000000000003
+    },
+    {
+      "id": "P6-P9",
+      "sourceId": "P6",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.5120000000000001
+    },
+    {
+      "id": "P8-P9",
+      "sourceId": "P8",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P9-P16",
+      "sourceId": "P9",
+      "targetId": "P16",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.12800000000000003
+    },
+    {
+      "id": "P9-P17",
+      "sourceId": "P9",
+      "targetId": "P17",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.12800000000000003
+    }
+  ],
+  "categories": [
+    {
+      "id": "general",
+      "name": "General Aspects of Psi",
+      "color": "#000000",
+      "description": ""
+    },
+    {
+      "id": "bio",
+      "name": "Fisiological Aspects of Psi",
+      "color": "#00ff00",
+      "description": ""
+    },
+    {
+      "id": "physical",
+      "name": "Physical Aspects of Psi",
+      "color": "#0000ff",
+      "description": ""
+    },
+    {
+      "id": "psichological",
+      "name": "Psychological Aspects of Psi",
+      "color": "#ff0000",
+      "description": ""
+    },
+    {
+      "id": "cultural",
+      "name": "Cultural Aspects of Psi",
+      "color": "#00ffff",
+      "description": ""
+    },
+    {
+      "id": "na",
+      "name": "N/C",
+      "color": "#b4b4b4",
+      "description": ""
+    }
+  ],
+  "references": [
+    {
+      "id": "1",
+      "title": "Parapsychological phenomena and the absorption domain",
+      "authors": [
+        "Irwin, Harvey J."
+      ],
+      "year": 1985,
+      "publication": "Journal of the American Society for Psychical Research",
+      "publisher": "",
+      "citation": "Irwin, Harvey J. (1985). Parapsychological phenomena and the absorption domain. Journal of the American Society for Psychical Research, 79, 1-11.",
+      "pageStart": 1,
+      "pageEnd": 11,
+      "volume": 79
+    },
+    {
+      "id": "2",
+      "title": "Magical thinking in formal operational adults",
+      "authors": [
+        "Lesser, R.",
+        "Paisner, M."
+      ],
+      "year": 1985,
+      "publication": "Human Development",
+      "publisher": "",
+      "citation": "Lesser, R. & Paisner, M. (1985). Magical thinking in formal operational adults.Human Development, 28, 57-70.",
+      "pageStart": 57,
+      "pageEnd": 70,
+      "volume": 28
+    },
+    {
+      "id": "3",
+      "title": "Wings of Illusion",
+      "authors": [
+        "Schumaker, J. F."
+      ],
+      "year": 1990,
+      "publication": "",
+      "publisher": "Polity Press",
+      "citation": "Schumaker, J.F. (1990). Wings of Illusion. Cambridge: Polity Press.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0
+    },
+    {
+      "id": "4",
+      "title": "Illusion of control for self and others in depressed and non-depressed college students",
+      "authors": [
+        "Martin, D.J.",
+        "Abramson, L.Y.",
+        "Alloy, L.B."
+      ],
+      "year": 1984,
+      "publication": "Journal of Personality and Social Psychology",
+      "publisher": "",
+      "citation": "Martin, D.J. ; Abramson, L.Y. & Alloy, L.B. (1984). Illusion of control for self and others in depressed and non-depressed college students.Journal of Personality and Social Psychology, 46, 125-136.",
+      "pageStart": 125,
+      "pageEnd": 136,
+      "volume": 46
+    },
+    {
+      "id": "5",
+      "title": "Reasoning errors and belief in the paranormal",
+      "authors": [],
+      "year": 1985,
+      "publication": "Journal of Social Psychology",
+      "publisher": "",
+      "citation": "Wierzbicki, M. (1985). Reasoning errors and belief in the paranormal.Journal of Social Psychology, 125, 489-494.",
+      "pageStart": 489,
+      "pageEnd": 494,
+      "volume": 125
+    },
+    {
+      "id": "6",
+      "title": "Diagnostic and Statistical Manual of Mental\r\nDisorders",
+      "authors": [],
+      "year": 1994,
+      "publication": "",
+      "publisher": "American Psychiatric Association",
+      "citation": "American Psychiatric Association. (1994). Diagnostic and Statistical Manual of Mental Disorders.Washington, DC:American Psychiatric Association.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0
+    },
+    {
+      "id": "7",
+      "title": "Conscious vs. unconscious clairvoyance in the context of an academic examination",
+      "authors": [
+        "Braud, W. G."
+      ],
+      "year": 1975,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Braud, W. G. (1975). Conscious vs. unconscious clairvoyance in the context of an academic examination.Journal of Parapsychology, 39, 277-288.",
+      "pageStart": 277,
+      "pageEnd": 288,
+      "volume": 39
+    },
+    {
+      "id": "8",
+      "title": "Comparison of PK action on two different random number generators",
+      "authors": [
+        "Schmidt, H."
+      ],
+      "year": 1974,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Schmidt, H. (1974). Comparison of PK action on two different random number generators.Journal of Parapsychology, 38, 47-55.",
+      "pageStart": 47,
+      "pageEnd": 55,
+      "volume": 38
+    },
+    {
+      "id": "9",
+      "title": "Toward a mathematical theory of psi",
+      "authors": [
+        "Schmidt, H."
+      ],
+      "year": 1975,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Schmidt, H. (1975). Toward a mathematical theory of psi.Journal of Parapsychology, 69, 301-319.",
+      "pageStart": 301,
+      "pageEnd": 319,
+      "volume": 69
+    },
+    {
+      "id": "10",
+      "title": "Experimental study of complexity dependence in precognition",
+      "authors": [
+        "Vassy, Z."
+      ],
+      "year": 1986,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Vassy, Z. (1986). Experimental study of complexity dependence in precognition.Journal of Parapsychology, 50, 235-270.",
+      "pageStart": 235,
+      "pageEnd": 270,
+      "volume": 50
+    }
+  ]
+}

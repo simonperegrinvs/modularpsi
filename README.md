@@ -15,7 +15,7 @@ Knowledge graph editor for tracking and evaluating scientific evidence. Build di
 - **Snapshots & rollback** — Immutable dated snapshots with diff and rollback; auto-snapshot before every batch import
 - **Review workflow** — Agent-added content starts as `draft`, with approve/reject workflow for human oversight
 - **Obsidian vault sync** — Bidirectional sync to markdown notes with YAML frontmatter and `[[wikilinks]]`
-- **Agent loop** — Automated literature scanning via `run-agent.sh` (Claude Code CLI cron job)
+- **Agent loop** — Automated literature scanning via `run-agent.sh` with conservative auto-node growth controls
 - **Legacy import** — Import data from the original ModularPsi XML format (.mpsi, .graphml)
 - **Export** — Graphviz DOT and PNG export
 
@@ -41,10 +41,11 @@ See [CLI.md](CLI.md) for complete CLI documentation.
 
 ### Agent Loop
 
-Run a daily literature scan that finds gaps, searches APIs, and imports new references:
+Run a daily literature scan that finds gaps, searches APIs, imports references, and can conservatively grow new nodes in real mode:
 
 ```bash
-./run-agent.sh                # Manual one-off run
+./run-agent.sh                # Manual one-off real run
+RUN_MODE=smoke ./run-agent.sh # Smoke run (node growth disabled)
 # Or add to crontab:
 # 0 8 * * * /path/to/run-agent.sh
 ```
@@ -130,7 +131,7 @@ npm run mpsi -- review approve <id>
 | `agent discovery list` | List latest discovery candidates with filters |
 | `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
 | `agent discovery ingest` | Run gap/frontier/citation discovery ingestion and append registry events |
-| `agent discovery import` | Import queued discovery candidates as draft references |
+| `agent discovery import` | Import queued discovery candidates as draft references, with optional auto-node growth |
 | `agent discovery reconcile-state` | Rebuild discovery state counters from registry events |
 | `agent claims extract` | Extract claim-level entries from reference abstracts |
 | `agent run-note generate` | Generate structured run notes in `vault/agent-runs` |
@@ -156,6 +157,8 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
 - **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
 - **Auto-scope filter** — Discovery auto-import can reject out-of-scope candidates using include/exclude keywords plus node-link scoring
+- **Auto node growth** — Discovery import can create conservative node/edge additions with duplicate guards and governance checks
+- **Structured skip reporting** — Node growth reports machine-readable skip reasons when no nodes are created
 - **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)
 - **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
 - **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references

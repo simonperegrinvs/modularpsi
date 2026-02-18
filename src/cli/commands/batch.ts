@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { readFileSync, writeFileSync, copyFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import type { GraphData, GraphNode, GraphEdge, Reference, Provenance, ReviewStatus } from '../../domain/types';
+import type { GraphData, GraphNode, Reference, Provenance, ReviewStatus } from '../../domain/types';
 import { parseNodeType, parseEdgeType, EDGE_TYPE_IMPLICATION } from '../../domain/types';
 import { propagateTrust } from '../../domain/trust';
 import { canAddEdge } from '../../domain/validation';

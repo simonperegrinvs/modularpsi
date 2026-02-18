@@ -1,5 +1,5 @@
-import type { GraphNode, GraphEdge, Reference, GraphData } from '../domain/types';
-import { nodeTypeLabel, edgeTypeLabel } from '../domain/types';
+import type { GraphNode, Reference, GraphData } from '../domain/types';
+import { nodeTypeLabel } from '../domain/types';
 import { serializeFrontmatter } from './frontmatter';
 
 function slugify(s: string): string {

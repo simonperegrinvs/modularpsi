@@ -1,5 +1,5 @@
 import { mkdirSync, appendFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { join } from 'path';
 
 export interface AuditEntry {
   timestamp: string;

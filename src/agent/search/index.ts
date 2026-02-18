@@ -1,5 +1,5 @@
 import type { LiteratureSearchResult, SearchOptions } from './types';
-import { searchSemanticScholar, resolveByDoi, getCitations } from './semantic-scholar';
+import { searchSemanticScholar, resolveByDoi } from './semantic-scholar';
 import { searchOpenAlex } from './openalex';
 import { resolveDoiCrossRef } from './crossref';
 

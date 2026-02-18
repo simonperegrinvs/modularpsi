@@ -4,6 +4,7 @@ import { graphToJson, jsonToGraph } from '../../io/json-io';
 import { createHypothesis } from '../../domain/hypothesis';
 import type { HypothesisStatus } from '../../domain/types';
 import { triageHypotheses } from '../../agent/hypothesis-scoring';
+import { runHypothesisLoop } from '../../agent/hypothesis-loop';
 import { formatOutput, type OutputFormat } from '../format';
 
 function parseList(value?: string): string[] {
@@ -152,6 +153,33 @@ export function registerHypothesisCommands(program: Command) {
         selectedCount: result.selected.length,
         promoted: result.promoted,
         selected: result.selected,
+      }, opts.format as OutputFormat));
+    });
+
+  hypothesis
+    .command('propose')
+    .option('--top <n>', 'Maximum number of proposed hypothesis cards', '5')
+    .option('--run-id <id>', 'Run ID for provenance')
+    .description('Run generator/skeptic/judge loop to propose new hypothesis cards from claim evidence')
+    .action((cmdOpts: { top?: string; runId?: string }) => {
+      const opts = program.opts();
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+      const top = cmdOpts.top ? parseInt(cmdOpts.top, 10) : 5;
+
+      const result = runHypothesisLoop(data, {
+        top,
+        runId: cmdOpts.runId,
+      });
+
+      data.hypotheses.push(...result.accepted);
+      writeFileSync(opts.file, graphToJson(data));
+
+      console.log(formatOutput({
+        status: 'ok',
+        proposed: result.accepted.length,
+        rejected: result.rejected.length,
+        accepted: result.accepted,
+        rejectedDetails: result.rejected,
       }, opts.format as OutputFormat));
     });
 }

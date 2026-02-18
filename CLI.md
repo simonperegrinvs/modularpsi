@@ -440,6 +440,20 @@ npm run mpsi -- hypothesis triage --top 5 --promote
 | `--min-score <n>` | No | Score threshold (0-1) | `0.6` |
 | `--promote` | No | Promote selected drafts to `pending-review` | false |
 
+### hypothesis propose
+
+Run a generator/skeptic/judge loop over claim-backed nodes and propose new draft hypothesis cards.
+
+```
+npm run mpsi -- hypothesis propose
+npm run mpsi -- hypothesis propose --top 3 --run-id run-20260218-a
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--top <n>` | No | Max number of generated proposals | `5` |
+| `--run-id <id>` | No | Provenance run ID for created cards | |
+
 ---
 
 ### batch import

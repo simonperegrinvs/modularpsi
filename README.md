@@ -158,6 +158,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Constraint edges** — Edge semantics include `requires`, `confounded-by`, `incompatible-with`, and `fails-when`
 - **Run notes** — Structured per-run markdown notes can be generated in `vault/agent-runs`
 - **Review/processing sync** — Reference `processingStatus` is aligned automatically on review approve/reject actions
+- **Governance for hypotheses/constraints** — Daily caps and evidence validation now include hypotheses and constraint-edge publishing
 
 ## Tech Stack
 

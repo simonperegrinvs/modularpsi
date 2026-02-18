@@ -6,6 +6,11 @@ import { jsonToGraph } from '../../io/json-io';
 import { loadGovernanceConfig, saveGovernanceConfig } from '../../agent/governance';
 import { readAuditEntries, readTodayAuditEntries, listAuditDates } from '../../agent/audit';
 import { runPublishGate } from '../../agent/publish-validation';
+import {
+  checkDailyConstraintEdgeCap,
+  checkDailyHypothesisCap,
+  validateHypothesesForGovernance,
+} from '../../agent/hypothesis-governance';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerGovernanceCommands(program: Command) {
@@ -74,17 +79,32 @@ export function registerGovernanceCommands(program: Command) {
         config,
       );
 
+      const hypoValidation = validateHypothesesForGovernance(data.hypotheses, data.references, config);
+      const hypoCap = checkDailyHypothesisCap(data.hypotheses, config.maxDailyNewHypotheses);
+      const constraintCap = checkDailyConstraintEdgeCap(data.edges, config.maxDailyConstraintEdges);
+
+      const errors = [...gateResult.errors, ...hypoValidation.errors];
+      const warnings = [...gateResult.warnings, ...hypoValidation.warnings];
+      if (!hypoCap.withinCap) {
+        errors.push(`Daily hypothesis cap exceeded: ${hypoCap.todayCount}/${config.maxDailyNewHypotheses}`);
+      }
+      if (!constraintCap.withinCap) {
+        errors.push(`Daily constraint-edge cap exceeded: ${constraintCap.todayCount}/${config.maxDailyConstraintEdges}`);
+      }
+
       const output = {
-        valid: gateResult.valid,
-        errorCount: gateResult.errors.length,
-        warningCount: gateResult.warnings.length,
-        errors: gateResult.errors,
-        warnings: gateResult.warnings,
+        valid: errors.length === 0,
+        errorCount: errors.length,
+        warningCount: warnings.length,
+        errors,
+        warnings,
+        hypothesisCap: hypoCap,
+        constraintEdgeCap: constraintCap,
       };
 
       console.log(formatOutput(output, opts.format as OutputFormat));
 
-      if (!gateResult.valid) {
+      if (errors.length > 0) {
         process.exit(1);
       }
     });
@@ -137,15 +157,26 @@ export function registerGovernanceCommands(program: Command) {
       const todayNodes = data.nodes.filter(
         (n) => n.provenance?.timestamp?.startsWith(today),
       );
+      const todayHypotheses = data.hypotheses.filter((h) => h.createdAt?.startsWith(today));
+      const todayConstraintEdges = data.edges.filter(
+        (e) => [3, 4, 5, 6].includes(e.type) && e.provenance?.timestamp?.startsWith(today),
+      );
 
       const stats = {
         date: today,
         todayNodeCount: todayNodes.length,
         dailyCap: config.maxDailyNewNodes,
         remaining: Math.max(0, config.maxDailyNewNodes - todayNodes.length),
+        todayHypothesisCount: todayHypotheses.length,
+        hypothesisDailyCap: config.maxDailyNewHypotheses,
+        hypothesisRemaining: Math.max(0, config.maxDailyNewHypotheses - todayHypotheses.length),
+        todayConstraintEdgeCount: todayConstraintEdges.length,
+        constraintEdgeDailyCap: config.maxDailyConstraintEdges,
+        constraintEdgeRemaining: Math.max(0, config.maxDailyConstraintEdges - todayConstraintEdges.length),
         totalNodes: data.nodes.length,
         totalEdges: data.edges.length,
         totalReferences: data.references.length,
+        totalHypotheses: data.hypotheses.length,
         maxDailyTrustDelta: config.maxDailyTrustDelta,
       };
 

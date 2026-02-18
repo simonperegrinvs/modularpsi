@@ -770,9 +770,12 @@ npm run mpsi -- governance config --set requireDescription=false maxDailyTrustDe
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `maxDailyNewNodes` | number | `20` | Max nodes that can be created per day |
+| `maxDailyNewHypotheses` | number | `15` | Max hypotheses that can be created per day |
+| `maxDailyConstraintEdges` | number | `40` | Max constraint edges (`requires/confounded-by/incompatible-with/fails-when`) per day |
 | `maxDailyTrustDelta` | number | `2.0` | Max sum of absolute trust changes per node per day |
 | `requireDescription` | boolean | `true` | Reject nodes without descriptions |
 | `requireRefTitleYearDoi` | boolean | `true` | Reject references missing title, year, or DOI/URL |
+| `requireHypothesisEvidence` | boolean | `true` | Reject hypotheses without supporting references |
 | `duplicateRejection` | boolean | `true` | Reject duplicate nodes/references |
 | `fuzzyDuplicateThreshold` | number | `0.85` | Fuzzy title match threshold |
 

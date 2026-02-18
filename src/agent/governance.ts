@@ -3,18 +3,24 @@ import { join, dirname } from 'path';
 
 export interface GovernanceConfig {
   maxDailyNewNodes: number;
+  maxDailyNewHypotheses: number;
+  maxDailyConstraintEdges: number;
   maxDailyTrustDelta: number;
   requireDescription: boolean;
   requireRefTitleYearDoi: boolean;
+  requireHypothesisEvidence: boolean;
   duplicateRejection: boolean;
   fuzzyDuplicateThreshold: number;
 }
 
 const DEFAULT_GOVERNANCE: GovernanceConfig = {
   maxDailyNewNodes: 20,
+  maxDailyNewHypotheses: 15,
+  maxDailyConstraintEdges: 40,
   maxDailyTrustDelta: 2.0,
   requireDescription: true,
   requireRefTitleYearDoi: true,
+  requireHypothesisEvidence: true,
   duplicateRejection: true,
   fuzzyDuplicateThreshold: 0.85,
 };

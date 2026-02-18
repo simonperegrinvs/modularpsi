@@ -73,8 +73,17 @@ export function registerGovernanceCommands(program: Command) {
 
       const gateResult = runPublishGate(
         {
-          nodes: data.nodes.map((n) => ({ name: n.name, description: n.description })),
-          references: data.references.map((r) => ({ title: r.title, year: r.year, doi: r.doi, url: r.url })),
+          nodes: data.nodes.map((n) => ({ id: n.id, name: n.name, description: n.description })),
+          references: data.references.map((r) => ({
+            id: r.id,
+            title: r.title,
+            authors: r.authors,
+            year: r.year,
+            doi: r.doi,
+            url: r.url,
+            semanticScholarId: r.semanticScholarId,
+            openAlexId: r.openAlexId,
+          })),
         },
         { nodes: data.nodes, references: data.references, auditEntries: todayAudit },
         config,

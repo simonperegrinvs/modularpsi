@@ -5,7 +5,7 @@ export interface AuditEntry {
   timestamp: string;
   runId: string;
   action: string;
-  entityType: 'node' | 'edge' | 'reference';
+  entityType: 'node' | 'edge' | 'reference' | 'hypothesis';
   entityId: string;
   sourceApis?: string[];
   aiClassification?: string;
@@ -16,6 +16,8 @@ export interface AuditEntry {
   after: unknown;
   aiRationale?: string;
   validationErrors?: string[];
+  decisionType?: string;
+  scoreBreakdown?: unknown;
 }
 
 export function writeAuditEntry(baseDir: string, entry: AuditEntry): void {

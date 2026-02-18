@@ -47,10 +47,14 @@ export function triageHypotheses(
   updatedHypotheses: HypothesisCard[];
   selected: HypothesisCard[];
   promoted: number;
+  scoreBreakdowns: Record<string, HypothesisScoreBreakdown>;
 } {
   const now = options.nowIso ?? new Date().toISOString();
+  const scoreBreakdowns: Record<string, HypothesisScoreBreakdown> = {};
   const rescored = hypotheses.map((h) => {
-    const score = computeHypothesisScore(h).score;
+    const breakdown = computeHypothesisScore(h);
+    scoreBreakdowns[h.id] = breakdown;
+    const score = breakdown.score;
     return {
       ...h,
       score,
@@ -77,5 +81,5 @@ export function triageHypotheses(
     });
   }
 
-  return { updatedHypotheses, selected, promoted };
+  return { updatedHypotheses, selected, promoted, scoreBreakdowns };
 }

@@ -49,6 +49,7 @@ describe('hypothesis scoring', () => {
 
     expect(triaged.selected.length).toBe(2);
     expect(triaged.promoted).toBe(1);
+    expect(Object.keys(triaged.scoreBreakdowns)).toEqual(expect.arrayContaining(['hyp-1', 'hyp-2', 'hyp-3']));
 
     const hyp1 = triaged.updatedHypotheses.find((h) => h.id === 'hyp-1');
     const hyp3 = triaged.updatedHypotheses.find((h) => h.id === 'hyp-3');

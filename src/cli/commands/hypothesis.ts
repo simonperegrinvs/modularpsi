@@ -1,15 +1,30 @@
 import { Command } from 'commander';
 import { readFileSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
 import { graphToJson, jsonToGraph } from '../../io/json-io';
 import { createHypothesis } from '../../domain/hypothesis';
 import type { HypothesisStatus } from '../../domain/types';
 import { triageHypotheses } from '../../agent/hypothesis-scoring';
 import { runHypothesisLoop } from '../../agent/hypothesis-loop';
+import { writeAuditEntry, type AuditEntry } from '../../agent/audit';
 import { formatOutput, type OutputFormat } from '../format';
 
 function parseList(value?: string): string[] {
   if (!value) return [];
   return value.split(',').map((x) => x.trim()).filter(Boolean);
+}
+
+function writeHypothesisAudit(
+  baseDir: string,
+  entry: Pick<AuditEntry, 'runId' | 'action' | 'entityId' | 'validationOutcome' | 'reason' | 'aiRationale' | 'decisionType' | 'scoreBreakdown'>,
+): void {
+  writeAuditEntry(baseDir, {
+    timestamp: new Date().toISOString(),
+    entityType: 'hypothesis',
+    before: null,
+    after: null,
+    ...entry,
+  });
 }
 
 export function registerHypothesisCommands(program: Command) {
@@ -133,9 +148,11 @@ export function registerHypothesisCommands(program: Command) {
     .description('Re-score hypotheses and select highest-priority cards')
     .action((cmdOpts: { top?: string; minScore?: string; promote?: boolean }) => {
       const opts = program.opts();
+      const baseDir = dirname(opts.file);
       const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
       const top = cmdOpts.top ? parseInt(cmdOpts.top, 10) : 10;
       const minScore = cmdOpts.minScore ? parseFloat(cmdOpts.minScore) : 0.6;
+      const runId = `triage-${Date.now()}`;
 
       const result = triageHypotheses(data.hypotheses, {
         top,
@@ -146,10 +163,26 @@ export function registerHypothesisCommands(program: Command) {
       data.hypotheses = result.updatedHypotheses;
       writeFileSync(opts.file, graphToJson(data));
 
+      const selectedIds = new Set(result.selected.map((h) => h.id));
+      for (const h of result.updatedHypotheses) {
+        const selected = selectedIds.has(h.id);
+        writeHypothesisAudit(baseDir, {
+          runId,
+          action: 'hypothesis-triage',
+          entityId: h.id,
+          validationOutcome: selected ? 'accepted' : 'rejected',
+          reason: selected ? 'top-and-threshold' : 'below-threshold-or-top-cutoff',
+          aiRationale: selected ? 'selected for review priority' : 'not selected in triage window',
+          decisionType: selected ? 'triage-selected' : 'triage-skipped',
+          scoreBreakdown: result.scoreBreakdowns[h.id],
+        });
+      }
+
       console.log(formatOutput({
         status: 'ok',
         top,
         minScore,
+        runId,
         selectedCount: result.selected.length,
         promoted: result.promoted,
         selected: result.selected,
@@ -163,19 +196,47 @@ export function registerHypothesisCommands(program: Command) {
     .description('Run generator/skeptic/judge loop to propose new hypothesis cards from claim evidence')
     .action((cmdOpts: { top?: string; runId?: string }) => {
       const opts = program.opts();
+      const baseDir = dirname(opts.file);
       const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
       const top = cmdOpts.top ? parseInt(cmdOpts.top, 10) : 5;
+      const runId = cmdOpts.runId ?? `propose-${Date.now()}`;
 
       const result = runHypothesisLoop(data, {
         top,
-        runId: cmdOpts.runId,
+        runId,
       });
 
       data.hypotheses.push(...result.accepted);
       writeFileSync(opts.file, graphToJson(data));
 
+      for (const accepted of result.accepted) {
+        writeHypothesisAudit(baseDir, {
+          runId,
+          action: 'hypothesis-propose',
+          entityId: accepted.id,
+          validationOutcome: 'accepted',
+          reason: 'judge-accepted',
+          aiRationale: 'generator output survived skeptic checks',
+          decisionType: 'judge-accepted',
+          scoreBreakdown: undefined,
+        });
+      }
+      for (const rejected of result.rejected) {
+        writeHypothesisAudit(baseDir, {
+          runId,
+          action: 'hypothesis-propose',
+          entityId: rejected.nodeId,
+          validationOutcome: 'rejected',
+          reason: rejected.reason,
+          aiRationale: 'rejected by skeptic/judge rule',
+          decisionType: 'skeptic-rejected',
+          scoreBreakdown: undefined,
+        });
+      }
+
       console.log(formatOutput({
         status: 'ok',
+        runId,
         proposed: result.accepted.length,
         rejected: result.rejected.length,
         accepted: result.accepted,

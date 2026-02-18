@@ -163,6 +163,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Review/processing sync** — Reference `processingStatus` is aligned automatically on review approve/reject actions
 - **Governance for hypotheses/constraints** — Daily caps and evidence validation now include hypotheses and constraint-edge publishing
 - **Hypothesis duplicate guard** — Governance validation now catches semantic duplicate hypotheses when similar statements target overlapping nodes
+- **Decision audit detail** — Hypothesis propose/triage writes decision metadata (`decisionType`, `aiRationale`, `scoreBreakdown`) to audit logs
 - **UI review surface** — Side panel now includes a hypothesis review queue and contradiction snapshot when nothing is selected
 
 ## Tech Stack

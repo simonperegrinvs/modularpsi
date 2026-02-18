@@ -100,6 +100,8 @@ npm run mpsi -- review approve <id>
 | `hypothesis update <id>` | Update statement/links/score/status |
 | `hypothesis triage` | Re-score and prioritize hypothesis cards (`--promote` optional) |
 | `hypothesis propose` | Run generator/skeptic/judge loop to propose draft cards |
+| **Constraints** | |
+| `constraint list` | List constraint edges (`requires`, `confounded-by`, `incompatible-with`, `fails-when`) |
 | **Batch** | |
 | `batch import` | Import from JSON with publish gate, dedup, provenance, audit trail |
 | **Governance** | |

@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
 import type { GraphData } from '../../domain/types';
+import { isConstraintEdgeType } from '../../domain/constraints';
 import { jsonToGraph } from '../../io/json-io';
 import { loadGovernanceConfig, saveGovernanceConfig } from '../../agent/governance';
 import { readAuditEntries, readTodayAuditEntries, listAuditDates } from '../../agent/audit';
@@ -159,7 +160,7 @@ export function registerGovernanceCommands(program: Command) {
       );
       const todayHypotheses = data.hypotheses.filter((h) => h.createdAt?.startsWith(today));
       const todayConstraintEdges = data.edges.filter(
-        (e) => [3, 4, 5, 6].includes(e.type) && e.provenance?.timestamp?.startsWith(today),
+        (e) => isConstraintEdgeType(e.type) && e.provenance?.timestamp?.startsWith(today),
       );
 
       const stats = {

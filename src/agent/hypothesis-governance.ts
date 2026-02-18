@@ -1,18 +1,6 @@
 import type { GraphEdge, HypothesisCard, Reference } from '../domain/types';
-import {
-  EDGE_TYPE_CONFOUNDED_BY,
-  EDGE_TYPE_FAILS_WHEN,
-  EDGE_TYPE_INCOMPATIBLE_WITH,
-  EDGE_TYPE_REQUIRES,
-} from '../domain/types';
+import { isConstraintEdgeType } from '../domain/constraints';
 import type { GovernanceConfig } from './governance';
-
-const CONSTRAINT_EDGE_TYPES = new Set<number>([
-  EDGE_TYPE_REQUIRES,
-  EDGE_TYPE_CONFOUNDED_BY,
-  EDGE_TYPE_INCOMPATIBLE_WITH,
-  EDGE_TYPE_FAILS_WHEN,
-]);
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -82,7 +70,7 @@ export function checkDailyConstraintEdgeCap(
 ): { withinCap: boolean; todayCount: number; remaining: number } {
   const today = new Date().toISOString().slice(0, 10);
   const todayCount = edges.filter(
-    (e) => CONSTRAINT_EDGE_TYPES.has(e.type) && e.provenance?.timestamp?.startsWith(today),
+    (e) => isConstraintEdgeType(e.type) && e.provenance?.timestamp?.startsWith(today),
   ).length;
   return {
     withinCap: todayCount < cap,

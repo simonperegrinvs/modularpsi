@@ -22,6 +22,7 @@ import { registerVaultCommands } from './commands/vault';
 import { registerGovernanceCommands } from './commands/governance';
 import { registerSnapshotCommands } from './commands/snapshot';
 import { registerHypothesisCommands } from './commands/hypothesis';
+import { registerConstraintCommands } from './commands/constraint';
 
 // ── Last-used file persistence ────────────────────────────────
 const RC_PATH = resolve(homedir(), '.mpsirc');
@@ -89,5 +90,6 @@ registerVaultCommands(program);
 registerGovernanceCommands(program);
 registerSnapshotCommands(program);
 registerHypothesisCommands(program);
+registerConstraintCommands(program);
 
 program.parse();

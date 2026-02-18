@@ -456,6 +456,21 @@ npm run mpsi -- hypothesis propose --top 3 --run-id run-20260218-a
 
 ---
 
+### constraint list
+
+List constraint edges (`requires`, `confounded-by`, `incompatible-with`, `fails-when`).
+
+```
+npm run mpsi -- constraint list
+npm run mpsi -- constraint list --node P6
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--node <id>` | No | Filter by source or target node ID | none |
+
+---
+
 ### batch import
 
 Batch import nodes, references, and edges from a JSON file with publish gate validation, governance, and audit trail.

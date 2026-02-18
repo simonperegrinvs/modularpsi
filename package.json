@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "mpsi": "tsx src/cli/index.ts",
+    "agentic:daily": "tsx src/cli/agentic-daily.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

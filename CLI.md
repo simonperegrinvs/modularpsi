@@ -19,6 +19,8 @@ npm run mpsi -- [options] <command> [subcommand] [arguments]
 
 The CLI remembers the last-used file path in `~/.mpsirc`. You can also set `MPSI_FILE` environment variable.
 
+The CLI auto-loads `.env` and `.env.local` (if present) from the project root.
+
 ## Output Formats
 
 - **json** (default): Pretty-printed JSON. Best for programmatic parsing.
@@ -373,6 +375,31 @@ Key options:
 - `--max-new-refs <n>`: per-run cap for applied references
 - `--max-new-nodes <n>`: guard rail for proposed node creation
 - `--max-trust-delta <n>`: guard rail for maximum trust drift in one run
+
+Publish/apply mode requires backend env gate:
+
+```
+MPSI_AGENTIC_ENABLED=1
+```
+
+If not set, non-dry `discover run` exits with a guard-rail error.
+
+### agentic:daily (npm script)
+
+Run snapshot + discovery + rank + brief using env settings:
+
+```
+npm run agentic:daily
+```
+
+Primary env variables:
+
+- `MPSI_AGENTIC_ENABLED=1`: required (backend safety gate)
+- `MPSI_AGENTIC_APPLY=0|1`: `0` dry-run, `1` apply
+- `MPSI_FILE`: graph file path (default `research/psi-map-2026.json`)
+- `MPSI_VAULT`: vault path (default `~/data/modularpsi`)
+- `MPSI_AGENTIC_MAX_QUERIES`, `MPSI_AGENTIC_PER_SOURCE`
+- `MPSI_AGENTIC_MAX_NEW_REFS`, `MPSI_AGENTIC_MAX_NEW_NODES`, `MPSI_AGENTIC_MAX_TRUST_DELTA`
 
 ### snapshot create
 

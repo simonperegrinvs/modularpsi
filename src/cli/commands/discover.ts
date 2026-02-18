@@ -8,6 +8,7 @@ import { compactTimestamp, DEFAULT_VAULT, resolveVaultPath, todayIsoDate } from 
 import { dedupeDiscoveredWorks, mapWorkToNode, parseOpenAlexAbstract, workToReference } from '../discovery';
 import type { DiscoveredWork } from '../discovery';
 import { rankHypotheses } from '../evidence';
+import { envBool } from '../env';
 
 function loadGraph(file: string): GraphData {
   return jsonToGraph(readFileSync(file, 'utf-8'));
@@ -277,6 +278,12 @@ export function registerDiscoverCommands(program: Command) {
       dryRun: boolean;
     }) => {
       const opts = program.opts();
+      const agenticEnabled = envBool('MPSI_AGENTIC_ENABLED', false);
+      if (!cmdOpts.dryRun && !agenticEnabled) {
+        console.error('Blocked publish: set MPSI_AGENTIC_ENABLED=1 in environment (or run with --dry-run).');
+        process.exit(1);
+      }
+
       const data = loadGraph(opts.file);
       const beforeTrustByNode = new Map(data.nodes.map((n) => [n.id, n.trust]));
       const vault = resolveVaultPath(cmdOpts.vault);

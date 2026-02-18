@@ -18,12 +18,16 @@ import { registerHypothesisCommands } from './commands/hypothesis';
 import { registerReportCommands } from './commands/report';
 import { registerDiscoverCommands } from './commands/discover';
 import { registerSnapshotCommands } from './commands/snapshot';
+import { envString, loadEnvFiles } from './env';
+
+loadEnvFiles();
 
 // ── Last-used file persistence ────────────────────────────────
 const RC_PATH = resolve(homedir(), '.mpsirc');
 
 function getDefaultFile(): string {
-  if (process.env.MPSI_FILE) return process.env.MPSI_FILE;
+  const envFile = envString('MPSI_FILE', '');
+  if (envFile) return envFile;
   if (existsSync(RC_PATH)) {
     try {
       const saved = readFileSync(RC_PATH, 'utf-8').trim();

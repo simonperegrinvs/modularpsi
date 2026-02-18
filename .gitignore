@@ -3,3 +3,5 @@ dist/
 legacy/
 *.tsbuildinfo
 .DS_Store
+.env
+.env.local

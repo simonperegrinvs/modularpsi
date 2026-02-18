@@ -28,8 +28,18 @@ jobs:
           npm run lint
 
       - name: Discovery Dry Run
+        env:
+          MPSI_AGENTIC_ENABLED: "1"
+          MPSI_AGENTIC_APPLY: "0"
+          MPSI_FILE: research/psi-map-2026.json
+          MPSI_VAULT: ~/data/modularpsi
+          MPSI_AGENTIC_MAX_QUERIES: "16"
+          MPSI_AGENTIC_PER_SOURCE: "6"
+          MPSI_AGENTIC_MAX_NEW_REFS: "150"
+          MPSI_AGENTIC_MAX_NEW_NODES: "20"
+          MPSI_AGENTIC_MAX_TRUST_DELTA: "0.35"
         run: |
-          npm run mpsi -- -f research/psi-map-2026.json discover run --vault ~/data/modularpsi --strict --dry-run --max-queries 16 --per-source 6
+          npm run agentic:daily
 
       - name: Upload Discovery Artifacts
         uses: actions/upload-artifact@v4
@@ -37,4 +47,3 @@ jobs:
           name: discovery-runs
           path: ~/data/modularpsi/runs/**
           if-no-files-found: warn
-

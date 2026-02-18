@@ -27,6 +27,13 @@ npm run mpsi -- edge add --source P1 --target P2 --trust 0.8
 npm run mpsi -- trust show                    # Show propagated trust values
 ```
 
+Agentic daily flow (env-driven):
+
+```bash
+cp .env.example .env
+npm run agentic:daily
+```
+
 See [CLI.md](CLI.md) for complete CLI documentation.
 
 ## CLI Command Reference

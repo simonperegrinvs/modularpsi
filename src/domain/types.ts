@@ -109,6 +109,7 @@ export interface GraphData {
   categories: Category[];
   references: Reference[];
   metadata?: {
+    schemaVersion?: number;
     lastAgentRun?: string;
     lastAgentRunId?: string;
     totalAgentRuns?: number;

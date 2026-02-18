@@ -15,6 +15,7 @@ describe('createEmptyGraph', () => {
     expect(g.edges).toHaveLength(0);
     expect(g.categories.length).toBeGreaterThan(0);
     expect(g.references).toHaveLength(0);
+    expect(g.metadata?.schemaVersion).toBe(1);
   });
 
   it('supports M prefix', () => {
@@ -88,6 +89,21 @@ describe('jsonToGraph backfills', () => {
     const g = jsonToGraph(json);
     expect(g.categories.length).toBeGreaterThan(0);
     expect(g.references).toEqual([]);
+  });
+
+  it('backfills missing metadata.schemaVersion for legacy graphs', () => {
+    const json = JSON.stringify({
+      version: 1,
+      prefix: 'P',
+      rootId: 'P1',
+      lastNodeNumber: 1,
+      nodes: [],
+      edges: [],
+      categories: [],
+      references: [],
+    });
+    const g = jsonToGraph(json);
+    expect(g.metadata?.schemaVersion).toBe(1);
   });
 
   it('preserves trust=0 (does not backfill falsy values)', () => {

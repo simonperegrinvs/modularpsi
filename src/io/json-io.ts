@@ -2,6 +2,14 @@ import type { GraphData } from '../domain/types';
 import { DEFAULT_CATEGORIES } from '../domain/types';
 
 const CURRENT_VERSION = 1;
+const CURRENT_SCHEMA_VERSION = 1;
+
+function migrateGraphData(data: GraphData): void {
+  if (!data.metadata) data.metadata = {};
+  if (!data.metadata.schemaVersion) {
+    data.metadata.schemaVersion = CURRENT_SCHEMA_VERSION;
+  }
+}
 
 /** Create a new empty graph */
 export function createEmptyGraph(prefix: 'P' | 'M' = 'P'): GraphData {
@@ -25,6 +33,9 @@ export function createEmptyGraph(prefix: 'P' | 'M' = 'P'): GraphData {
     edges: [],
     categories: [...DEFAULT_CATEGORIES],
     references: [],
+    metadata: {
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+    },
   };
 }
 
@@ -36,6 +47,7 @@ export function graphToJson(data: GraphData): string {
 /** Parse JSON string to graph data */
 export function jsonToGraph(json: string): GraphData {
   const data = JSON.parse(json) as GraphData;
+  migrateGraphData(data);
   // Ensure version field exists
   if (!data.version) {
     data.version = CURRENT_VERSION;
@@ -66,6 +78,8 @@ export function jsonToGraph(json: string): GraphData {
     if (!ref.openAlexId) ref.openAlexId = '';
     if (!ref.abstract) ref.abstract = '';
   }
+  if (!data.metadata) data.metadata = {};
+  if (!data.metadata.schemaVersion) data.metadata.schemaVersion = CURRENT_SCHEMA_VERSION;
   return data;
 }
 

@@ -117,6 +117,9 @@ npm run mpsi -- review approve <id>
 | `agent state` | Raw agent state |
 | `agent reset` | Clear agent state |
 | `agent config` | View/modify agent configuration |
+| `agent discovery status` | Discovery registry summary (events, candidates, status counts) |
+| `agent discovery list` | List latest discovery candidates with filters |
+| `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
 | **Vault** | |
 | `vault init` | Initialize Obsidian vault directory |
 | `vault sync` | Sync graph to/from vault (`--direction`) |
@@ -134,6 +137,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Review status** — `draft` → `pending-review` → `approved` / `rejected`
 - **External IDs** — References store DOI, Semantic Scholar ID, OpenAlex ID for deduplication
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
+- **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
 
 ## Tech Stack
 

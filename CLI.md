@@ -504,6 +504,49 @@ npm run mpsi -- agent config --set maxNewRefsPerRun=30
 npm run mpsi -- agent config --set focusKeywords=ganzfeld,precognition,psi
 ```
 
+### agent discovery status
+
+Show discovery registry summary (candidate/event counts and status breakdown).
+
+```
+npm run mpsi -- agent discovery status
+npm run mpsi -- agent discovery status --date 2026-02-18
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--date <date>` | No | Filter summary to `YYYY-MM-DD` | all dates |
+
+### agent discovery list
+
+List latest discovery candidates, optionally filtered.
+
+```
+npm run mpsi -- agent discovery list
+npm run mpsi -- agent discovery list --status deferred --api semantic-scholar
+npm run mpsi -- agent discovery list --query "ganzfeld" --date 2026-02-18
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--date <date>` | No | Filter by `YYYY-MM-DD` | all dates |
+| `--status <status>` | No | `queued`, `parsed`, `imported-draft`, `duplicate`, `rejected`, or `deferred` | none |
+| `--query <query>` | No | Filter by query or title substring | none |
+| `--api <api>` | No | `semantic-scholar`, `openalex`, `crossref`, `arxiv` | none |
+
+### agent discovery retry <candidate-id>
+
+Re-queue a discovery candidate for processing.
+
+```
+npm run mpsi -- agent discovery retry cand-123
+npm run mpsi -- agent discovery retry cand-123 --run-id manual-retry-20260218
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--run-id <id>` | No | Run ID to record for retry event | auto-generated |
+
 ---
 
 ### vault init

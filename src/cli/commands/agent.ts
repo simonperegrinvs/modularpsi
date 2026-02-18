@@ -1,8 +1,15 @@
 import { Command } from 'commander';
 import { readFileSync } from 'fs';
+import { dirname } from 'path';
 import { jsonToGraph } from '../../io/json-io';
 import { loadAgentState, resetAgentState } from '../../agent/state';
 import { loadAgentConfig, saveAgentConfig } from '../../agent/config';
+import {
+  listDiscoveryCandidates,
+  listDiscoveryDates,
+  retryDiscoveryCandidate,
+  summarizeDiscovery,
+} from '../../agent/discovery';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerAgentCommands(program: Command) {
@@ -124,5 +131,58 @@ export function registerAgentCommands(program: Command) {
       }
 
       console.log(formatOutput(config, opts.format as OutputFormat));
+    });
+
+  const discovery = agent.command('discovery').description('Discovery registry operations');
+
+  discovery
+    .command('status')
+    .option('--date <date>', 'Summarize discovery activity for YYYY-MM-DD')
+    .description('Show discovery registry summary')
+    .action((cmdOpts: { date?: string }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const summary = summarizeDiscovery(baseDir, cmdOpts.date);
+      const dates = listDiscoveryDates(baseDir);
+      console.log(formatOutput({
+        ...summary,
+        availableDates: dates,
+      }, opts.format as OutputFormat));
+    });
+
+  discovery
+    .command('list')
+    .option('--date <date>', 'Filter by date YYYY-MM-DD')
+    .option('--status <status>', 'Filter by status (queued|parsed|imported-draft|duplicate|rejected|deferred)')
+    .option('--query <query>', 'Filter by query or title substring')
+    .option('--api <api>', 'Filter by source API')
+    .description('List latest discovery candidates with optional filters')
+    .action((cmdOpts: { date?: string; status?: string; query?: string; api?: string }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const candidates = listDiscoveryCandidates(baseDir, {
+        date: cmdOpts.date,
+        status: cmdOpts.status as 'queued' | 'parsed' | 'imported-draft' | 'duplicate' | 'rejected' | 'deferred' | undefined,
+        query: cmdOpts.query,
+        api: cmdOpts.api as 'semantic-scholar' | 'openalex' | 'crossref' | 'arxiv' | undefined,
+      });
+      console.log(formatOutput(candidates, opts.format as OutputFormat));
+    });
+
+  discovery
+    .command('retry')
+    .argument('<candidate-id>', 'Candidate ID to re-queue')
+    .option('--run-id <id>', 'Run ID to record for retry')
+    .description('Re-queue a discovery candidate for processing')
+    .action((candidateId: string, cmdOpts: { runId?: string }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const runId = cmdOpts.runId || `manual-retry-${Date.now()}`;
+      const event = retryDiscoveryCandidate(baseDir, candidateId, runId);
+      if (!event) {
+        console.error(`Discovery candidate ${candidateId} not found`);
+        process.exit(1);
+      }
+      console.log(formatOutput({ status: 'ok', candidate: event }, opts.format as OutputFormat));
     });
 }

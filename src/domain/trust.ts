@@ -61,12 +61,11 @@ export function propagateTrust(
       }
       edgeCopy.combinedTrust = combined;
 
-      // Update child trust if this path gives higher trust
+      // Update child trust if this path gives higher trust, then recurse
       if (combined > child.trust) {
         child.trust = combined;
+        dfs(child);
       }
-
-      dfs(child);
     }
   }
 

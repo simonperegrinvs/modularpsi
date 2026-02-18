@@ -78,6 +78,10 @@ export interface GraphNode {
   type: NodeType;
   trust: number; // -1 = unclassified, 0..1 = trust level
   referenceIds: string[];
+  provenance?: Provenance;
+  reviewStatus?: ReviewStatus;
+  lastReviewedAt?: string;
+  status?: NodeStatus;
 }
 
 // ── Graph Edge ──────────────────────────────────────────────
@@ -88,6 +92,7 @@ export interface GraphEdge {
   trust: number; // -1 = unclassified, 0..1
   type: EdgeType;
   combinedTrust: number; // computed: parent.trust * edge.trust
+  provenance?: Provenance;
 }
 
 // ── Graph Prefix ────────────────────────────────────────────
@@ -103,6 +108,11 @@ export interface GraphData {
   edges: GraphEdge[];
   categories: Category[];
   references: Reference[];
+  metadata?: {
+    lastAgentRun?: string;
+    lastAgentRunId?: string;
+    totalAgentRuns?: number;
+  };
 }
 
 // ── Layout Direction ────────────────────────────────────────
@@ -117,6 +127,23 @@ export type InteractionMode =
   | 'delete-node'
   | 'delete-edge';
 
+// ── Provenance & Review ─────────────────────────────────────
+export type ProvenanceSource = 'human' | 'agent';
+
+export interface Provenance {
+  source: ProvenanceSource;
+  agent?: string;
+  timestamp: string; // ISO 8601
+  runId?: string;
+  searchQuery?: string;
+  apiSource?: string;
+  aiClassification?: 'in-scope-core' | 'in-scope-adjacent' | 'out-of-scope';
+  mappingConfidence?: number; // 0-1
+}
+
+export type ReviewStatus = 'draft' | 'pending-review' | 'approved' | 'rejected';
+export type NodeStatus = 'active' | 'stale' | 'merged';
+
 // ── Reference ───────────────────────────────────────────────
 export interface Reference {
   id: string;
@@ -129,6 +156,14 @@ export interface Reference {
   pageStart: number;
   pageEnd: number;
   volume: number;
+  description: string;
+  doi: string;
+  url: string;
+  semanticScholarId: string;
+  openAlexId: string;
+  abstract: string;
+  provenance?: Provenance;
+  reviewStatus?: ReviewStatus;
 }
 
 // ── Default Categories (from legacy cats.mpsi) ──────────────

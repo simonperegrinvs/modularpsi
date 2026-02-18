@@ -20,11 +20,16 @@ export function registerNodeCommands(program: Command) {
 
   node
     .command('list')
+    .option('--review-status <status>', 'Filter by review status')
     .description('List all nodes')
-    .action(() => {
+    .action((cmdOpts: { reviewStatus?: string }) => {
       const opts = program.opts();
       const data = loadGraph(opts.file);
-      const rows = data.nodes.map((n) => ({
+      let nodes = data.nodes;
+      if (cmdOpts.reviewStatus) {
+        nodes = nodes.filter((n) => n.reviewStatus === cmdOpts.reviewStatus);
+      }
+      const rows = nodes.map((n) => ({
         id: n.id,
         name: n.name,
         trust: n.trust,
@@ -59,8 +64,10 @@ export function registerNodeCommands(program: Command) {
     .requiredOption('--name <name>', 'Node name')
     .option('--type <type>', 'Node type (regular|chooser|holder)', 'regular')
     .option('--category <cat>', 'Category ID', 'general')
+    .option('--description <desc>', 'Node description')
+    .option('--keywords <keywords>', 'Keywords (semicolon-separated)')
     .description('Add a new node')
-    .action((cmdOpts: { parent: string; name: string; type: string; category: string }) => {
+    .action((cmdOpts: { parent: string; name: string; type: string; category: string; description?: string; keywords?: string }) => {
       const opts = program.opts();
       const data = loadGraph(opts.file);
       const parent = data.nodes.find((n) => n.id === cmdOpts.parent);
@@ -76,9 +83,9 @@ export function registerNodeCommands(program: Command) {
       const newNode: GraphNode = {
         id: newId,
         name: cmdOpts.name,
-        description: '',
+        description: cmdOpts.description ?? '',
         categoryId: cmdOpts.category,
-        keywords: [],
+        keywords: cmdOpts.keywords ? cmdOpts.keywords.split(';').map((k) => k.trim()).filter(Boolean) : [],
         type: nodeType,
         trust: -1,
         referenceIds: [],

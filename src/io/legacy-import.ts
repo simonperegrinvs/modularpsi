@@ -226,6 +226,12 @@ function parseLegacyReferences(files: Map<string, string>): Reference[] {
       pageStart: parseInt(row.l) || 0,
       pageEnd: parseInt(row.m) || 0,
       volume: parseInt(row.p) || 0,
+      description: row.i ?? '',
+      doi: '',
+      url: '',
+      semanticScholarId: '',
+      openAlexId: '',
+      abstract: '',
     });
   }
 

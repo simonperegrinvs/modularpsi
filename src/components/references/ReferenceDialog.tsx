@@ -13,6 +13,7 @@ export function ReferenceDialog({ open, onClose, nodeId }: ReferenceDialogProps)
   const [title, setTitle] = useState('');
   const [authors, setAuthors] = useState('');
   const [year, setYear] = useState('');
+  const [description, setDescription] = useState('');
   const references = useGraphStore((s) => s.references);
   const nodes = useGraphStore((s) => s.nodes);
   const updateNode = useGraphStore((s) => s.updateNode);
@@ -56,6 +57,12 @@ export function ReferenceDialog({ open, onClose, nodeId }: ReferenceDialogProps)
           pageStart: 0,
           pageEnd: 0,
           volume: 0,
+          description,
+          doi: '',
+          url: '',
+          semanticScholarId: '',
+          openAlexId: '',
+          abstract: '',
         },
       ],
     });
@@ -63,6 +70,7 @@ export function ReferenceDialog({ open, onClose, nodeId }: ReferenceDialogProps)
     setTitle('');
     setAuthors('');
     setYear('');
+    setDescription('');
     setMode('search');
   }
 
@@ -143,6 +151,15 @@ export function ReferenceDialog({ open, onClose, nodeId }: ReferenceDialogProps)
                 className="mt-1 block w-full border border-gray-300 rounded px-3 py-2 text-sm"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm text-gray-600">Description</span>
+              <textarea
+                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </label>
             <button

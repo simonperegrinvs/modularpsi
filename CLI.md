@@ -613,7 +613,7 @@ npm run mpsi -- agent discovery retry cand-123 --run-id manual-retry-20260218
 
 ### agent discovery ingest
 
-Run discovery ingestion across one or more APIs, append candidates to the discovery registry, and update agent state.
+Run discovery ingestion across one or more APIs, append candidates to the discovery registry, update agent state, and optionally add citation-snowball candidates from DOI anchors.
 
 ```
 npm run mpsi -- agent discovery ingest
@@ -622,6 +622,7 @@ npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" -
 ```
 
 When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
+If DOI references exist, citation snowballing also runs (bounded by `citationSnowballsPerRun` in agent config).
 
 | Option | Required | Description | Default |
 |--------|----------|-------------|---------|

@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import { graphToJson, jsonToGraph } from '../../io/json-io';
 import { loadAgentState, resetAgentState, saveAgentState } from '../../agent/state';
 import { loadAgentConfig, saveAgentConfig } from '../../agent/config';
-import { searchLiterature, type ApiSource } from '../../agent/search';
+import { getCitations, resolveDoi, searchLiterature, type ApiSource } from '../../agent/search';
 import {
   deriveStateFromDiscovery,
   listDiscoveryCandidates,
@@ -224,6 +224,11 @@ export function registerAgentCommands(program: Command) {
         config,
         state,
         searchFn: searchLiterature,
+        citationFn: async (doi, direction, limit) => {
+          const resolved = await resolveDoi(doi);
+          if (!resolved?.semanticScholarId) return [];
+          return getCitations(resolved.semanticScholarId, direction, limit);
+        },
         runId: cmdOpts.runId,
         queries: cmdOpts.query,
         apis: cmdOpts.api as ApiSource[] | undefined,
@@ -242,6 +247,8 @@ export function registerAgentCommands(program: Command) {
         queries: result.queries,
         apis: result.apis,
         totalResults: result.totalResults,
+        citationAnchorCount: result.citationAnchorCount,
+        citationResults: result.citationResults,
         eventsWritten: result.eventsWritten,
         byDecision: result.byDecision,
       }, opts.format as OutputFormat));

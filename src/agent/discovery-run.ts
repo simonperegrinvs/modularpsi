@@ -44,6 +44,11 @@ export interface DiscoveryIngestOptions {
   config: AgentConfig;
   state: AgentState;
   searchFn: (opts: SearchOptions & { api?: ApiSource }) => Promise<LiteratureSearchResult[]>;
+  citationFn?: (
+    doi: string,
+    direction: 'citing' | 'cited-by',
+    limit: number,
+  ) => Promise<LiteratureSearchResult[]>;
   runId?: string;
   queries?: string[];
   apis?: ApiSource[];
@@ -58,6 +63,8 @@ export interface DiscoveryIngestResult {
   queries: string[];
   apis: ApiSource[];
   totalResults: number;
+  citationAnchorCount: number;
+  citationResults: number;
   eventsWritten: number;
   byDecision: Record<'queued' | 'parsed' | 'imported-draft' | 'duplicate' | 'rejected' | 'deferred', number>;
   nextState: AgentState;
@@ -87,6 +94,7 @@ export async function runDiscoveryIngestion(opts: DiscoveryIngestOptions): Promi
   const byDecisionMutable = { ...byDecision };
 
   let totalResults = 0;
+  let citationResults = 0;
   let eventsWritten = 0;
 
   for (const query of queries) {
@@ -105,6 +113,46 @@ export async function runDiscoveryIngestion(opts: DiscoveryIngestOptions): Promi
         const event = createDiscoveryEventFromSearchResult(
           result,
           query,
+          runId,
+          opts.references,
+        );
+
+        if (processedIds.has(event.candidateId)) {
+          event.decision = 'duplicate';
+          event.decisionReason = 'already-processed-candidate-id';
+          event.action = 'decision-update';
+        } else {
+          processedIds.add(event.candidateId);
+        }
+
+        byDecisionMutable[event.decision]++;
+        writeDiscoveryEvent(opts.baseDir, event);
+        eventsWritten++;
+      }
+
+      if (opts.config.rateLimitMs > 0) {
+        await sleep(opts.config.rateLimitMs);
+      }
+    }
+  }
+
+  // Citation snowball lane: anchored on existing DOI references
+  const citationAnchors = opts.references
+    .filter((r) => !!r.doi)
+    .slice(0, Math.max(0, opts.config.citationSnowballsPerRun));
+
+  if (opts.citationFn) {
+    for (const ref of citationAnchors) {
+      const citeResults = await opts.citationFn(ref.doi, 'citing', limit);
+      citationResults += citeResults.length;
+      totalResults += citeResults.length;
+      const citationQuery = `citations:citing:${ref.doi}`;
+      recentQueries.push(citationQuery);
+
+      for (const result of citeResults) {
+        const event = createDiscoveryEventFromSearchResult(
+          result,
+          citationQuery,
           runId,
           opts.references,
         );
@@ -158,6 +206,8 @@ export async function runDiscoveryIngestion(opts: DiscoveryIngestOptions): Promi
     queries,
     apis,
     totalResults,
+    citationAnchorCount: citationAnchors.length,
+    citationResults,
     eventsWritten,
     byDecision: byDecisionMutable,
     nextState,

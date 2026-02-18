@@ -169,4 +169,54 @@ describe('discovery-run', () => {
     expect(listed).toHaveLength(1);
     expect(listed[0].decisionReason).toBe('already-processed-candidate-id');
   });
+
+  it('runs citation snowball lane from DOI anchors when citation provider is available', async () => {
+    const baseDir = createDir();
+    const data = createEmptyGraph();
+
+    const result = await runDiscoveryIngestion({
+      baseDir,
+      data,
+      references: [
+        {
+          id: 'ref-anchor',
+          title: 'Anchor',
+          authors: ['A'],
+          year: 2020,
+          publication: '',
+          publisher: '',
+          citation: '',
+          pageStart: 0,
+          pageEnd: 0,
+          volume: 0,
+          description: '',
+          doi: '10.1000/anchor',
+          url: '',
+          semanticScholarId: '',
+          openAlexId: '',
+          abstract: '',
+        },
+      ],
+      config: baseConfig,
+      state: baseState,
+      queries: [],
+      apis: ['semantic-scholar'],
+      runId: 'run-cite-1',
+      searchFn: async () => [],
+      citationFn: async () => [
+        {
+          title: 'Citing Paper',
+          authors: ['B'],
+          year: 2025,
+          semanticScholarId: 'S2-CITE-1',
+          source: 'semantic-scholar',
+        },
+      ],
+    });
+
+    expect(result.citationAnchorCount).toBe(1);
+    expect(result.citationResults).toBe(1);
+    expect(result.eventsWritten).toBe(1);
+    expect(result.byDecision.queued).toBe(1);
+  });
 });

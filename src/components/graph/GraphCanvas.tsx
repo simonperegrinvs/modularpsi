@@ -13,14 +13,15 @@ import {
 import { useGraphStore } from '../../store/graph-store';
 import { TrustNode, type TrustNodeData } from './TrustNode';
 import { TrustEdge, type TrustEdgeData } from './TrustEdge';
+import { ClusterNode, type ClusterNodeData } from './ClusterNode';
 import { trustToHex } from '../../lib/colors';
 
-const nodeTypes = { trust: TrustNode };
+const nodeTypes = { trust: TrustNode, cluster: ClusterNode };
 const edgeTypes = { trust: TrustEdge };
 
 export function GraphCanvas() {
-  const nodes = useGraphStore((s) => s.nodes);
-  const edges = useGraphStore((s) => s.edges);
+  const visibleNodes = useGraphStore((s) => s.visibleNodes);
+  const visibleEdges = useGraphStore((s) => s.visibleEdges);
   const categories = useGraphStore((s) => s.categories);
   const nodePositions = useGraphStore((s) => s.nodePositions);
   const selectedNodeId = useGraphStore((s) => s.selectedNodeId);
@@ -36,6 +37,9 @@ export function GraphCanvas() {
   const setMode = useGraphStore((s) => s.setMode);
   const setEdgeSource = useGraphStore((s) => s.setEdgeSource);
   const updateNodePosition = useGraphStore((s) => s.updateNodePosition);
+  const clusterBounds = useGraphStore((s) => s.clusterBounds);
+  const recentChangeIds = useGraphStore((s) => s.recentChangeIds);
+  const nodeSizes = useGraphStore((s) => s.nodeSizes);
 
   const categoryColorMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -43,29 +47,63 @@ export function GraphCanvas() {
     return map;
   }, [categories]);
 
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const cat of categories) map.set(cat.id, cat.name);
+    return map;
+  }, [categories]);
+
   // Convert domain nodes → React Flow nodes
-  const rfNodes: Node[] = useMemo(
-    () =>
-      nodes.map((n) => {
-        const pos = nodePositions.get(n.id) ?? { x: 0, y: 0 };
-        return {
-          id: n.id,
-          type: 'trust',
-          position: pos,
-          data: {
-            graphNode: n,
-            categoryColor: categoryColorMap.get(n.categoryId) ?? '#000000',
-            selected: n.id === selectedNodeId,
-          } satisfies TrustNodeData,
-        };
-      }),
-    [nodes, nodePositions, selectedNodeId, categoryColorMap],
-  );
+  const rfNodes: Node[] = useMemo(() => {
+    const nodes: Node[] = [];
+
+    // Add cluster boundary nodes (behind real nodes)
+    for (const bounds of clusterBounds) {
+      nodes.push({
+        id: `cluster-${bounds.categoryId}`,
+        type: 'cluster',
+        position: { x: bounds.x, y: bounds.y },
+        draggable: false,
+        selectable: false,
+        zIndex: -1,
+        data: {
+          categoryId: bounds.categoryId,
+          categoryName: categoryNameMap.get(bounds.categoryId) ?? bounds.categoryId,
+          categoryColor: categoryColorMap.get(bounds.categoryId) ?? '#888888',
+          collapsed: false,
+          nodeCount: 0,
+          width: bounds.width,
+          height: bounds.height,
+        } satisfies ClusterNodeData,
+      });
+    }
+
+    // Add real nodes
+    for (const n of visibleNodes) {
+      const pos = nodePositions.get(n.id) ?? { x: 0, y: 0 };
+      const size = nodeSizes.get(n.id);
+      nodes.push({
+        id: n.id,
+        type: 'trust',
+        position: pos,
+        data: {
+          graphNode: n,
+          categoryColor: categoryColorMap.get(n.categoryId) ?? '#000000',
+          selected: n.id === selectedNodeId,
+          recentlyChanged: recentChangeIds.has(n.id),
+          nodeWidth: size?.width,
+          nodeHeight: size?.height,
+        } satisfies TrustNodeData,
+      });
+    }
+
+    return nodes;
+  }, [visibleNodes, nodePositions, selectedNodeId, categoryColorMap, categoryNameMap, clusterBounds, recentChangeIds, nodeSizes]);
 
   // Convert domain edges → React Flow edges
   const rfEdges: Edge[] = useMemo(
     () =>
-      edges.map((e) => ({
+      visibleEdges.map((e) => ({
         id: e.id,
         source: e.sourceId,
         target: e.targetId,
@@ -76,11 +114,14 @@ export function GraphCanvas() {
           selected: e.id === selectedEdgeId,
         } satisfies TrustEdgeData,
       })),
-    [edges, selectedEdgeId],
+    [visibleEdges, selectedEdgeId],
   );
 
   const onNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
+      // Ignore clicks on cluster nodes for interaction modes
+      if (node.id.startsWith('cluster-')) return;
+
       switch (mode) {
         case 'normal':
           selectNode(node.id);
@@ -126,6 +167,7 @@ export function GraphCanvas() {
 
   const onNodeDragStop: NodeMouseHandler = useCallback(
     (_event, node) => {
+      if (node.id.startsWith('cluster-')) return;
       updateNodePosition(node.id, node.position.x, node.position.y);
     },
     [updateNodePosition],

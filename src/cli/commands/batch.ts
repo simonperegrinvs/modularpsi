@@ -1,13 +1,16 @@
 import { Command } from 'commander';
-import { readFileSync, writeFileSync, copyFileSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
 import type { GraphData, GraphNode, Reference, Provenance, ReviewStatus } from '../../domain/types';
 import { parseNodeType, parseEdgeType, EDGE_TYPE_IMPLICATION } from '../../domain/types';
 import { propagateTrust } from '../../domain/trust';
 import { canAddEdge } from '../../domain/validation';
 import { jsonToGraph, graphToJson } from '../../io/json-io';
 import { isDuplicate } from '../../agent/search/dedup';
-import { writeAuditEntry, createAuditEntry } from '../../agent/audit';
+import { writeAuditEntry, createAuditEntry, readTodayAuditEntries } from '../../agent/audit';
+import { loadGovernanceConfig } from '../../agent/governance';
+import { runPublishGate } from '../../agent/publish-validation';
+import { saveSnapshot } from '../../agent/snapshot';
 import { formatOutput, type OutputFormat } from '../format';
 
 interface BatchInput {
@@ -54,8 +57,9 @@ export function registerBatchCommands(program: Command) {
     .option('--review-status <status>', 'Review status for imported items', 'draft')
     .option('--run-id <id>', 'Run ID for provenance', `run-${Date.now()}`)
     .option('--agent <name>', 'Agent name for provenance', 'batch-import')
-    .option('--snapshot', 'Save snapshot before importing')
+    .option('--snapshot', 'Save snapshot before importing (now always enabled)')
     .option('--audit-dir <dir>', 'Directory for audit logs')
+    .option('--force', 'Force import even if publish gate validation fails')
     .description('Import nodes, references, and edges from a JSON file')
     .action((cmdOpts: {
       input: string;
@@ -64,6 +68,7 @@ export function registerBatchCommands(program: Command) {
       agent: string;
       snapshot?: boolean;
       auditDir?: string;
+      force?: boolean;
     }) => {
       const opts = program.opts();
       const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
@@ -72,12 +77,33 @@ export function registerBatchCommands(program: Command) {
       const runId = cmdOpts.runId;
       const auditDir = cmdOpts.auditDir ?? dirname(opts.file);
 
-      // Save snapshot if requested
-      if (cmdOpts.snapshot) {
-        const snapshotDir = join(auditDir, 'research', 'snapshots');
-        mkdirSync(snapshotDir, { recursive: true });
-        const date = new Date().toISOString().slice(0, 10);
-        copyFileSync(opts.file, join(snapshotDir, `psi-map-${date}.json`));
+      // Always save snapshot before importing
+      saveSnapshot(opts.file, data, 'pre-import', runId);
+
+      // Run publish gate validation
+      const govConfig = loadGovernanceConfig(opts.file);
+      const todayAudit = readTodayAuditEntries(auditDir);
+      const gateResult = runPublishGate(
+        {
+          nodes: input.nodes?.map((n) => ({ name: n.name, description: n.description })),
+          references: input.references?.map((r) => ({ title: r.title, year: r.year, doi: r.doi, url: r.url })),
+        },
+        { nodes: data.nodes, references: data.references, auditEntries: todayAudit },
+        govConfig,
+      );
+
+      if (!gateResult.valid && !cmdOpts.force) {
+        console.error(formatOutput({
+          status: 'error',
+          message: 'Publish gate validation failed. Use --force to override.',
+          errors: gateResult.errors,
+          warnings: gateResult.warnings,
+        }, opts.format as OutputFormat));
+        process.exit(1);
+      }
+
+      if (gateResult.warnings.length > 0) {
+        console.error(`Warnings: ${gateResult.warnings.join('; ')}`);
       }
 
       const provenance: Provenance = {
@@ -120,7 +146,11 @@ export function registerBatchCommands(program: Command) {
           refIdMap.set(i, dupCheck.matchedRefId!);
           writeAuditEntry(auditDir, createAuditEntry(
             runId, 'add-reference', 'reference', dupCheck.matchedRefId!,
-            'skipped-duplicate', refInput, { reason: `Duplicate: ${dupCheck.matchType}` },
+            'skipped-duplicate', refInput, {
+              reason: `Duplicate: ${dupCheck.matchType}`,
+              aiRationale: `Dedup matched via ${dupCheck.matchType}`,
+              validationErrors: [`Duplicate reference: ${dupCheck.matchType} match with ${dupCheck.matchedRefId}`],
+            },
           ));
           continue;
         }
@@ -152,6 +182,7 @@ export function registerBatchCommands(program: Command) {
 
         writeAuditEntry(auditDir, createAuditEntry(
           runId, 'add-reference', 'reference', refId, 'accepted', { title: refInput.title, doi: refInput.doi },
+          { aiRationale: 'Passed publish gate validation', validationErrors: [] },
         ));
 
         // Link to nodes
@@ -171,7 +202,10 @@ export function registerBatchCommands(program: Command) {
         if (!parent) {
           summary.nodesSkipped++;
           writeAuditEntry(auditDir, createAuditEntry(
-            runId, 'add-node', 'node', '', 'rejected', nodeInput, { reason: `Parent ${parentId} not found` },
+            runId, 'add-node', 'node', '', 'rejected', nodeInput, {
+              reason: `Parent ${parentId} not found`,
+              validationErrors: [`Parent node ${parentId} does not exist in graph`],
+            },
           ));
           continue;
         }
@@ -206,6 +240,7 @@ export function registerBatchCommands(program: Command) {
         summary.nodesCreated++;
         writeAuditEntry(auditDir, createAuditEntry(
           runId, 'add-node', 'node', nodeId, 'accepted', { name: nodeInput.name, parentId },
+          { aiRationale: 'Passed publish gate validation', validationErrors: [] },
         ));
       }
 
@@ -215,7 +250,10 @@ export function registerBatchCommands(program: Command) {
         if (!check.ok) {
           summary.edgesSkipped++;
           writeAuditEntry(auditDir, createAuditEntry(
-            runId, 'add-edge', 'edge', '', 'rejected', edgeInput, { reason: check.reason },
+            runId, 'add-edge', 'edge', '', 'rejected', edgeInput, {
+              reason: check.reason,
+              validationErrors: [check.reason ?? 'Edge validation failed'],
+            },
           ));
           continue;
         }
@@ -233,6 +271,7 @@ export function registerBatchCommands(program: Command) {
         summary.edgesCreated++;
         writeAuditEntry(auditDir, createAuditEntry(
           runId, 'add-edge', 'edge', edgeId, 'accepted', edgeInput,
+          { aiRationale: 'Edge validation passed', validationErrors: [] },
         ));
       }
 
@@ -247,7 +286,17 @@ export function registerBatchCommands(program: Command) {
       data.metadata.lastAgentRunId = runId;
       data.metadata.totalAgentRuns = (data.metadata.totalAgentRuns ?? 0) + 1;
 
+      // Check daily cap after import and warn if approaching limit
+      const today = new Date().toISOString().slice(0, 10);
+      const todayNodeCount = data.nodes.filter(
+        (n) => n.provenance?.timestamp?.startsWith(today),
+      ).length;
+      const remaining = Math.max(0, govConfig.maxDailyNewNodes - todayNodeCount);
+      if (remaining <= 5) {
+        console.error(`Warning: Approaching daily node cap — ${remaining} nodes remaining (${todayNodeCount}/${govConfig.maxDailyNewNodes})`);
+      }
+
       writeFileSync(opts.file, graphToJson(data));
-      console.log(formatOutput({ status: 'ok', ...summary }, opts.format as OutputFormat));
+      console.log(formatOutput({ status: 'ok', ...summary, dailyCapRemaining: remaining }, opts.format as OutputFormat));
     });
 }

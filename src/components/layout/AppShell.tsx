@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { GraphCanvas } from '../graph/GraphCanvas';
 import { GraphToolbar } from '../graph/GraphToolbar';
+import { FilterPanel } from '../graph/FilterPanel';
 import { Legend } from '../graph/Legend';
 import { NodePanel } from '../panels/NodePanel';
 import { EdgePanel } from '../panels/EdgePanel';
@@ -14,6 +15,7 @@ import { importLegacyData } from '../../io/legacy-import';
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const selectedNodeId = useGraphStore((s) => s.selectedNodeId);
   const selectedEdgeId = useGraphStore((s) => s.selectedEdgeId);
   const loadGraph = useGraphStore((s) => s.loadGraph);
@@ -111,10 +113,18 @@ export function AppShell() {
       </div>
 
       {/* Toolbar */}
-      <GraphToolbar />
+      <GraphToolbar
+        onToggleFilters={() => setFiltersOpen((v) => !v)}
+        filtersOpen={filtersOpen}
+      />
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
+        {/* Filter panel (left sidebar) */}
+        {filtersOpen && (
+          <FilterPanel onClose={() => setFiltersOpen(false)} />
+        )}
+
         {/* Graph area */}
         <div className="flex-1 relative">
           <ReactFlowProvider>

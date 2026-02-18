@@ -5,10 +5,14 @@ Knowledge graph editor for tracking and evaluating scientific evidence. Build di
 ## Features
 
 - **Web UI** — Interactive graph editor built with React Flow, with drag-and-drop layout, node/edge editing, and real-time trust visualization
+- **Clustered graph layout** — Category-based cluster boundaries, collapsible clusters, degree-scaled node sizing, overlap resolution
+- **Interactive filtering** — Filter by category, edge trust threshold, source API, date range, node type, review status, and recent changes; focus mode (k-hop ego graph)
 - **CLI** — Full command-line interface for scripting and AI agent integration (`npm run mpsi -- <command>`)
 - **Trust propagation** — DFS-based trust calculation from root through edge weights, handles DAGs with cross-links
 - **Literature search** — Search Semantic Scholar, OpenAlex, and CrossRef APIs directly from the CLI
-- **Batch import** — Governance-controlled import with deduplication, provenance tracking, and JSONL audit trail
+- **Batch import** — Governance-controlled import with pre-publish validation gate, deduplication, provenance tracking, and JSONL audit trail
+- **Governance guardrails** — Daily node caps, required-field validation, duplicate rejection, configurable via `.mpsi-governance.json`
+- **Snapshots & rollback** — Immutable dated snapshots with diff and rollback; auto-snapshot before every batch import
 - **Review workflow** — Agent-added content starts as `draft`, with approve/reject workflow for human oversight
 - **Obsidian vault sync** — Bidirectional sync to markdown notes with YAML frontmatter and `[[wikilinks]]`
 - **Agent loop** — Automated literature scanning via `run-agent.sh` (Claude Code CLI cron job)
@@ -90,7 +94,18 @@ npm run mpsi -- review approve <id>
 | `review approve <id>` | Approve a node or reference |
 | `review reject <id>` | Reject a node or reference |
 | **Batch** | |
-| `batch import` | Import from JSON with dedup, provenance, audit trail |
+| `batch import` | Import from JSON with publish gate, dedup, provenance, audit trail |
+| **Governance** | |
+| `governance config` | View/modify governance config (`--show`, `--set key=value`) |
+| `governance validate` | Run publish gate validation on current graph |
+| `governance audit` | View audit log entries (`--date`, `--today`, `--entity`) |
+| `governance stats` | Today's node count, daily cap status |
+| **Snapshot** | |
+| `snapshot save` | Save a dated snapshot (`--trigger manual\|daily-auto`) |
+| `snapshot list` | List all available snapshots |
+| `snapshot show <date>` | Show snapshot summary |
+| `snapshot diff <date>` | Compare snapshot vs current graph |
+| `snapshot rollback <date>` | Rollback to snapshot (`--force` required) |
 | **Literature** | |
 | `literature search` | Search Semantic Scholar or OpenAlex |
 | `literature resolve` | Resolve a DOI to metadata |

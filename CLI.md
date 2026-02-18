@@ -376,11 +376,12 @@ npm run mpsi -- review reject P5
 
 ### batch import
 
-Batch import nodes, references, and edges from a JSON file with governance and audit trail.
+Batch import nodes, references, and edges from a JSON file with publish gate validation, governance, and audit trail.
 
 ```
 npm run mpsi -- batch import --input data.json
-npm run mpsi -- batch import --input data.json --review-status draft --snapshot --audit-dir ~/data
+npm run mpsi -- batch import --input data.json --review-status draft --audit-dir ~/data
+npm run mpsi -- batch import --input data.json --force   # Skip publish gate validation
 ```
 
 | Option | Required | Description | Default |
@@ -389,8 +390,9 @@ npm run mpsi -- batch import --input data.json --review-status draft --snapshot 
 | `--review-status <status>` | No | Review status for imported items | `draft` |
 | `--run-id <id>` | No | Run ID for provenance | auto-generated |
 | `--agent <name>` | No | Agent name for provenance | `batch-import` |
-| `--snapshot` | No | Save snapshot before importing | |
+| `--snapshot` | No | Save snapshot before importing (now always enabled) | |
 | `--audit-dir <dir>` | No | Directory for audit logs | graph file directory |
+| `--force` | No | Skip publish gate validation errors | |
 
 Input JSON format:
 ```json
@@ -402,7 +404,12 @@ Input JSON format:
 }
 ```
 
-Features: deduplication (DOI/S2-ID/fuzzy-title), provenance tracking, JSONL audit trail, daily snapshots.
+Features:
+- **Pre-publish gate** — Validates against governance config (daily caps, required fields, duplicates). Aborts on errors unless `--force`.
+- **Auto-snapshot** — Always saves a dated snapshot to `research/snapshots/` before importing.
+- **Deduplication** — DOI, Semantic Scholar ID, OpenAlex ID, and fuzzy title+year matching.
+- **Audit trail** — Extended JSONL audit entries with `aiRationale` and `validationErrors`.
+- **Cap warning** — Warns when approaching the daily node cap (5 or fewer remaining).
 
 ---
 
@@ -537,6 +544,126 @@ Show vault file counts and categories.
 ```
 npm run mpsi -- vault status --path ~/data/modularpsi/vault
 ```
+
+---
+
+### governance config
+
+View or update governance configuration (stored in `.mpsi-governance.json` alongside the graph file).
+
+```
+npm run mpsi -- governance config --show
+npm run mpsi -- governance config --set maxDailyNewNodes=30
+npm run mpsi -- governance config --set requireDescription=false maxDailyTrustDelta=3.0
+```
+
+| Option | Description |
+|--------|-------------|
+| `--show` | Display current config (default behavior) |
+| `--set <pairs...>` | Set one or more `key=value` pairs |
+
+**Config keys:**
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `maxDailyNewNodes` | number | `20` | Max nodes that can be created per day |
+| `maxDailyTrustDelta` | number | `2.0` | Max sum of absolute trust changes per node per day |
+| `requireDescription` | boolean | `true` | Reject nodes without descriptions |
+| `requireRefTitleYearDoi` | boolean | `true` | Reject references missing title, year, or DOI/URL |
+| `duplicateRejection` | boolean | `true` | Reject duplicate nodes/references |
+| `fuzzyDuplicateThreshold` | number | `0.85` | Fuzzy title match threshold |
+
+### governance validate
+
+Run publish gate validation on the current graph. Reports all errors and warnings.
+
+```
+npm run mpsi -- governance validate
+```
+
+Exits with code 1 if validation fails. Useful in CI pipelines.
+
+### governance audit
+
+View audit log entries.
+
+```
+npm run mpsi -- governance audit                 # List available audit dates
+npm run mpsi -- governance audit --today         # Show today's entries
+npm run mpsi -- governance audit --date 2026-02-15
+npm run mpsi -- governance audit --entity P5     # Filter by entity ID
+```
+
+| Option | Description |
+|--------|-------------|
+| `--date <YYYY-MM-DD>` | Show entries for a specific date |
+| `--today` | Show today's entries |
+| `--entity <id>` | Filter entries by entity ID |
+
+### governance stats
+
+Show today's governance statistics: node count, daily cap, remaining capacity.
+
+```
+npm run mpsi -- governance stats
+```
+
+**Output:** `date`, `todayNodeCount`, `dailyCap`, `remaining`, `totalNodes`, `totalEdges`, `totalReferences`, `maxDailyTrustDelta`
+
+---
+
+### snapshot save
+
+Save a dated snapshot of the current graph to `research/snapshots/`.
+
+```
+npm run mpsi -- snapshot save
+npm run mpsi -- snapshot save --trigger daily-auto
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--trigger <type>` | Trigger type: `manual` or `daily-auto` | `manual` |
+
+### snapshot list
+
+List all available snapshots with metadata.
+
+```
+npm run mpsi -- snapshot list
+```
+
+**Output:** Array of `{ date, timestamp, trigger, nodeCount, edgeCount, refCount }`
+
+### snapshot show \<date\>
+
+Show summary of a snapshot.
+
+```
+npm run mpsi -- snapshot show 2026-02-15
+```
+
+### snapshot diff \<date\>
+
+Compare a snapshot against the current graph, showing node/edge/reference count deltas.
+
+```
+npm run mpsi -- snapshot diff 2026-02-15
+```
+
+**Output:** `{ nodes: { snapshot, current, delta }, edges: {...}, references: {...} }`
+
+### snapshot rollback \<date\>
+
+Rollback the graph to a previous snapshot. Saves a pre-rollback backup automatically.
+
+```
+npm run mpsi -- snapshot rollback 2026-02-15 --force
+```
+
+| Option | Description |
+|--------|-------------|
+| `--force` | **Required.** Confirms the destructive rollback operation. |
 
 ---
 

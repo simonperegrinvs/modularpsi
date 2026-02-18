@@ -166,6 +166,35 @@ export interface Reference {
   reviewStatus?: ReviewStatus;
 }
 
+// ── Graph Filter / Focus / Cluster State ────────────────────
+export interface GraphFilterState {
+  visibleCategories: Set<string>;
+  edgeTrustThreshold: number; // 0.0–1.0; edges below this are hidden
+  sourceApiFilter: Set<string>; // e.g. 'semantic-scholar', 'openalex', 'crossref', 'human'
+  dateRange: { from: string | null; to: string | null }; // ISO date strings
+  nodeTypeFilter: Set<NodeType>;
+  reviewStatusFilter: Set<ReviewStatus>;
+  recentChangeDays: number; // 0 = disabled
+}
+
+export interface FocusModeState {
+  enabled: boolean;
+  centerId: string | null;
+  hops: number; // 1–5
+}
+
+export interface ClusterState {
+  collapsedClusters: Set<string>; // category IDs that are collapsed
+}
+
+export interface ClusterBounds {
+  categoryId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 // ── Default Categories (from legacy cats.mpsi) ──────────────
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'general', name: 'General Aspects of Psi', color: '#000000', description: '' },

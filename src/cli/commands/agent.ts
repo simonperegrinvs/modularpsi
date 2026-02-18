@@ -5,6 +5,8 @@ import { graphToJson, jsonToGraph } from '../../io/json-io';
 import { loadAgentState, resetAgentState, saveAgentState } from '../../agent/state';
 import { loadAgentConfig, saveAgentConfig } from '../../agent/config';
 import { getCitations, resolveDoi, searchLiterature, type ApiSource } from '../../agent/search';
+import { loadGovernanceConfig } from '../../agent/governance';
+import { readTodayAuditEntries } from '../../agent/audit';
 import {
   deriveStateFromDiscovery,
   listDiscoveryCandidates,
@@ -14,11 +16,13 @@ import {
   summarizeDiscovery,
 } from '../../agent/discovery';
 import { runDiscoveryIngestion } from '../../agent/discovery-run';
+import { importQueuedDiscoveryCandidates } from '../../agent/discovery-import';
 import { extractClaimsForReference } from '../../agent/claims';
 import { writeRunNote } from '../../agent/run-notes';
 import { summarizeHypothesisContradictions, summarizeNodeContradictions } from '../../agent/contradictions';
 import { buildMetricsReport, type MetricsPeriod } from '../../agent/metrics';
 import { formatOutput, type OutputFormat } from '../format';
+import type { ReviewStatus } from '../../domain/types';
 
 export function registerAgentCommands(program: Command) {
   const agent = program.command('agent').description('Agent management and diagnostics');
@@ -164,8 +168,9 @@ export function registerAgentCommands(program: Command) {
     .option('--status <status>', 'Filter by status (queued|parsed|imported-draft|duplicate|rejected|deferred)')
     .option('--query <query>', 'Filter by query or title substring')
     .option('--api <api>', 'Filter by source API')
+    .option('--run-id <id>', 'Filter by discovery run ID')
     .description('List latest discovery candidates with optional filters')
-    .action((cmdOpts: { date?: string; status?: string; query?: string; api?: string }) => {
+    .action((cmdOpts: { date?: string; status?: string; query?: string; api?: string; runId?: string }) => {
       const opts = program.opts();
       const baseDir = dirname(opts.file);
       const candidates = listDiscoveryCandidates(baseDir, {
@@ -173,6 +178,7 @@ export function registerAgentCommands(program: Command) {
         status: cmdOpts.status as 'queued' | 'parsed' | 'imported-draft' | 'duplicate' | 'rejected' | 'deferred' | undefined,
         query: cmdOpts.query,
         api: cmdOpts.api as 'semantic-scholar' | 'openalex' | 'crossref' | 'arxiv' | undefined,
+        runId: cmdOpts.runId,
       });
       console.log(formatOutput(candidates, opts.format as OutputFormat));
     });
@@ -203,6 +209,9 @@ export function registerAgentCommands(program: Command) {
     .option('--year-min <year>', 'Minimum publication year')
     .option('--year-max <year>', 'Maximum publication year')
     .option('--run-id <id>', 'Run ID for provenance')
+    .option('--auto-import', 'Automatically import queued candidates from this run as draft references')
+    .option('--import-limit <n>', 'Maximum queued candidates to import when --auto-import is set')
+    .option('--import-review-status <status>', 'Review status for auto-imported references', 'draft')
     .description('Run discovery ingestion and append candidates to discovery registry')
     .action(async (cmdOpts: {
       query?: string[];
@@ -212,6 +221,9 @@ export function registerAgentCommands(program: Command) {
       yearMin?: string;
       yearMax?: string;
       runId?: string;
+      autoImport?: boolean;
+      importLimit?: string;
+      importReviewStatus?: string;
     }) => {
       const opts = program.opts();
       const baseDir = dirname(opts.file);
@@ -240,7 +252,33 @@ export function registerAgentCommands(program: Command) {
         yearMax: cmdOpts.yearMax ? parseInt(cmdOpts.yearMax, 10) : undefined,
       });
 
-      const nextState = result.nextState;
+      let autoImportSummary: ReturnType<typeof importQueuedDiscoveryCandidates> | null = null;
+      if (cmdOpts.autoImport) {
+        const governanceConfig = loadGovernanceConfig(opts.file);
+        const todayAudit = readTodayAuditEntries(baseDir);
+        const maxItems = cmdOpts.importLimit ? parseInt(cmdOpts.importLimit, 10) : config.maxNewRefsPerRun;
+        const reviewStatus = (cmdOpts.importReviewStatus ?? config.defaultReviewStatus) as ReviewStatus;
+        autoImportSummary = importQueuedDiscoveryCandidates({
+          baseDir,
+          data,
+          governanceConfig,
+          auditEntries: todayAudit,
+          runId: result.runId,
+          sourceRunId: result.runId,
+          maxItems,
+          reviewStatus,
+        });
+        if (autoImportSummary.imported > 0) {
+          writeFileSync(opts.file, graphToJson(data));
+        }
+      }
+
+      const derivedState = deriveStateFromDiscovery(baseDir);
+      const nextState = {
+        ...result.nextState,
+        processedCandidateIds: derivedState.processedCandidateIds,
+        discoveryStats: derivedState.discoveryStats,
+      };
       saveAgentState(opts.file, nextState);
 
       console.log(formatOutput({
@@ -253,6 +291,67 @@ export function registerAgentCommands(program: Command) {
         citationResults: result.citationResults,
         eventsWritten: result.eventsWritten,
         byDecision: result.byDecision,
+        autoImport: autoImportSummary,
+      }, opts.format as OutputFormat));
+    });
+
+  discovery
+    .command('import')
+    .option('--date <date>', 'Filter queued candidates by discovery date YYYY-MM-DD')
+    .option('--run-id <id>', 'Filter queued candidates by source run ID')
+    .option('--limit <n>', 'Maximum queued candidates to import')
+    .option('--review-status <status>', 'Review status for imported references', 'draft')
+    .option('--max-linked-nodes <n>', 'Maximum existing nodes to link per imported reference', '2')
+    .description('Import queued discovery candidates into draft references')
+    .action((cmdOpts: {
+      date?: string;
+      runId?: string;
+      limit?: string;
+      reviewStatus?: string;
+      maxLinkedNodes?: string;
+    }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+      const config = loadAgentConfig(opts.file);
+      const governanceConfig = loadGovernanceConfig(opts.file);
+      const state = loadAgentState(opts.file);
+
+      const maxItems = cmdOpts.limit ? parseInt(cmdOpts.limit, 10) : config.maxNewRefsPerRun;
+      const maxLinkedNodes = cmdOpts.maxLinkedNodes ? parseInt(cmdOpts.maxLinkedNodes, 10) : 2;
+      const reviewStatus = (cmdOpts.reviewStatus ?? config.defaultReviewStatus) as ReviewStatus;
+      const runId = `discovery-import-${Date.now()}`;
+      const summary = importQueuedDiscoveryCandidates({
+        baseDir,
+        data,
+        governanceConfig,
+        auditEntries: readTodayAuditEntries(baseDir),
+        runId,
+        sourceRunId: cmdOpts.runId,
+        date: cmdOpts.date,
+        maxItems,
+        maxLinkedNodes,
+        reviewStatus,
+      });
+
+      if (summary.imported > 0) {
+        writeFileSync(opts.file, graphToJson(data));
+      }
+
+      const derivedState = deriveStateFromDiscovery(baseDir);
+      saveAgentState(opts.file, {
+        ...state,
+        processedCandidateIds: derivedState.processedCandidateIds,
+        discoveryStats: derivedState.discoveryStats,
+        lastRunTimestamp: new Date().toISOString(),
+        lastRunId: runId,
+        totalRuns: (state.totalRuns ?? 0) + 1,
+      });
+
+      console.log(formatOutput({
+        status: 'ok',
+        runId,
+        summary,
       }, opts.format as OutputFormat));
     });
 

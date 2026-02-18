@@ -130,6 +130,7 @@ npm run mpsi -- review approve <id>
 | `agent discovery list` | List latest discovery candidates with filters |
 | `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
 | `agent discovery ingest` | Run gap/frontier/citation discovery ingestion and append registry events |
+| `agent discovery import` | Import queued discovery candidates as draft references |
 | `agent discovery reconcile-state` | Rebuild discovery state counters from registry events |
 | `agent claims extract` | Extract claim-level entries from reference abstracts |
 | `agent run-note generate` | Generate structured run notes in `vault/agent-runs` |

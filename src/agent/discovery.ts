@@ -15,6 +15,7 @@ export interface DiscoveryListFilters {
   status?: DiscoveryDecision;
   query?: string;
   api?: DiscoveryCandidate['source'];
+  runId?: string;
 }
 
 function discoveryDate(timestamp: string): string {
@@ -149,6 +150,7 @@ export function listDiscoveryCandidates(baseDir: string, filters: DiscoveryListF
   return latest.filter((item) => {
     if (filters.status && item.decision !== filters.status) return false;
     if (filters.api && item.source !== filters.api) return false;
+    if (filters.runId && item.runId !== filters.runId) return false;
     if (filters.query) {
       const q = filters.query.toLowerCase();
       const inQuery = item.query.toLowerCase().includes(q);

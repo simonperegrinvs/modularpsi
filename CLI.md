@@ -673,6 +673,21 @@ npm run mpsi -- agent run-note generate --path ~/data/modularpsi/vault --run-id 
 | `--run-id <id>` | No | Run ID used in note title/filename | last run ID or auto |
 | `--date <date>` | No | Note date (`YYYY-MM-DD`) | today |
 
+### agent contradictions
+
+Surface mixed support/contradiction evidence from extracted claims and hypothesis links.
+
+```
+npm run mpsi -- agent contradictions
+npm run mpsi -- agent contradictions --node P6
+npm run mpsi -- agent contradictions --hypothesis hyp-2
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--node <id>` | No | Filter node contradiction summary by node ID | mixed nodes only |
+| `--hypothesis <id>` | No | Filter hypothesis contradiction summary by ID | mixed hypotheses only |
+
 ---
 
 ### vault init

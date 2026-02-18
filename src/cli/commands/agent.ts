@@ -15,6 +15,7 @@ import {
 import { runDiscoveryIngestion } from '../../agent/discovery-run';
 import { extractClaimsForReference } from '../../agent/claims';
 import { writeRunNote } from '../../agent/run-notes';
+import { summarizeHypothesisContradictions, summarizeNodeContradictions } from '../../agent/contradictions';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerAgentCommands(program: Command) {
@@ -375,6 +376,40 @@ export function registerAgentCommands(program: Command) {
         runId,
         date,
         queryCount: state.recentSearchQueries.slice(-10).length,
+      }, opts.format as OutputFormat));
+    });
+
+  agent
+    .command('contradictions')
+    .option('--node <id>', 'Filter to a specific node ID')
+    .option('--hypothesis <id>', 'Filter to a specific hypothesis ID')
+    .description('Surface mixed support/contradiction evidence from claims and hypothesis links')
+    .action((cmdOpts: { node?: string; hypothesis?: string }) => {
+      const opts = program.opts();
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+
+      let nodeSummary = summarizeNodeContradictions(data);
+      let hypothesisSummary = summarizeHypothesisContradictions(data.hypotheses);
+
+      if (cmdOpts.node) {
+        nodeSummary = nodeSummary.filter((n) => n.nodeId === cmdOpts.node);
+      } else {
+        nodeSummary = nodeSummary.filter((n) => n.status === 'mixed');
+      }
+
+      if (cmdOpts.hypothesis) {
+        hypothesisSummary = hypothesisSummary.filter((h) => h.hypothesisId === cmdOpts.hypothesis);
+      } else {
+        hypothesisSummary = hypothesisSummary.filter((h) => h.status === 'mixed');
+      }
+
+      console.log(formatOutput({
+        nodeContradictions: nodeSummary,
+        hypothesisContradictions: hypothesisSummary,
+        summary: {
+          mixedNodes: nodeSummary.length,
+          mixedHypotheses: hypothesisSummary.length,
+        },
       }, opts.format as OutputFormat));
     });
 }

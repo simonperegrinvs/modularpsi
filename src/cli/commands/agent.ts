@@ -14,6 +14,7 @@ import {
 } from '../../agent/discovery';
 import { runDiscoveryIngestion } from '../../agent/discovery-run';
 import { extractClaimsForReference } from '../../agent/claims';
+import { writeRunNote } from '../../agent/run-notes';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerAgentCommands(program: Command) {
@@ -318,6 +319,62 @@ export function registerAgentCommands(program: Command) {
         noAbstract,
         force: !!cmdOpts.force,
         details,
+      }, opts.format as OutputFormat));
+    });
+
+  const runNote = agent.command('run-note').description('Generate and manage agent run notes');
+
+  runNote
+    .command('generate')
+    .requiredOption('--path <vault>', 'Vault path')
+    .option('--run-id <id>', 'Run ID for note filename/title')
+    .option('--date <date>', 'Date for note (YYYY-MM-DD)')
+    .description('Generate a structured run note in vault/agent-runs')
+    .action((cmdOpts: { path: string; runId?: string; date?: string }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+      const state = loadAgentState(opts.file);
+
+      const date = cmdOpts.date ?? new Date().toISOString().slice(0, 10);
+      const runId = cmdOpts.runId
+        ?? state.lastDiscoveryRunId
+        ?? state.lastRunId
+        ?? `manual-${Date.now()}`;
+      const discoverySummary = summarizeDiscovery(baseDir, date);
+      const rejectedNearMisses = listDiscoveryCandidates(baseDir, {
+        date,
+        status: 'rejected',
+      }).slice(0, 10).map((r) => ({
+        candidateId: r.candidateId,
+        reason: r.decisionReason,
+        title: r.title,
+      }));
+
+      const importedDraftRefs = data.references.filter(
+        (r) => r.processingStatus === 'imported-draft' || r.reviewStatus === 'draft',
+      ).length;
+      const topHypotheses = [...data.hypotheses]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5)
+        .map((h) => ({ id: h.id, statement: h.statement, score: h.score, status: h.status }));
+
+      const note = writeRunNote(cmdOpts.path, {
+        runId,
+        date,
+        queries: state.recentSearchQueries.slice(-10),
+        discoverySummary,
+        importedDraftRefs,
+        topHypotheses,
+        rejectedNearMisses,
+      });
+
+      console.log(formatOutput({
+        status: 'ok',
+        file: note.filePath,
+        runId,
+        date,
+        queryCount: state.recentSearchQueries.slice(-10).length,
       }, opts.format as OutputFormat));
     });
 }

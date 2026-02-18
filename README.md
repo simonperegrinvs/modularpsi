@@ -129,6 +129,7 @@ npm run mpsi -- review approve <id>
 | `agent discovery ingest` | Run gap/frontier discovery ingestion and append registry events |
 | `agent discovery reconcile-state` | Rebuild discovery state counters from registry events |
 | `agent claims extract` | Extract claim-level entries from reference abstracts |
+| `agent run-note generate` | Generate structured run notes in `vault/agent-runs` |
 | **Vault** | |
 | `vault init` | Initialize Obsidian vault directory |
 | `vault sync` | Sync graph to/from vault (`--direction`) |
@@ -153,6 +154,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Claim-level extraction** — References can store `claims[]` with direction/context/confidence derived from abstracts
 - **Hypothesis cards** — Structured candidate correlations/constraints with support/contradiction links and triage status
 - **Constraint edges** — Edge semantics include `requires`, `confounded-by`, `incompatible-with`, and `fails-when`
+- **Run notes** — Structured per-run markdown notes can be generated in `vault/agent-runs`
 
 ## Tech Stack
 

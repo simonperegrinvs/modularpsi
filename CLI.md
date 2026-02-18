@@ -658,6 +658,21 @@ When no `--ref-id` is provided, extraction runs for all references.
 | `--ref-id <id>` | No | Extract for a specific reference | all references |
 | `--force` | No | Re-extract even if abstract checksum is unchanged | false |
 
+### agent run-note generate
+
+Generate a structured run note markdown file in `<vault>/agent-runs`.
+
+```
+npm run mpsi -- agent run-note generate --path ~/data/modularpsi/vault
+npm run mpsi -- agent run-note generate --path ~/data/modularpsi/vault --run-id run-42 --date 2026-02-18
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--path <vault>` | Yes | Vault path | |
+| `--run-id <id>` | No | Run ID used in note title/filename | last run ID or auto |
+| `--date <date>` | No | Note date (`YYYY-MM-DD`) | today |
+
 ---
 
 ### vault init

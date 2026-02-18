@@ -3,6 +3,9 @@ import { mkdtempSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
+  computeCandidateId,
+  createDiscoveryEventFromSearchResult,
+  decisionForSearchResult,
   listDiscoveryCandidates,
   listDiscoveryDates,
   readDiscoveryEvents,
@@ -11,6 +14,7 @@ import {
   writeDiscoveryEvent,
   type DiscoveryEvent,
 } from '../discovery';
+import type { Reference } from '../../domain/types';
 
 function fakeEvent(overrides: Partial<DiscoveryEvent>): DiscoveryEvent {
   return {
@@ -110,5 +114,103 @@ describe('discovery registry', () => {
 
     const latest = listDiscoveryCandidates(baseDir, {});
     expect(latest.find((c) => c.candidateId === 'cand-1')?.decision).toBe('queued');
+  });
+});
+
+describe('discovery candidate identity and decisions', () => {
+  const existingRefs: Reference[] = [
+    {
+      id: 'ref-1',
+      title: 'Ganzfeld Signal',
+      authors: ['A. Author'],
+      year: 2024,
+      publication: '',
+      publisher: '',
+      citation: '',
+      pageStart: 0,
+      pageEnd: 0,
+      volume: 0,
+      description: '',
+      doi: '10.1234/ABC',
+      url: '',
+      semanticScholarId: '',
+      openAlexId: '',
+      abstract: '',
+    },
+  ];
+
+  it('uses stable candidate ID priority: DOI > S2 > OpenAlex > title/year hash', () => {
+    expect(computeCandidateId({
+      title: 'T',
+      authors: [],
+      year: 2024,
+      doi: '10.1000/XyZ',
+      semanticScholarId: 'S2-1',
+      openAlexId: 'W123',
+      source: 'semantic-scholar',
+    })).toBe('doi:10.1000/xyz');
+
+    expect(computeCandidateId({
+      title: 'T',
+      authors: [],
+      year: 2024,
+      semanticScholarId: 'S2-1',
+      openAlexId: 'W123',
+      source: 'semantic-scholar',
+    })).toBe('s2:S2-1');
+
+    expect(computeCandidateId({
+      title: 'T',
+      authors: [],
+      year: 2024,
+      openAlexId: 'W123',
+      source: 'openalex',
+    })).toBe('oa:W123');
+  });
+
+  it('keeps fallback title/year candidate IDs stable under punctuation and case changes', () => {
+    const a = computeCandidateId({
+      title: 'Ganzfeld Signal Effects!',
+      authors: [],
+      year: 2024,
+      source: 'semantic-scholar',
+    });
+    const b = computeCandidateId({
+      title: 'ganzfeld signal   effects',
+      authors: [],
+      year: 2024,
+      source: 'openalex',
+    });
+    expect(a).toBe(b);
+    expect(a.startsWith('title-year:')).toBe(true);
+  });
+
+  it('marks duplicates from existing references and builds queued events for new items', () => {
+    const dupDecision = decisionForSearchResult({
+      title: 'Different Title',
+      authors: ['X'],
+      year: 2024,
+      doi: '10.1234/abc',
+      source: 'openalex',
+    }, existingRefs);
+    expect(dupDecision.decision).toBe('duplicate');
+
+    const event = createDiscoveryEventFromSearchResult(
+      {
+        title: 'Brand New Paper',
+        authors: ['X'],
+        year: 2025,
+        abstract: 'Some abstract text',
+        source: 'semantic-scholar',
+      },
+      'brand new query',
+      'run-22',
+      existingRefs,
+      { timestamp: '2026-02-18T12:00:00.000Z', discoveredAt: '2026-02-18T12:00:00.000Z' },
+    );
+
+    expect(event.decision).toBe('queued');
+    expect(event.action).toBe('discover');
+    expect(event.abstractChecksum).toBeTruthy();
   });
 });

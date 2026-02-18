@@ -1,6 +1,9 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import type { DiscoveryCandidate, DiscoveryDecision } from './search/types';
+import type { LiteratureSearchResult } from './search/types';
+import type { Reference } from '../domain/types';
+import { isDuplicate } from './search/dedup';
 
 export interface DiscoveryEvent extends DiscoveryCandidate {
   timestamp: string;
@@ -16,6 +19,76 @@ export interface DiscoveryListFilters {
 
 function discoveryDate(timestamp: string): string {
   return timestamp.slice(0, 10);
+}
+
+function normalizeText(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function simpleHash(s: string): string {
+  let hash = 0;
+  for (let i = 0; i < s.length; i++) {
+    hash = ((hash << 5) - hash + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash).toString(16);
+}
+
+export function abstractChecksum(abstract?: string): string | undefined {
+  if (!abstract) return undefined;
+  return simpleHash(normalizeText(abstract));
+}
+
+export function computeCandidateId(result: LiteratureSearchResult): string {
+  if (result.doi) return `doi:${result.doi.toLowerCase()}`;
+  if (result.semanticScholarId) return `s2:${result.semanticScholarId}`;
+  if (result.openAlexId) return `oa:${result.openAlexId}`;
+  return `title-year:${simpleHash(`${normalizeText(result.title)}|${result.year}`)}`;
+}
+
+export function decisionForSearchResult(
+  result: LiteratureSearchResult,
+  existingRefs: Reference[],
+): { decision: DiscoveryDecision; reason?: string } {
+  const dup = isDuplicate(result, existingRefs);
+  if (dup.duplicate) {
+    return {
+      decision: 'duplicate',
+      reason: `matched ${dup.matchedRefId} (${dup.matchType})`,
+    };
+  }
+  return { decision: 'queued' };
+}
+
+export function createDiscoveryEventFromSearchResult(
+  result: LiteratureSearchResult,
+  query: string,
+  runId: string,
+  existingRefs: Reference[],
+  overrides?: Partial<DiscoveryEvent>,
+): DiscoveryEvent {
+  const now = new Date().toISOString();
+  const decision = decisionForSearchResult(result, existingRefs);
+  return {
+    candidateId: computeCandidateId(result),
+    source: result.source,
+    discoveredAt: now,
+    query,
+    title: result.title,
+    authors: result.authors,
+    year: result.year,
+    doi: result.doi,
+    abstract: result.abstract,
+    abstractChecksum: abstractChecksum(result.abstract),
+    url: result.url,
+    semanticScholarId: result.semanticScholarId,
+    openAlexId: result.openAlexId,
+    decision: decision.decision,
+    decisionReason: decision.reason,
+    runId,
+    timestamp: now,
+    action: 'discover',
+    ...overrides,
+  };
 }
 
 function discoveryPath(baseDir: string, date: string): string {

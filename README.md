@@ -138,6 +138,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **External IDs** — References store DOI, Semantic Scholar ID, OpenAlex ID for deduplication
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
 - **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
+- **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)
 - **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
 
 ## Tech Stack

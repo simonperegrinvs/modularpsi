@@ -56,8 +56,16 @@ export function jsonToGraph(json: string): GraphData {
     if (edge.combinedTrust === undefined) edge.combinedTrust = -1;
     if (edge.type === undefined) edge.type = 0;
   }
-  // Ensure references exist
+  // Ensure references exist and have all fields
   if (!data.references) data.references = [];
+  for (const ref of data.references) {
+    if (!ref.description) ref.description = '';
+    if (!ref.doi) ref.doi = '';
+    if (!ref.url) ref.url = '';
+    if (!ref.semanticScholarId) ref.semanticScholarId = '';
+    if (!ref.openAlexId) ref.openAlexId = '';
+    if (!ref.abstract) ref.abstract = '';
+  }
   return data;
 }
 

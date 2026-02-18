@@ -45,16 +45,6 @@ Fails if the file already exists.
 
 ---
 
-### node list
-
-List all nodes in the graph.
-
-```
-npm run mpsi -- node list
-```
-
-**Output fields:** `id`, `name`, `trust`, `type`, `category`
-
 ### node show \<id\>
 
 Show full details for a node, including its outgoing edges.
@@ -65,6 +55,21 @@ npm run mpsi -- node show P1
 
 **Output fields:** `id`, `name`, `description`, `categoryId`, `keywords`, `type`, `trust`, `referenceIds`, `edges[]`
 
+### node list
+
+List all nodes in the graph.
+
+```
+npm run mpsi -- node list
+npm run mpsi -- node list --review-status draft
+```
+
+| Option | Description |
+|--------|-------------|
+| `--review-status <status>` | Filter by review status (`draft`, `pending-review`, `approved`, `rejected`) |
+
+**Output fields:** `id`, `name`, `trust`, `type`, `category`
+
 ### node add
 
 Add a new node connected to a parent.
@@ -72,6 +77,7 @@ Add a new node connected to a parent.
 ```
 npm run mpsi -- node add --parent P1 --name "Telepathy evidence"
 npm run mpsi -- node add --parent P1 --name "Options" --type chooser --category bio
+npm run mpsi -- node add --parent P1 --name "Evidence" --description "Study results" --keywords "telepathy;meta-analysis"
 ```
 
 | Option | Required | Description | Default |
@@ -80,6 +86,8 @@ npm run mpsi -- node add --parent P1 --name "Options" --type chooser --category 
 | `--name <name>` | Yes | Node name | |
 | `--type <type>` | No | `regular`, `chooser`, or `holder` | `regular` |
 | `--category <cat>` | No | Category ID | `general` |
+| `--description <desc>` | No | Node description | `""` |
+| `--keywords <kw>` | No | Semicolon-separated keywords | `""` |
 
 **Output fields:** `id`, `name`
 
@@ -174,7 +182,7 @@ npm run mpsi -- edge delete P1-P3
 
 ### trust show
 
-Show propagated trust values for all nodes or a specific node.
+Show propagated trust values for all nodes or a specific node. Re-propagates in memory without saving to file (use `trust propagate` to save).
 
 ```
 npm run mpsi -- trust show
@@ -248,11 +256,25 @@ npm run mpsi -- category update neuro --name "Neuroscience Research" --color "#0
 
 ### ref list
 
-List all references, optionally filtered by node.
+List all references, optionally filtered by node or review status.
 
 ```
 npm run mpsi -- ref list
 npm run mpsi -- ref list --node P3
+npm run mpsi -- ref list --review-status draft
+```
+
+| Option | Description |
+|--------|-------------|
+| `--node <id>` | Filter by linked node |
+| `--review-status <status>` | Filter by review status |
+
+### ref show \<id\>
+
+Show full details for a reference, including linked nodes.
+
+```
+npm run mpsi -- ref show ref-123
 ```
 
 ### ref add
@@ -261,6 +283,7 @@ Add a new reference.
 
 ```
 npm run mpsi -- ref add --title "Study of Psi" --authors "Smith;Jones" --year 2020
+npm run mpsi -- ref add --title "Ganzfeld" --authors "Tressoldi" --year 2024 --description "Registered report" --doi "10.xxx/yyy"
 ```
 
 | Option | Required | Description | Default |
@@ -268,6 +291,30 @@ npm run mpsi -- ref add --title "Study of Psi" --authors "Smith;Jones" --year 20
 | `--title <title>` | Yes | Reference title | |
 | `--authors <authors>` | No | Semicolon-separated author names | `""` |
 | `--year <year>` | No | Publication year | `0` |
+| `--description <desc>` | No | Brief description | `""` |
+| `--journal <journal>` | No | Journal/publication name | `""` |
+| `--citation <citation>` | No | Full citation string | `""` |
+| `--doi <doi>` | No | DOI identifier | `""` |
+| `--url <url>` | No | Direct URL | `""` |
+| `--abstract <abstract>` | No | Full abstract text | `""` |
+
+### ref update \<id\>
+
+Update one or more fields on an existing reference.
+
+```
+npm run mpsi -- ref update ref-123 --doi "10.1037/a0021524" --description "Updated description"
+```
+
+Accepts all the same options as `ref add`.
+
+### ref search \<query\>
+
+Search references by title, author, DOI, or description.
+
+```
+npm run mpsi -- ref search "ganzfeld"
+```
 
 ### ref link \<ref-id\> \<node-id\>
 
@@ -283,6 +330,212 @@ Unlink a reference from a node.
 
 ```
 npm run mpsi -- ref unlink ref-123 P3
+```
+
+---
+
+### review list
+
+List items (nodes and references) with review status.
+
+```
+npm run mpsi -- review list
+npm run mpsi -- review list --status draft
+```
+
+| Option | Description |
+|--------|-------------|
+| `--status <status>` | Filter: `draft`, `pending-review`, `approved`, `rejected` |
+
+### review pending
+
+List items pending review (shorthand for `review list` with draft/pending-review).
+
+```
+npm run mpsi -- review pending
+```
+
+### review approve \<id\>
+
+Approve a node or reference.
+
+```
+npm run mpsi -- review approve P5
+npm run mpsi -- review approve ref-123
+```
+
+### review reject \<id\>
+
+Reject a node or reference.
+
+```
+npm run mpsi -- review reject P5
+```
+
+---
+
+### batch import
+
+Batch import nodes, references, and edges from a JSON file with governance and audit trail.
+
+```
+npm run mpsi -- batch import --input data.json
+npm run mpsi -- batch import --input data.json --review-status draft --snapshot --audit-dir ~/data
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--input <file>` | Yes | JSON file with batch data | |
+| `--review-status <status>` | No | Review status for imported items | `draft` |
+| `--run-id <id>` | No | Run ID for provenance | auto-generated |
+| `--agent <name>` | No | Agent name for provenance | `batch-import` |
+| `--snapshot` | No | Save snapshot before importing | |
+| `--audit-dir <dir>` | No | Directory for audit logs | graph file directory |
+
+Input JSON format:
+```json
+{
+  "nodes": [{ "parentId": "P3", "name": "...", "description": "...", "categoryId": "phenom", "keywords": ["..."] }],
+  "references": [{ "title": "...", "authors": ["..."], "year": 2024, "doi": "10.xxx/yyy", "linkToNodes": ["P5"] }],
+  "edges": [{ "sourceId": "P5", "targetId": "P13", "trust": 0.6, "type": "derivation" }],
+  "provenance": { "searchQuery": "...", "apiSource": "semantic-scholar" }
+}
+```
+
+Features: deduplication (DOI/S2-ID/fuzzy-title), provenance tracking, JSONL audit trail, daily snapshots.
+
+---
+
+### literature search
+
+Search external literature databases (read-only, does not modify graph).
+
+```
+npm run mpsi -- literature search --query "ganzfeld psi" --limit 10
+npm run mpsi -- literature search --query "precognition" --api openalex --year-min 2010
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--query <q>` | Yes | Search query | |
+| `--api <api>` | No | `semantic-scholar` or `openalex` | `semantic-scholar` |
+| `--limit <n>` | No | Max results | `20` |
+| `--year-min <year>` | No | Minimum year | |
+| `--year-max <year>` | No | Maximum year | |
+
+### literature resolve
+
+Resolve a DOI to paper metadata.
+
+```
+npm run mpsi -- literature resolve --doi "10.1037/a0021524"
+```
+
+### literature citations
+
+Get citing or cited-by papers for a DOI.
+
+```
+npm run mpsi -- literature citations --doi "10.1037/a0021524" --direction citing --limit 10
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--doi <doi>` | Yes | DOI to look up | |
+| `--direction <dir>` | No | `citing` or `cited-by` | `citing` |
+| `--limit <n>` | No | Max results | `10` |
+
+### literature enrich
+
+Enrich an existing reference with external API data (DOI, abstract, S2 ID).
+
+```
+npm run mpsi -- literature enrich --ref-id ref-123
+```
+
+---
+
+### agent status
+
+Show agent run history, pending items, and coverage summary.
+
+```
+npm run mpsi -- agent status
+```
+
+### agent gaps
+
+Identify nodes needing evidence: no references, no description, unclassified trust.
+
+```
+npm run mpsi -- agent gaps
+```
+
+### agent state
+
+Show raw agent state (last run, search cursors, etc.).
+
+```
+npm run mpsi -- agent state
+```
+
+### agent reset
+
+Clear agent state to start fresh.
+
+```
+npm run mpsi -- agent reset
+```
+
+### agent config
+
+View or modify agent configuration.
+
+```
+npm run mpsi -- agent config --show
+npm run mpsi -- agent config --set maxNewRefsPerRun=30
+npm run mpsi -- agent config --set focusKeywords=ganzfeld,precognition,psi
+```
+
+---
+
+### vault init
+
+Initialize an Obsidian vault directory structure.
+
+```
+npm run mpsi -- vault init --path ~/data/modularpsi/vault
+```
+
+### vault sync
+
+Sync between graph and Obsidian vault. Preserves human-written `## Notes` sections.
+
+```
+npm run mpsi -- vault sync --path ~/data/modularpsi/vault
+npm run mpsi -- vault sync --path ~/data/modularpsi/vault --direction vault-to-graph
+npm run mpsi -- vault sync --path ~/data/modularpsi/vault --direction both
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--path <dir>` | Yes | Vault directory | |
+| `--direction <dir>` | No | `graph-to-vault`, `vault-to-graph`, or `both` | `graph-to-vault` |
+
+Vault structure:
+```
+vault/
+  nodes/{category}/{node-id}-{slug}.md
+  references/{year}/{ref-id}-{author}-{year}.md
+  agent-runs/
+```
+
+### vault status
+
+Show vault file counts and categories.
+
+```
+npm run mpsi -- vault status --path ~/data/modularpsi/vault
 ```
 
 ---
@@ -355,6 +608,45 @@ Trust propagates from root (trust=1.0) through edges: `combinedTrust = parentTru
 | `psichological` | Psychological Aspects of Psi |
 | `cultural` | Cultural Aspects of Psi |
 | `na` | N/C |
+
+### Review Status
+
+Items (nodes and references) can have a review status for agent governance:
+
+| Status | Meaning |
+|--------|---------|
+| `draft` | Agent-added, not yet reviewed |
+| `pending-review` | Flagged for human review |
+| `approved` | Human-approved |
+| `rejected` | Human-rejected |
+
+### Provenance
+
+Agent-added items include provenance metadata:
+
+```json
+{
+  "source": "agent",
+  "agent": "literature-scanner",
+  "timestamp": "2026-02-18T10:30:00Z",
+  "runId": "run-20260218",
+  "searchQuery": "ganzfeld psi",
+  "apiSource": "semantic-scholar"
+}
+```
+
+### Reference Fields
+
+References now include external identifiers for deduplication and enrichment:
+
+| Field | Description |
+|-------|-------------|
+| `description` | Brief summary of the study |
+| `doi` | DOI identifier |
+| `url` | Direct URL |
+| `semanticScholarId` | Semantic Scholar corpus ID |
+| `openAlexId` | OpenAlex work ID |
+| `abstract` | Full abstract text |
 
 ## File Format
 

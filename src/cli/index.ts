@@ -14,6 +14,11 @@ import { registerCategoryCommands } from './commands/category';
 import { registerImportCommands } from './commands/import';
 import { registerExportCommands } from './commands/export';
 import { registerRefCommands } from './commands/ref';
+import { registerReviewCommands } from './commands/review';
+import { registerBatchCommands } from './commands/batch';
+import { registerLiteratureCommands } from './commands/literature';
+import { registerAgentCommands } from './commands/agent';
+import { registerVaultCommands } from './commands/vault';
 
 // ── Last-used file persistence ────────────────────────────────
 const RC_PATH = resolve(homedir(), '.mpsirc');
@@ -73,5 +78,10 @@ registerCategoryCommands(program);
 registerImportCommands(program);
 registerExportCommands(program);
 registerRefCommands(program);
+registerReviewCommands(program);
+registerBatchCommands(program);
+registerLiteratureCommands(program);
+registerAgentCommands(program);
+registerVaultCommands(program);
 
 program.parse();

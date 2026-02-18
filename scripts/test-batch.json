@@ -1,0 +1,24 @@
+{
+  "nodes": [
+    {
+      "parentId": "P6",
+      "name": "Ganzfeld Hit Rate Debate",
+      "description": "Ongoing debate about true hit rate in ganzfeld experiments",
+      "categoryId": "phenom",
+      "keywords": ["ganzfeld", "hit rate", "debate"]
+    }
+  ],
+  "references": [
+    {
+      "title": "Test Reference for Batch Import",
+      "authors": ["Test Author"],
+      "year": 2025,
+      "description": "A test reference to verify batch import",
+      "linkToNodes": ["P6"]
+    }
+  ],
+  "provenance": {
+    "searchQuery": "ganzfeld hit rate",
+    "apiSource": "test"
+  }
+}

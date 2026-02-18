@@ -35,6 +35,7 @@ export function ReferenceList({ nodeId, onAddRef }: ReferenceListProps) {
             <div className="text-gray-500">{ref.authors.join(', ')}</div>
           )}
           {ref.year > 0 && <div className="text-gray-500">{ref.year}</div>}
+          {ref.description && <div className="text-gray-400 mt-1">{ref.description}</div>}
         </div>
       ))}
     </div>

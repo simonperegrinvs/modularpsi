@@ -6,7 +6,12 @@ Knowledge graph editor for tracking and evaluating scientific evidence. Build di
 
 - **Web UI** — Interactive graph editor built with React Flow, with drag-and-drop layout, node/edge editing, and real-time trust visualization
 - **CLI** — Full command-line interface for scripting and AI agent integration (`npm run mpsi -- <command>`)
-- **Trust propagation** — Automatic DFS-based trust calculation from root through edge weights
+- **Trust propagation** — DFS-based trust calculation from root through edge weights, handles DAGs with cross-links
+- **Literature search** — Search Semantic Scholar, OpenAlex, and CrossRef APIs directly from the CLI
+- **Batch import** — Governance-controlled import with deduplication, provenance tracking, and JSONL audit trail
+- **Review workflow** — Agent-added content starts as `draft`, with approve/reject workflow for human oversight
+- **Obsidian vault sync** — Bidirectional sync to markdown notes with YAML frontmatter and `[[wikilinks]]`
+- **Agent loop** — Automated literature scanning via `run-agent.sh` (Claude Code CLI cron job)
 - **Legacy import** — Import data from the original ModularPsi XML format (.mpsi, .graphml)
 - **Export** — Graphviz DOT and PNG export
 
@@ -21,48 +26,105 @@ npm run dev          # Start web UI at http://localhost:5173
 
 ```bash
 npm run mpsi -- init                          # Create new graph
-npm run mpsi -- node list                     # List all nodes
-npm run mpsi -- node add --parent P1 --name "My Node"
-npm run mpsi -- edge add --source P1 --target P2 --trust 0.8
+npm run mpsi -- node add --parent P1 --name "Hypothesis A" --description "..."
+npm run mpsi -- edge update P1-P2 --trust 0.8
 npm run mpsi -- trust show                    # Show propagated trust values
+npm run mpsi -- literature search --query "ganzfeld psi" --limit 10
+npm run mpsi -- review pending                # See agent-added draft items
 ```
 
 See [CLI.md](CLI.md) for complete CLI documentation.
+
+### Agent Loop
+
+Run a daily literature scan that finds gaps, searches APIs, and imports new references:
+
+```bash
+./run-agent.sh                # Manual one-off run
+# Or add to crontab:
+# 0 8 * * * /path/to/run-agent.sh
+```
+
+All agent content is imported with `reviewStatus: draft`. Review with:
+```bash
+npm run mpsi -- review pending
+npm run mpsi -- review approve <id>
+```
 
 ## CLI Command Reference
 
 | Command | Description |
 |---------|-------------|
 | `init` | Create a new empty graph file |
-| `node list` | List all nodes |
-| `node show <id>` | Show full node details |
-| `node add` | Add a new node (requires `--parent`, `--name`) |
+| **Nodes** | |
+| `node list` | List all nodes (supports `--review-status` filter) |
+| `node show <id>` | Show full node details with edges |
+| `node add` | Add a node (`--parent`, `--name`, `--description`, `--keywords`, `--category`) |
 | `node update <id>` | Update node fields |
 | `node delete <id>` | Delete a leaf node |
+| **Edges** | |
 | `edge list` | List all edges |
-| `edge add` | Add a new edge (requires `--source`, `--target`) |
+| `edge add` | Add an edge (`--source`, `--target`, `--trust`, `--type`) |
 | `edge update <id>` | Update edge trust/type |
 | `edge delete <id>` | Delete an edge |
-| `trust show` | Show trust values for all nodes |
-| `trust propagate` | Re-propagate and save trust values |
+| **Trust** | |
+| `trust show` | Show trust values (re-propagates in memory) |
+| `trust propagate` | Re-propagate trust and save to file |
+| **Search** | |
 | `search <query>` | Search nodes by name, description, keywords |
+| **Categories** | |
 | `category list` | List categories |
 | `category add` | Add a category |
 | `category update <id>` | Update a category |
-| `ref list` | List references |
-| `ref add` | Add a reference |
+| **References** | |
+| `ref list` | List references (`--node`, `--review-status` filters) |
+| `ref show <id>` | Show full reference details with linked nodes |
+| `ref add` | Add a reference (`--title`, `--authors`, `--year`, `--doi`, `--description`) |
+| `ref update <id>` | Update reference fields |
+| `ref search <query>` | Search references by title, author, DOI, description |
 | `ref link <ref-id> <node-id>` | Link reference to node |
 | `ref unlink <ref-id> <node-id>` | Unlink reference from node |
+| **Review** | |
+| `review list` | List items with review status (`--status` filter) |
+| `review pending` | List draft/pending-review items |
+| `review approve <id>` | Approve a node or reference |
+| `review reject <id>` | Reject a node or reference |
+| **Batch** | |
+| `batch import` | Import from JSON with dedup, provenance, audit trail |
+| **Literature** | |
+| `literature search` | Search Semantic Scholar or OpenAlex |
+| `literature resolve` | Resolve a DOI to metadata |
+| `literature citations` | Get citing/cited-by papers |
+| `literature enrich` | Enrich existing reference with external API data |
+| **Agent** | |
+| `agent status` | Last run, pending items, summary |
+| `agent gaps` | Nodes needing references or evidence |
+| `agent state` | Raw agent state |
+| `agent reset` | Clear agent state |
+| `agent config` | View/modify agent configuration |
+| **Vault** | |
+| `vault init` | Initialize Obsidian vault directory |
+| `vault sync` | Sync graph to/from vault (`--direction`) |
+| `vault status` | Show vault file counts |
+| **Import/Export** | |
 | `import <dir>` | Import legacy XML data directory |
 | `export dot` | Export as Graphviz DOT |
 | `export png` | Render as PNG (requires Graphviz) |
 
 Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format json|table|quiet`
 
+## Data Model
+
+- **Provenance** — Agent-added items track source, agent name, run ID, search query, API source
+- **Review status** — `draft` → `pending-review` → `approved` / `rejected`
+- **External IDs** — References store DOI, Semantic Scholar ID, OpenAlex ID for deduplication
+- **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
+
 ## Tech Stack
 
 - **Frontend**: React 19, React Flow, Zustand, Tailwind CSS 4
 - **CLI**: Commander.js, tsx
+- **Literature APIs**: Semantic Scholar, OpenAlex, CrossRef (all free, no keys needed)
 - **Build**: Vite 7, TypeScript 5.9
 - **Test**: Vitest
 

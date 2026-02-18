@@ -764,6 +764,8 @@ npm run mpsi -- vault sync --path ~/data/modularpsi/vault --direction both
 | `--path <dir>` | Yes | Vault directory | |
 | `--direction <dir>` | No | `graph-to-vault`, `vault-to-graph`, or `both` | `graph-to-vault` |
 
+Synced notes now include hypothesis links and contradiction summaries where available.
+
 Vault structure:
 ```
 vault/

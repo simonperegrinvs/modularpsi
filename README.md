@@ -165,6 +165,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Hypothesis duplicate guard** — Governance validation now catches semantic duplicate hypotheses when similar statements target overlapping nodes
 - **Decision audit detail** — Hypothesis propose/triage writes decision metadata (`decisionType`, `aiRationale`, `scoreBreakdown`) to audit logs
 - **UI review surface** — Side panel now includes a hypothesis review queue and contradiction snapshot when nothing is selected
+- **Vault note enrichment** — Synced node/reference markdown now includes hypothesis links and contradiction summaries
 
 ## Tech Stack
 

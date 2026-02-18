@@ -1,6 +1,6 @@
-import type { GraphNode, Reference } from './types';
-import type { AuditEntry } from '../agent/audit';
-import { isDuplicate } from '../agent/search/dedup';
+import type { GraphNode, Reference } from '../domain/types';
+import type { AuditEntry } from './audit';
+import { isDuplicate } from './search/dedup';
 
 export interface PublishGateConfig {
   requireDescription: boolean;

@@ -5,7 +5,7 @@ import type { GraphData } from '../../domain/types';
 import { jsonToGraph } from '../../io/json-io';
 import { loadGovernanceConfig, saveGovernanceConfig } from '../../agent/governance';
 import { readAuditEntries, readTodayAuditEntries, listAuditDates } from '../../agent/audit';
-import { runPublishGate } from '../../domain/publish-validation';
+import { runPublishGate } from '../../agent/publish-validation';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerGovernanceCommands(program: Command) {
@@ -36,13 +36,14 @@ export function registerGovernanceCommands(program: Command) {
             process.exit(1);
           }
 
-          const current = (config as Record<string, unknown>)[key];
+          const rec = config as unknown as Record<string, unknown>;
+          const current = rec[key];
           if (typeof current === 'number') {
-            (config as Record<string, unknown>)[key] = Number(value);
+            rec[key] = Number(value);
           } else if (typeof current === 'boolean') {
-            (config as Record<string, unknown>)[key] = value === 'true';
+            rec[key] = value === 'true';
           } else {
-            (config as Record<string, unknown>)[key] = value;
+            rec[key] = value;
           }
         }
         saveGovernanceConfig(opts.file, config);

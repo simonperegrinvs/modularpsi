@@ -9,7 +9,7 @@ import { jsonToGraph, graphToJson } from '../../io/json-io';
 import { isDuplicate } from '../../agent/search/dedup';
 import { writeAuditEntry, createAuditEntry, readTodayAuditEntries } from '../../agent/audit';
 import { loadGovernanceConfig } from '../../agent/governance';
-import { runPublishGate } from '../../domain/publish-validation';
+import { runPublishGate } from '../../agent/publish-validation';
 import { saveSnapshot } from '../../agent/snapshot';
 import { formatOutput, type OutputFormat } from '../format';
 

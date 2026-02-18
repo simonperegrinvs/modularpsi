@@ -7,6 +7,7 @@ export interface AgentConfig {
   maxResultsPerQuery: number;
   maxQueriesPerRun: number;
   maxNewNodesPerRun: number;
+  minNodeProposalConfidence: number;
   maxNewRefsPerRun: number;
   citationSnowballsPerRun: number;
   defaultReviewStatus: ReviewStatus;
@@ -21,6 +22,7 @@ const DEFAULT_CONFIG: AgentConfig = {
   maxResultsPerQuery: 20,
   maxQueriesPerRun: 30,
   maxNewNodesPerRun: 5,
+  minNodeProposalConfidence: 0.72,
   maxNewRefsPerRun: 20,
   citationSnowballsPerRun: 25,
   defaultReviewStatus: 'draft',

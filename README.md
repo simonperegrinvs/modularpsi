@@ -98,6 +98,7 @@ npm run mpsi -- review approve <id>
 | `hypothesis show <id>` | Show a hypothesis card |
 | `hypothesis add` | Add a hypothesis card |
 | `hypothesis update <id>` | Update statement/links/score/status |
+| `hypothesis triage` | Re-score and prioritize hypothesis cards (`--promote` optional) |
 | **Batch** | |
 | `batch import` | Import from JSON with publish gate, dedup, provenance, audit trail |
 | **Governance** | |

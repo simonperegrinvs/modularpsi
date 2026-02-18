@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { graphToJson, jsonToGraph } from '../../io/json-io';
 import { createHypothesis } from '../../domain/hypothesis';
 import type { HypothesisStatus } from '../../domain/types';
+import { triageHypotheses } from '../../agent/hypothesis-scoring';
 import { formatOutput, type OutputFormat } from '../format';
 
 function parseList(value?: string): string[] {
@@ -121,5 +122,36 @@ export function registerHypothesisCommands(program: Command) {
 
       writeFileSync(opts.file, graphToJson(data));
       console.log(formatOutput(item, opts.format as OutputFormat));
+    });
+
+  hypothesis
+    .command('triage')
+    .option('--top <n>', 'Maximum number of cards to select', '10')
+    .option('--min-score <n>', 'Minimum score threshold', '0.6')
+    .option('--promote', 'Promote selected draft cards to pending-review')
+    .description('Re-score hypotheses and select highest-priority cards')
+    .action((cmdOpts: { top?: string; minScore?: string; promote?: boolean }) => {
+      const opts = program.opts();
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+      const top = cmdOpts.top ? parseInt(cmdOpts.top, 10) : 10;
+      const minScore = cmdOpts.minScore ? parseFloat(cmdOpts.minScore) : 0.6;
+
+      const result = triageHypotheses(data.hypotheses, {
+        top,
+        minScore,
+        promote: !!cmdOpts.promote,
+      });
+
+      data.hypotheses = result.updatedHypotheses;
+      writeFileSync(opts.file, graphToJson(data));
+
+      console.log(formatOutput({
+        status: 'ok',
+        top,
+        minScore,
+        selectedCount: result.selected.length,
+        promoted: result.promoted,
+        selected: result.selected,
+      }, opts.format as OutputFormat));
     });
 }

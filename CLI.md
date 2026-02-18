@@ -420,6 +420,22 @@ npm run mpsi -- hypothesis update hyp-1 --status pending-review --score 0.78
 npm run mpsi -- hypothesis update hyp-1 --contradict-refs ref-9
 ```
 
+### hypothesis triage
+
+Re-score hypothesis cards and select top candidates for review.
+
+```
+npm run mpsi -- hypothesis triage
+npm run mpsi -- hypothesis triage --top 5 --min-score 0.65
+npm run mpsi -- hypothesis triage --top 5 --promote
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--top <n>` | No | Max number of cards selected | `10` |
+| `--min-score <n>` | No | Score threshold (0-1) | `0.6` |
+| `--promote` | No | Promote selected drafts to `pending-review` | false |
+
 ---
 
 ### batch import

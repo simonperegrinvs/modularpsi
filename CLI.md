@@ -613,6 +613,8 @@ npm run mpsi -- agent config --set maxNewRefsPerRun=30
 npm run mpsi -- agent config --set focusKeywords=ganzfeld,precognition,psi
 ```
 
+Common keys include `maxNewRefsPerRun`, `maxNewNodesPerRun`, `minNodeProposalConfidence`, `focusKeywords`, and `excludeKeywords`.
+
 ### agent discovery status
 
 Show discovery registry summary (candidate/event counts and status breakdown).
@@ -667,6 +669,7 @@ npm run mpsi -- agent discovery ingest --query "ganzfeld psi" --api semantic-sch
 npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" --max-queries 5 --year-min 2000
 npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --import-limit 8
 npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --scope-keyword "psi" "ganzfeld" --exclude-keyword "microbial" --min-scope-score 3
+npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --auto-node-growth --max-new-nodes 2 --min-node-confidence 0.78
 ```
 
 When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
@@ -688,6 +691,11 @@ If DOI references exist, citation snowballing also runs (bounded by `citationSno
 | `--exclude-keyword <keywords...>` | No | Exclude keywords used by auto-import scope filter (combined with agent `excludeKeywords`) | none |
 | `--min-scope-score <n>` | No | Minimum scope score required for auto-import | `2` |
 | `--no-scope-filter` | No | Disable scope filtering for auto-import | scope filter enabled |
+| `--auto-node-growth` | No | Create new nodes from imported candidates using conservative governance and dedupe checks | false |
+| `--max-new-nodes <n>` | No | Max auto-created nodes for this import pass | `maxNewNodesPerRun` |
+| `--min-node-confidence <n>` | No | Min confidence (0..1) required for node creation | `minNodeProposalConfidence` |
+| `--node-review-status <status>` | No | Review status assigned to auto-created nodes | `approved` |
+| `--node-similarity-threshold <n>` | No | Similarity threshold (0..1) for node-duplicate rejection | `0.82` |
 
 ### agent discovery import
 
@@ -698,6 +706,7 @@ npm run mpsi -- agent discovery import
 npm run mpsi -- agent discovery import --run-id real-flow-full-20260218-212350 --limit 10
 npm run mpsi -- agent discovery import --date 2026-02-18 --review-status draft --max-linked-nodes 3
 npm run mpsi -- agent discovery import --run-id run-42 --scope-keyword "psi" "remote viewing" --exclude-keyword "microbial"
+npm run mpsi -- agent discovery import --run-id run-42 --auto-node-growth --max-new-nodes 2 --min-node-confidence 0.78
 ```
 
 | Option | Required | Description | Default |
@@ -711,6 +720,13 @@ npm run mpsi -- agent discovery import --run-id run-42 --scope-keyword "psi" "re
 | `--exclude-keyword <keywords...>` | No | Exclude keywords used by scope filter (combined with agent `excludeKeywords`) | none |
 | `--min-scope-score <n>` | No | Minimum scope score required for import | `2` |
 | `--no-scope-filter` | No | Disable scope filtering for import | scope filter enabled |
+| `--auto-node-growth` | No | Create new nodes from imported candidates using conservative governance and dedupe checks | false |
+| `--max-new-nodes <n>` | No | Max auto-created nodes for this import pass | `maxNewNodesPerRun` |
+| `--min-node-confidence <n>` | No | Min confidence (0..1) required for node creation | `minNodeProposalConfidence` |
+| `--node-review-status <status>` | No | Review status assigned to auto-created nodes | `approved` |
+| `--node-similarity-threshold <n>` | No | Similarity threshold (0..1) for node-duplicate rejection | `0.82` |
+
+Import output now includes `nodesProposed`, `nodesCreated`, `nodeDuplicates`, `nodeRejected`, `nodeDetails[]`, and `skipReasons[]`.
 
 ### agent discovery reconcile-state
 
@@ -849,7 +865,7 @@ npm run mpsi -- governance config --set requireDescription=false maxDailyTrustDe
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `maxDailyNewNodes` | number | `20` | Max nodes that can be created per day |
-| `maxDailyNewHypotheses` | number | `15` | Max hypotheses that can be created per day |
+| `maxDailyNewHypotheses` | number | `15` | Hypothesis daily-cap target (reported as advisory warning; non-blocking) |
 | `maxDailyConstraintEdges` | number | `40` | Max constraint edges (`requires/confounded-by/incompatible-with/fails-when`) per day |
 | `maxDailyTrustDelta` | number | `2.0` | Max sum of absolute trust changes per node per day |
 | `requireDescription` | boolean | `true` | Reject nodes without descriptions |
@@ -868,7 +884,7 @@ Run publish gate validation on the current graph. Reports all errors and warning
 npm run mpsi -- governance validate
 ```
 
-Exits with code 1 if validation fails. Useful in CI pipelines.
+Exits with code 1 if blocking validation fails. Hypothesis cap exceedance is advisory and does not fail validation.
 
 ### governance audit
 

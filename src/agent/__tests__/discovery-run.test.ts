@@ -13,6 +13,7 @@ const baseConfig: AgentConfig = {
   maxResultsPerQuery: 5,
   maxQueriesPerRun: 10,
   maxNewNodesPerRun: 5,
+  minNodeProposalConfidence: 0.72,
   maxNewRefsPerRun: 20,
   citationSnowballsPerRun: 25,
   defaultReviewStatus: 'draft',

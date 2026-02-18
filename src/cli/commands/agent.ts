@@ -226,6 +226,11 @@ export function registerAgentCommands(program: Command) {
     .option('--exclude-keyword <keywords...>', 'Exclude keywords for auto-import scope matching')
     .option('--min-scope-score <n>', 'Minimum scope score required for auto-import', '2')
     .option('--no-scope-filter', 'Disable scope filtering for auto-import')
+    .option('--auto-node-growth', 'Automatically create new nodes from imported discovery candidates')
+    .option('--max-new-nodes <n>', 'Maximum new nodes to create in this import')
+    .option('--min-node-confidence <n>', 'Minimum confidence (0-1) required for node creation')
+    .option('--node-review-status <status>', 'Review status for auto-created nodes', 'approved')
+    .option('--node-similarity-threshold <n>', 'Duplicate similarity threshold (0-1) for node creation')
     .description('Run discovery ingestion and append candidates to discovery registry')
     .action(async (cmdOpts: {
       query?: string[];
@@ -242,6 +247,11 @@ export function registerAgentCommands(program: Command) {
       excludeKeyword?: string[];
       minScopeScore?: string;
       scopeFilter?: boolean;
+      autoNodeGrowth?: boolean;
+      maxNewNodes?: string;
+      minNodeConfidence?: string;
+      nodeReviewStatus?: string;
+      nodeSimilarityThreshold?: string;
     }) => {
       const opts = program.opts();
       const baseDir = dirname(opts.file);
@@ -279,6 +289,13 @@ export function registerAgentCommands(program: Command) {
         const scopeKeywords = uniqStrings([...(config.focusKeywords ?? []), ...(cmdOpts.scopeKeyword ?? [])]);
         const excludeKeywords = uniqStrings([...(config.excludeKeywords ?? []), ...(cmdOpts.excludeKeyword ?? [])]);
         const minScopeScore = cmdOpts.minScopeScore ? parseInt(cmdOpts.minScopeScore, 10) : 2;
+        const maxNewNodes = cmdOpts.maxNewNodes ? parseInt(cmdOpts.maxNewNodes, 10) : config.maxNewNodesPerRun;
+        const minNodeConfidence = cmdOpts.minNodeConfidence
+          ? parseFloat(cmdOpts.minNodeConfidence)
+          : config.minNodeProposalConfidence;
+        const nodeSimilarityThreshold = cmdOpts.nodeSimilarityThreshold
+          ? parseFloat(cmdOpts.nodeSimilarityThreshold)
+          : undefined;
         autoImportSummary = importQueuedDiscoveryCandidates({
           baseDir,
           data,
@@ -292,6 +309,11 @@ export function registerAgentCommands(program: Command) {
           excludeKeywords,
           minScopeScore,
           enforceScopeFilter: cmdOpts.scopeFilter !== false,
+          autoNodeGrowth: cmdOpts.autoNodeGrowth === true,
+          maxNewNodes,
+          minNodeConfidence,
+          nodeReviewStatus: (cmdOpts.nodeReviewStatus ?? 'approved') as ReviewStatus,
+          nodeSimilarityThreshold,
         });
         if (autoImportSummary.imported > 0) {
           writeFileSync(opts.file, graphToJson(data));
@@ -331,6 +353,11 @@ export function registerAgentCommands(program: Command) {
     .option('--exclude-keyword <keywords...>', 'Exclude keywords for auto-import scope matching')
     .option('--min-scope-score <n>', 'Minimum scope score required for import', '2')
     .option('--no-scope-filter', 'Disable scope filtering for import')
+    .option('--auto-node-growth', 'Automatically create new nodes from imported candidates')
+    .option('--max-new-nodes <n>', 'Maximum new nodes to create in this import')
+    .option('--min-node-confidence <n>', 'Minimum confidence (0-1) required for node creation')
+    .option('--node-review-status <status>', 'Review status for auto-created nodes', 'approved')
+    .option('--node-similarity-threshold <n>', 'Duplicate similarity threshold (0-1) for node creation')
     .description('Import queued discovery candidates into draft references')
     .action((cmdOpts: {
       date?: string;
@@ -342,6 +369,11 @@ export function registerAgentCommands(program: Command) {
       excludeKeyword?: string[];
       minScopeScore?: string;
       scopeFilter?: boolean;
+      autoNodeGrowth?: boolean;
+      maxNewNodes?: string;
+      minNodeConfidence?: string;
+      nodeReviewStatus?: string;
+      nodeSimilarityThreshold?: string;
     }) => {
       const opts = program.opts();
       const baseDir = dirname(opts.file);
@@ -356,6 +388,13 @@ export function registerAgentCommands(program: Command) {
       const scopeKeywords = uniqStrings([...(config.focusKeywords ?? []), ...(cmdOpts.scopeKeyword ?? [])]);
       const excludeKeywords = uniqStrings([...(config.excludeKeywords ?? []), ...(cmdOpts.excludeKeyword ?? [])]);
       const minScopeScore = cmdOpts.minScopeScore ? parseInt(cmdOpts.minScopeScore, 10) : 2;
+      const maxNewNodes = cmdOpts.maxNewNodes ? parseInt(cmdOpts.maxNewNodes, 10) : config.maxNewNodesPerRun;
+      const minNodeConfidence = cmdOpts.minNodeConfidence
+        ? parseFloat(cmdOpts.minNodeConfidence)
+        : config.minNodeProposalConfidence;
+      const nodeSimilarityThreshold = cmdOpts.nodeSimilarityThreshold
+        ? parseFloat(cmdOpts.nodeSimilarityThreshold)
+        : undefined;
       const runId = `discovery-import-${Date.now()}`;
       const summary = importQueuedDiscoveryCandidates({
         baseDir,
@@ -372,6 +411,11 @@ export function registerAgentCommands(program: Command) {
         excludeKeywords,
         minScopeScore,
         enforceScopeFilter: cmdOpts.scopeFilter !== false,
+        autoNodeGrowth: cmdOpts.autoNodeGrowth === true,
+        maxNewNodes,
+        minNodeConfidence,
+        nodeReviewStatus: (cmdOpts.nodeReviewStatus ?? 'approved') as ReviewStatus,
+        nodeSimilarityThreshold,
       });
 
       if (summary.imported > 0) {

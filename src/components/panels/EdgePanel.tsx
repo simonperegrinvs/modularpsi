@@ -1,5 +1,5 @@
 import { useGraphStore } from '../../store/graph-store';
-import { edgeTypeLabel, TRUST_LABELS, float2TrustItem, trustItem2float } from '../../domain/types';
+import { EDGE_TYPES, edgeTypeLabel, TRUST_LABELS, float2TrustItem, trustItem2float } from '../../domain/types';
 import type { EdgeType } from '../../domain/types';
 import { trustToHex } from '../../lib/colors';
 
@@ -71,7 +71,7 @@ export function EdgePanel() {
           value={edge.type}
           onChange={(e) => updateEdge(edge.id, { type: parseInt(e.target.value) as EdgeType })}
         >
-          {([0, 1, 2] as EdgeType[]).map((t) => (
+          {EDGE_TYPES.map((t) => (
             <option key={t} value={t}>
               {edgeTypeLabel[t]}
             </option>

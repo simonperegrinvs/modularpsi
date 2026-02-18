@@ -15,6 +15,8 @@ describe('createEmptyGraph', () => {
     expect(g.edges).toHaveLength(0);
     expect(g.categories.length).toBeGreaterThan(0);
     expect(g.references).toHaveLength(0);
+    expect(g.hypotheses).toEqual([]);
+    expect(g.metadata?.schemaVersion).toBe(1);
   });
 
   it('supports M prefix', () => {
@@ -88,6 +90,22 @@ describe('jsonToGraph backfills', () => {
     const g = jsonToGraph(json);
     expect(g.categories.length).toBeGreaterThan(0);
     expect(g.references).toEqual([]);
+    expect(g.hypotheses).toEqual([]);
+  });
+
+  it('backfills missing metadata.schemaVersion for legacy graphs', () => {
+    const json = JSON.stringify({
+      version: 1,
+      prefix: 'P',
+      rootId: 'P1',
+      lastNodeNumber: 1,
+      nodes: [],
+      edges: [],
+      categories: [],
+      references: [],
+    });
+    const g = jsonToGraph(json);
+    expect(g.metadata?.schemaVersion).toBe(1);
   });
 
   it('preserves trust=0 (does not backfill falsy values)', () => {
@@ -102,5 +120,41 @@ describe('jsonToGraph backfills', () => {
     });
     const g = jsonToGraph(json);
     expect(g.nodes[0].trust).toBe(0);
+  });
+
+  it('maps reviewStatus to reference processingStatus when missing', () => {
+    const json = JSON.stringify({
+      version: 1,
+      prefix: 'P',
+      rootId: 'P1',
+      lastNodeNumber: 1,
+      nodes: [],
+      edges: [],
+      categories: [],
+      references: [
+        {
+          id: 'ref-1',
+          title: 'A',
+          authors: [],
+          year: 2024,
+          publication: '',
+          publisher: '',
+          citation: '',
+          pageStart: 0,
+          pageEnd: 0,
+          volume: 0,
+          description: '',
+          doi: '',
+          url: '',
+          semanticScholarId: '',
+          openAlexId: '',
+          abstract: '',
+          reviewStatus: 'draft',
+        },
+      ],
+    });
+    const g = jsonToGraph(json);
+    expect(g.references[0].processingStatus).toBe('imported-draft');
+    expect(g.references[0].claims).toEqual([]);
   });
 });

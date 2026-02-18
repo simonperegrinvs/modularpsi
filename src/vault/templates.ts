@@ -22,6 +22,7 @@ export function refFilename(ref: Reference): string {
 
 export function generateNodeNote(node: GraphNode, data: GraphData): string {
   const linkedRefs = data.references.filter((r) => node.referenceIds.includes(r.id));
+  const linkedHypotheses = data.hypotheses.filter((h) => h.linkedNodeIds.includes(node.id));
   const incomingEdges = data.edges.filter((e) => e.targetId === node.id);
   const outgoingEdges = data.edges.filter((e) => e.sourceId === node.id);
   const parentNodes = incomingEdges.map((e) => data.nodes.find((n) => n.id === e.sourceId)).filter(Boolean);
@@ -59,6 +60,28 @@ export function generateNodeNote(node: GraphNode, data: GraphData): string {
     sections.push('');
   }
 
+  if (linkedHypotheses.length > 0) {
+    sections.push('## Hypotheses', '');
+    for (const h of linkedHypotheses) {
+      sections.push(`- ${h.id} (${h.status}, score ${h.score.toFixed(2)}): ${h.statement}`);
+    }
+    sections.push('');
+  }
+
+  if (linkedRefs.length > 0) {
+    const claims = linkedRefs.flatMap((r) => r.claims ?? []);
+    const support = claims.filter((c) => c.direction === 'supports').length;
+    const contradict = claims.filter((c) => c.direction === 'contradicts').length;
+    const neutral = claims.filter((c) => c.direction === 'null').length;
+    const status = support > 0 && contradict > 0 ? 'mixed' : (support > 0 || contradict > 0 ? 'one-sided' : 'insufficient');
+    sections.push('## Contradiction Summary', '');
+    sections.push(`- status: ${status}`);
+    sections.push(`- supports: ${support}`);
+    sections.push(`- contradicts: ${contradict}`);
+    sections.push(`- null: ${neutral}`);
+    sections.push('');
+  }
+
   if (parentNodes.length > 0 || childNodes.length > 0) {
     sections.push('## Related Nodes', '');
     for (const parent of parentNodes) {
@@ -83,6 +106,8 @@ export function generateNodeNote(node: GraphNode, data: GraphData): string {
 
 export function generateRefNote(ref: Reference, data: GraphData): string {
   const linkedNodes = data.nodes.filter((n) => n.referenceIds.includes(ref.id));
+  const supportingHypotheses = data.hypotheses.filter((h) => h.supportRefIds.includes(ref.id));
+  const contradictingHypotheses = data.hypotheses.filter((h) => h.contradictRefIds.includes(ref.id));
 
   const fm: Record<string, unknown> = {
     id: ref.id,
@@ -118,6 +143,17 @@ export function generateRefNote(ref: Reference, data: GraphData): string {
     for (const node of linkedNodes) {
       const fname = nodeFilename(node);
       sections.push(`- [[${fname.replace('.md', '')}|${node.name}]]`);
+    }
+    sections.push('');
+  }
+
+  if (supportingHypotheses.length > 0 || contradictingHypotheses.length > 0) {
+    sections.push('## Hypothesis Links', '');
+    for (const h of supportingHypotheses) {
+      sections.push(`- Supports ${h.id}: ${h.statement}`);
+    }
+    for (const h of contradictingHypotheses) {
+      sections.push(`- Contradicts ${h.id}: ${h.statement}`);
     }
     sections.push('');
   }

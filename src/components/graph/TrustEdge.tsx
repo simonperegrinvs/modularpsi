@@ -5,7 +5,7 @@ import {
   type EdgeProps,
 } from '@xyflow/react';
 import type { GraphEdge } from '../../domain/types';
-import { EDGE_TYPE_IMPLICATION, EDGE_TYPE_DERIVATION, EDGE_TYPE_POSSIBILITY } from '../../domain/types';
+import { edgeDashPattern } from './edge-style';
 import { trustToHex } from '../../lib/colors';
 
 export type TrustEdgeData = {
@@ -39,19 +39,8 @@ function TrustEdgeComponent({
   const color = graphEdge.trust >= 0 ? trustToHex(graphEdge.trust) : '#000000';
   const selectedColor = '#8080FF';
 
-  // Dash pattern based on edge type (from legacy edge.cpp:254-259)
-  let strokeDasharray: string | undefined;
-  switch (graphEdge.type) {
-    case EDGE_TYPE_IMPLICATION:
-      strokeDasharray = undefined; // solid
-      break;
-    case EDGE_TYPE_DERIVATION:
-      strokeDasharray = '8 4 2 4'; // dash-dot
-      break;
-    case EDGE_TYPE_POSSIBILITY:
-      strokeDasharray = '6 4'; // dashed
-      break;
-  }
+  // Dash pattern based on edge type, including constraint semantics.
+  const strokeDasharray = edgeDashPattern(graphEdge.type);
 
   return (
     <BaseEdge

@@ -22,18 +22,47 @@ export function parseNodeType(s: string): NodeType {
 export const EDGE_TYPE_IMPLICATION = 0 as const;
 export const EDGE_TYPE_DERIVATION = 1 as const;
 export const EDGE_TYPE_POSSIBILITY = 2 as const;
-export type EdgeType = typeof EDGE_TYPE_IMPLICATION | typeof EDGE_TYPE_DERIVATION | typeof EDGE_TYPE_POSSIBILITY;
+export const EDGE_TYPE_REQUIRES = 3 as const;
+export const EDGE_TYPE_CONFOUNDED_BY = 4 as const;
+export const EDGE_TYPE_INCOMPATIBLE_WITH = 5 as const;
+export const EDGE_TYPE_FAILS_WHEN = 6 as const;
+export type EdgeType =
+  | typeof EDGE_TYPE_IMPLICATION
+  | typeof EDGE_TYPE_DERIVATION
+  | typeof EDGE_TYPE_POSSIBILITY
+  | typeof EDGE_TYPE_REQUIRES
+  | typeof EDGE_TYPE_CONFOUNDED_BY
+  | typeof EDGE_TYPE_INCOMPATIBLE_WITH
+  | typeof EDGE_TYPE_FAILS_WHEN;
+
+export const EDGE_TYPES: EdgeType[] = [
+  EDGE_TYPE_IMPLICATION,
+  EDGE_TYPE_DERIVATION,
+  EDGE_TYPE_POSSIBILITY,
+  EDGE_TYPE_REQUIRES,
+  EDGE_TYPE_CONFOUNDED_BY,
+  EDGE_TYPE_INCOMPATIBLE_WITH,
+  EDGE_TYPE_FAILS_WHEN,
+];
 
 export const edgeTypeLabel: Record<EdgeType, string> = {
   [EDGE_TYPE_IMPLICATION]: 'implication',
   [EDGE_TYPE_DERIVATION]: 'derivation',
   [EDGE_TYPE_POSSIBILITY]: 'possibility',
+  [EDGE_TYPE_REQUIRES]: 'requires',
+  [EDGE_TYPE_CONFOUNDED_BY]: 'confounded-by',
+  [EDGE_TYPE_INCOMPATIBLE_WITH]: 'incompatible-with',
+  [EDGE_TYPE_FAILS_WHEN]: 'fails-when',
 };
 
 export function parseEdgeType(s: string): EdgeType {
   switch (s.toLowerCase()) {
     case 'derivation': case '1': return EDGE_TYPE_DERIVATION;
     case 'possibility': case '2': return EDGE_TYPE_POSSIBILITY;
+    case 'requires': case '3': return EDGE_TYPE_REQUIRES;
+    case 'confounded-by': case 'confoundedby': case '4': return EDGE_TYPE_CONFOUNDED_BY;
+    case 'incompatible-with': case 'incompatiblewith': case '5': return EDGE_TYPE_INCOMPATIBLE_WITH;
+    case 'fails-when': case 'failswhen': case '6': return EDGE_TYPE_FAILS_WHEN;
     default: return EDGE_TYPE_IMPLICATION;
   }
 }
@@ -108,7 +137,9 @@ export interface GraphData {
   edges: GraphEdge[];
   categories: Category[];
   references: Reference[];
+  hypotheses: HypothesisCard[];
   metadata?: {
+    schemaVersion?: number;
     lastAgentRun?: string;
     lastAgentRunId?: string;
     totalAgentRuns?: number;
@@ -144,6 +175,19 @@ export interface Provenance {
 export type ReviewStatus = 'draft' | 'pending-review' | 'approved' | 'rejected';
 export type NodeStatus = 'active' | 'stale' | 'merged';
 
+export type ClaimDirection = 'supports' | 'contradicts' | 'null';
+
+export interface ReferenceClaim {
+  claimId: string;
+  text: string;
+  direction: ClaimDirection;
+  contextTags: string[];
+  confidence: number;
+  rationale: string;
+  extractorModel: string;
+  createdAt: string;
+}
+
 // ── Reference ───────────────────────────────────────────────
 export interface Reference {
   id: string;
@@ -162,8 +206,28 @@ export interface Reference {
   semanticScholarId: string;
   openAlexId: string;
   abstract: string;
+  claims?: ReferenceClaim[];
+  abstractChecksum?: string;
+  discoveryCandidateId?: string;
+  processingStatus?: 'imported-draft' | 'approved' | 'rejected';
   provenance?: Provenance;
   reviewStatus?: ReviewStatus;
+}
+
+export type HypothesisStatus = 'draft' | 'pending-review' | 'approved' | 'rejected';
+
+export interface HypothesisCard {
+  id: string;
+  statement: string;
+  linkedNodeIds: string[];
+  supportRefIds: string[];
+  contradictRefIds: string[];
+  constraintEdgeIds: string[];
+  score: number;
+  status: HypothesisStatus;
+  createdAt: string;
+  updatedAt?: string;
+  createdByRunId?: string;
 }
 
 // ── Graph Filter / Focus / Cluster State ────────────────────

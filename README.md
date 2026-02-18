@@ -93,6 +93,15 @@ npm run mpsi -- review approve <id>
 | `review pending` | List draft/pending-review items |
 | `review approve <id>` | Approve a node or reference |
 | `review reject <id>` | Reject a node or reference |
+| **Hypotheses** | |
+| `hypothesis list` | List hypothesis cards (`--status` filter) |
+| `hypothesis show <id>` | Show a hypothesis card |
+| `hypothesis add` | Add a hypothesis card |
+| `hypothesis update <id>` | Update statement/links/score/status |
+| `hypothesis triage` | Re-score and prioritize hypothesis cards (`--promote` optional) |
+| `hypothesis propose` | Run generator/skeptic/judge loop to propose draft cards |
+| **Constraints** | |
+| `constraint list` | List constraint edges (`requires`, `confounded-by`, `incompatible-with`, `fails-when`) |
 | **Batch** | |
 | `batch import` | Import from JSON with publish gate, dedup, provenance, audit trail |
 | **Governance** | |
@@ -117,6 +126,15 @@ npm run mpsi -- review approve <id>
 | `agent state` | Raw agent state |
 | `agent reset` | Clear agent state |
 | `agent config` | View/modify agent configuration |
+| `agent discovery status` | Discovery registry summary (events, candidates, status counts) |
+| `agent discovery list` | List latest discovery candidates with filters |
+| `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
+| `agent discovery ingest` | Run gap/frontier/citation discovery ingestion and append registry events |
+| `agent discovery reconcile-state` | Rebuild discovery state counters from registry events |
+| `agent claims extract` | Extract claim-level entries from reference abstracts |
+| `agent run-note generate` | Generate structured run notes in `vault/agent-runs` |
+| `agent contradictions` | Surface mixed support/contradiction evidence for nodes/hypotheses |
+| `agent metrics` | Generate daily/weekly/monthly calibration metrics report |
 | **Vault** | |
 | `vault init` | Initialize Obsidian vault directory |
 | `vault sync` | Sync graph to/from vault (`--direction`) |
@@ -134,6 +152,21 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Review status** — `draft` → `pending-review` → `approved` / `rejected`
 - **External IDs** — References store DOI, Semantic Scholar ID, OpenAlex ID for deduplication
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
+- **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
+- **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)
+- **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
+- **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references
+- **Claim-level extraction** — References can store `claims[]` with direction/context/confidence derived from abstracts
+- **Hypothesis cards** — Structured candidate correlations/constraints with support/contradiction links and triage status
+- **Constraint edges** — Edge semantics include `requires`, `confounded-by`, `incompatible-with`, and `fails-when`
+- **Run notes** — Structured per-run markdown notes can be generated in `vault/agent-runs`
+- **Review/processing sync** — Reference `processingStatus` is aligned automatically on review approve/reject actions
+- **Governance for hypotheses/constraints** — Daily caps and evidence validation now include hypotheses and constraint-edge publishing
+- **Hypothesis duplicate guard** — Governance validation now catches semantic duplicate hypotheses when similar statements target overlapping nodes
+- **Decision audit detail** — Hypothesis propose/triage writes decision metadata (`decisionType`, `aiRationale`, `scoreBreakdown`) to audit logs
+- **UI review surface** — Side panel now includes a hypothesis review queue and contradiction snapshot when nothing is selected
+- **Vault note enrichment** — Synced node/reference markdown now includes hypothesis links and contradiction summaries
+- **Constraint edge styling** — Graph canvas renders each constraint edge type with distinct dash patterns for quick visual differentiation
 
 ## Tech Stack
 

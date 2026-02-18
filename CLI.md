@@ -152,7 +152,7 @@ npm run mpsi -- edge add --source P1 --target P3 --type derivation
 | `--source <id>` | Yes | Source node ID | |
 | `--target <id>` | Yes | Target node ID | |
 | `--trust <n>` | No | Trust value (-1 to 1) | `-1` |
-| `--type <type>` | No | `implication`, `derivation`, or `possibility` | `implication` |
+| `--type <type>` | No | `implication`, `derivation`, `possibility`, `requires`, `confounded-by`, `incompatible-with`, or `fails-when` | `implication` |
 
 Fails if: self-loop, duplicate edge, or source/target node not found.
 
@@ -168,7 +168,7 @@ npm run mpsi -- edge update P1-P3 --type possibility
 | Option | Description |
 |--------|-------------|
 | `--trust <n>` | New trust value |
-| `--type <type>` | New edge type |
+| `--type <type>` | New edge type (including constraint semantics) |
 
 ### edge delete \<id\>
 
@@ -364,6 +364,8 @@ npm run mpsi -- review approve P5
 npm run mpsi -- review approve ref-123
 ```
 
+For references, this also sets `processingStatus=approved`.
+
 ### review reject \<id\>
 
 Reject a node or reference.
@@ -371,6 +373,101 @@ Reject a node or reference.
 ```
 npm run mpsi -- review reject P5
 ```
+
+For references, this also sets `processingStatus=rejected`.
+
+---
+
+### hypothesis list
+
+List hypothesis cards, optionally filtered by status.
+
+```
+npm run mpsi -- hypothesis list
+npm run mpsi -- hypothesis list --status pending-review
+```
+
+### hypothesis show \<id\>
+
+Show full details for a hypothesis card.
+
+```
+npm run mpsi -- hypothesis show hyp-1
+```
+
+### hypothesis add
+
+Add a new hypothesis card.
+
+```
+npm run mpsi -- hypothesis add --statement "Ganzfeld signal depends on strict blinding"
+npm run mpsi -- hypothesis add --statement "Constraint candidate" --linked-nodes P6,P11 --support-refs ref-1,ref-2 --score 0.62
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--statement <text>` | Yes | Hypothesis statement | |
+| `--linked-nodes <ids>` | No | Comma-separated linked node IDs | empty |
+| `--support-refs <ids>` | No | Comma-separated supporting ref IDs | empty |
+| `--contradict-refs <ids>` | No | Comma-separated contradicting ref IDs | empty |
+| `--constraint-edges <ids>` | No | Comma-separated constraint edge IDs | empty |
+| `--score <n>` | No | Initial score | `0` |
+| `--status <status>` | No | `draft`, `pending-review`, `approved`, `rejected` | `draft` |
+| `--run-id <id>` | No | Provenance run ID | |
+
+### hypothesis update \<id\>
+
+Update one or more fields on an existing hypothesis card.
+
+```
+npm run mpsi -- hypothesis update hyp-1 --status pending-review --score 0.78
+npm run mpsi -- hypothesis update hyp-1 --contradict-refs ref-9
+```
+
+### hypothesis triage
+
+Re-score hypothesis cards and select top candidates for review.
+
+```
+npm run mpsi -- hypothesis triage
+npm run mpsi -- hypothesis triage --top 5 --min-score 0.65
+npm run mpsi -- hypothesis triage --top 5 --promote
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--top <n>` | No | Max number of cards selected | `10` |
+| `--min-score <n>` | No | Score threshold (0-1) | `0.6` |
+| `--promote` | No | Promote selected drafts to `pending-review` | false |
+
+### hypothesis propose
+
+Run a generator/skeptic/judge loop over claim-backed nodes and propose new draft hypothesis cards.
+
+```
+npm run mpsi -- hypothesis propose
+npm run mpsi -- hypothesis propose --top 3 --run-id run-20260218-a
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--top <n>` | No | Max number of generated proposals | `5` |
+| `--run-id <id>` | No | Provenance run ID for created cards | |
+
+---
+
+### constraint list
+
+List constraint edges (`requires`, `confounded-by`, `incompatible-with`, `fails-when`).
+
+```
+npm run mpsi -- constraint list
+npm run mpsi -- constraint list --node P6
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--node <id>` | No | Filter by source or target node ID | none |
 
 ---
 
@@ -504,6 +601,144 @@ npm run mpsi -- agent config --set maxNewRefsPerRun=30
 npm run mpsi -- agent config --set focusKeywords=ganzfeld,precognition,psi
 ```
 
+### agent discovery status
+
+Show discovery registry summary (candidate/event counts and status breakdown).
+
+```
+npm run mpsi -- agent discovery status
+npm run mpsi -- agent discovery status --date 2026-02-18
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--date <date>` | No | Filter summary to `YYYY-MM-DD` | all dates |
+
+### agent discovery list
+
+List latest discovery candidates, optionally filtered.
+
+```
+npm run mpsi -- agent discovery list
+npm run mpsi -- agent discovery list --status deferred --api semantic-scholar
+npm run mpsi -- agent discovery list --query "ganzfeld" --date 2026-02-18
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--date <date>` | No | Filter by `YYYY-MM-DD` | all dates |
+| `--status <status>` | No | `queued`, `parsed`, `imported-draft`, `duplicate`, `rejected`, or `deferred` | none |
+| `--query <query>` | No | Filter by query or title substring | none |
+| `--api <api>` | No | `semantic-scholar`, `openalex`, `crossref`, `arxiv` | none |
+
+### agent discovery retry <candidate-id>
+
+Re-queue a discovery candidate for processing.
+
+```
+npm run mpsi -- agent discovery retry cand-123
+npm run mpsi -- agent discovery retry cand-123 --run-id manual-retry-20260218
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--run-id <id>` | No | Run ID to record for retry event | auto-generated |
+
+### agent discovery ingest
+
+Run discovery ingestion across one or more APIs, append candidates to the discovery registry, update agent state, and optionally add citation-snowball candidates from DOI anchors.
+
+```
+npm run mpsi -- agent discovery ingest
+npm run mpsi -- agent discovery ingest --query "ganzfeld psi" --api semantic-scholar --limit 10
+npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" --max-queries 5 --year-min 2000
+```
+
+When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
+If DOI references exist, citation snowballing also runs (bounded by `citationSnowballsPerRun` in agent config).
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--query <queries...>` | No | Explicit discovery queries | auto-generated |
+| `--api <apis...>` | No | API set (`semantic-scholar`, `openalex`) | from agent config |
+| `--limit <n>` | No | Max results per query/API | from agent config |
+| `--max-queries <n>` | No | Max number of queries this run | from agent config |
+| `--year-min <year>` | No | Minimum publication year | none |
+| `--year-max <year>` | No | Maximum publication year | none |
+| `--run-id <id>` | No | Run ID for provenance | auto-generated |
+
+### agent discovery reconcile-state
+
+Rebuild in-file agent discovery tracking (`processedCandidateIds`, `discoveryStats`) from the append-only discovery registry.
+
+```
+npm run mpsi -- agent discovery reconcile-state
+```
+
+### agent claims extract
+
+Extract claim-level entries from reference abstracts and store them on references.
+
+```
+npm run mpsi -- agent claims extract
+npm run mpsi -- agent claims extract --ref-id ref-123
+npm run mpsi -- agent claims extract --ref-id ref-123 --force
+```
+
+When no `--ref-id` is provided, extraction runs for all references.
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--ref-id <id>` | No | Extract for a specific reference | all references |
+| `--force` | No | Re-extract even if abstract checksum is unchanged | false |
+
+### agent run-note generate
+
+Generate a structured run note markdown file in `<vault>/agent-runs`.
+
+```
+npm run mpsi -- agent run-note generate --path ~/data/modularpsi/vault
+npm run mpsi -- agent run-note generate --path ~/data/modularpsi/vault --run-id run-42 --date 2026-02-18
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--path <vault>` | Yes | Vault path | |
+| `--run-id <id>` | No | Run ID used in note title/filename | last run ID or auto |
+| `--date <date>` | No | Note date (`YYYY-MM-DD`) | today |
+
+### agent contradictions
+
+Surface mixed support/contradiction evidence from extracted claims and hypothesis links.
+
+```
+npm run mpsi -- agent contradictions
+npm run mpsi -- agent contradictions --node P6
+npm run mpsi -- agent contradictions --hypothesis hyp-2
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--node <id>` | No | Filter node contradiction summary by node ID | mixed nodes only |
+| `--hypothesis <id>` | No | Filter hypothesis contradiction summary by ID | mixed hypotheses only |
+
+### agent metrics
+
+Generate calibration metrics report for the operational loop.
+
+```
+npm run mpsi -- agent metrics
+npm run mpsi -- agent metrics --period daily
+npm run mpsi -- agent metrics --period monthly --now 2026-02-18T00:00:00.000Z
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--period <period>` | No | `daily`, `weekly`, `monthly` | `weekly` |
+| `--now <iso>` | No | Override timestamp for reproducible reporting | system time |
+
+UI note: in the web app side panel, when no node/edge is selected, a **Review Queue** view now shows pending hypotheses and contradiction summaries for quick triage.
+
 ---
 
 ### vault init
@@ -528,6 +763,8 @@ npm run mpsi -- vault sync --path ~/data/modularpsi/vault --direction both
 |--------|----------|-------------|---------|
 | `--path <dir>` | Yes | Vault directory | |
 | `--direction <dir>` | No | `graph-to-vault`, `vault-to-graph`, or `both` | `graph-to-vault` |
+
+Synced notes now include hypothesis links and contradiction summaries where available.
 
 Vault structure:
 ```
@@ -567,9 +804,12 @@ npm run mpsi -- governance config --set requireDescription=false maxDailyTrustDe
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `maxDailyNewNodes` | number | `20` | Max nodes that can be created per day |
+| `maxDailyNewHypotheses` | number | `15` | Max hypotheses that can be created per day |
+| `maxDailyConstraintEdges` | number | `40` | Max constraint edges (`requires/confounded-by/incompatible-with/fails-when`) per day |
 | `maxDailyTrustDelta` | number | `2.0` | Max sum of absolute trust changes per node per day |
 | `requireDescription` | boolean | `true` | Reject nodes without descriptions |
 | `requireRefTitleYearDoi` | boolean | `true` | Reject references missing title, year, or DOI/URL |
+| `requireHypothesisEvidence` | boolean | `true` | Reject hypotheses without supporting references |
 | `duplicateRejection` | boolean | `true` | Reject duplicate nodes/references |
 | `fuzzyDuplicateThreshold` | number | `0.85` | Fuzzy title match threshold |
 

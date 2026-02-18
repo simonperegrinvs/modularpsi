@@ -7,6 +7,16 @@ export interface AgentState {
   totalRuns: number;
   recentSearchQueries: string[];
   searchCursors: Record<string, string>;
+  processedCandidateIds: string[];
+  lastCursorByQueryApi: Record<string, string>;
+  lastDiscoveryRunId: string;
+  discoveryStats: {
+    queued: number;
+    parsed: number;
+    imported: number;
+    duplicate: number;
+    rejected: number;
+  };
 }
 
 const DEFAULT_STATE: AgentState = {
@@ -15,6 +25,16 @@ const DEFAULT_STATE: AgentState = {
   totalRuns: 0,
   recentSearchQueries: [],
   searchCursors: {},
+  processedCandidateIds: [],
+  lastCursorByQueryApi: {},
+  lastDiscoveryRunId: '',
+  discoveryStats: {
+    queued: 0,
+    parsed: 0,
+    imported: 0,
+    duplicate: 0,
+    rejected: 0,
+  },
 };
 
 function statePath(graphFile: string): string {

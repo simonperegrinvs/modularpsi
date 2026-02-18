@@ -5,6 +5,7 @@ import type {
   GraphEdge,
   Category,
   Reference,
+  HypothesisCard,
   GraphData,
   GraphPrefix,
   RankDir,
@@ -42,6 +43,7 @@ export interface GraphState {
   edges: GraphEdge[];
   categories: Category[];
   references: Reference[];
+  hypotheses: HypothesisCard[];
   prefix: GraphPrefix;
   rootId: string;
   lastNodeNumber: number;
@@ -90,6 +92,10 @@ export interface GraphState {
   updateNodePosition: (nodeId: string, x: number, y: number) => void;
   addCategory: (category: Category) => void;
   updateCategory: (id: string, updates: Partial<Category>) => void;
+  updateHypothesis: (
+    id: string,
+    updates: Partial<Pick<HypothesisCard, 'statement' | 'linkedNodeIds' | 'supportRefIds' | 'contradictRefIds' | 'constraintEdgeIds' | 'score' | 'status'>>,
+  ) => void;
   setFileHandle: (handle: FileSystemFileHandle | null) => void;
   getGraphData: () => GraphData;
 
@@ -142,6 +148,7 @@ export const useGraphStore = create<GraphState>()(
       edges: [],
       categories: [...DEFAULT_CATEGORIES],
       references: [],
+      hypotheses: [],
       prefix: 'P' as GraphPrefix,
       rootId: 'P1',
       lastNodeNumber: 0,
@@ -172,6 +179,7 @@ export const useGraphStore = create<GraphState>()(
           edges: data.edges,
           categories: data.categories,
           references: data.references,
+          hypotheses: data.hypotheses,
           prefix: data.prefix,
           rootId: data.rootId,
           lastNodeNumber: data.lastNodeNumber,
@@ -386,6 +394,14 @@ export const useGraphStore = create<GraphState>()(
         }));
       },
 
+      updateHypothesis: (id, updates) => {
+        set((state) => ({
+          hypotheses: state.hypotheses.map((h) =>
+            h.id === id ? { ...h, ...updates, updatedAt: new Date().toISOString() } : h,
+          ),
+        }));
+      },
+
       setFileHandle: (handle) => set({ fileHandle: handle }),
 
       getGraphData: () => {
@@ -399,6 +415,7 @@ export const useGraphStore = create<GraphState>()(
           edges: state.edges,
           categories: state.categories,
           references: state.references,
+          hypotheses: state.hypotheses,
         };
       },
 

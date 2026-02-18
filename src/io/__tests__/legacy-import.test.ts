@@ -174,6 +174,7 @@ describe('importLegacyData', () => {
     expect(data.lastNodeNumber).toBe(3);
     expect(data.nodes).toHaveLength(3);
     expect(data.edges).toHaveLength(2);
+    expect(data.hypotheses).toEqual([]);
 
     // Root should have trust=1.0
     const root = data.nodes.find(n => n.id === 'P1')!;

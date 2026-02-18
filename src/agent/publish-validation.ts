@@ -38,9 +38,10 @@ export function validateNodeForPublish(
   // Check for duplicate names
   if (config.duplicateRejection && node.name) {
     const nameLower = node.name.toLowerCase().trim();
-    const dupes = existingNodes.filter(
-      (n) => n.name.toLowerCase().trim() === nameLower,
-    );
+    const dupes = existingNodes.filter((n) => {
+      if (node.id && n.id === node.id) return false; // ignore self
+      return n.name.toLowerCase().trim() === nameLower;
+    });
     if (dupes.length > 0) {
       warnings.push(
         `Duplicate node name "${node.name}" matches: ${dupes.map((d) => d.id).join(', ')}`,
@@ -76,6 +77,10 @@ export function validateReferenceForPublish(
 
   // Check for duplicates using existing dedup logic
   if (config.duplicateRejection) {
+    const refsForDuplicateCheck = ref.id
+      ? existingRefs.filter((r) => r.id !== ref.id) // ignore self
+      : existingRefs;
+
     const dupCheck = isDuplicate(
       {
         title: ref.title,
@@ -86,7 +91,7 @@ export function validateReferenceForPublish(
         openAlexId: ref.openAlexId,
         source: 'semantic-scholar',
       },
-      existingRefs,
+      refsForDuplicateCheck,
     );
     if (dupCheck.duplicate) {
       errors.push(

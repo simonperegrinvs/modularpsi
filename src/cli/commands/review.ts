@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { readFileSync, writeFileSync } from 'fs';
 import type { ReviewStatus } from '../../domain/types';
 import { jsonToGraph, graphToJson } from '../../io/json-io';
+import { applyReviewStatusToNode, applyReviewStatusToReference } from '../../domain/review';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerReviewCommands(program: Command) {
@@ -56,8 +57,7 @@ export function registerReviewCommands(program: Command) {
 
       const node = data.nodes.find((n) => n.id === id);
       if (node) {
-        node.reviewStatus = 'approved';
-        node.lastReviewedAt = now;
+        applyReviewStatusToNode(node, 'approved', now);
         writeFileSync(opts.file, graphToJson(data));
         console.log(formatOutput({ approved: id, type: 'node' }, opts.format as OutputFormat));
         return;
@@ -65,7 +65,7 @@ export function registerReviewCommands(program: Command) {
 
       const ref = data.references.find((r) => r.id === id);
       if (ref) {
-        ref.reviewStatus = 'approved';
+        applyReviewStatusToReference(ref, 'approved');
         writeFileSync(opts.file, graphToJson(data));
         console.log(formatOutput({ approved: id, type: 'reference' }, opts.format as OutputFormat));
         return;
@@ -85,7 +85,7 @@ export function registerReviewCommands(program: Command) {
 
       const node = data.nodes.find((n) => n.id === id);
       if (node) {
-        node.reviewStatus = 'rejected';
+        applyReviewStatusToNode(node, 'rejected', new Date().toISOString());
         writeFileSync(opts.file, graphToJson(data));
         console.log(formatOutput({ rejected: id, type: 'node' }, opts.format as OutputFormat));
         return;
@@ -93,7 +93,7 @@ export function registerReviewCommands(program: Command) {
 
       const ref = data.references.find((r) => r.id === id);
       if (ref) {
-        ref.reviewStatus = 'rejected';
+        applyReviewStatusToReference(ref, 'rejected');
         writeFileSync(opts.file, graphToJson(data));
         console.log(formatOutput({ rejected: id, type: 'reference' }, opts.format as OutputFormat));
         return;

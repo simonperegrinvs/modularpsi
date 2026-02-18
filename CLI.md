@@ -364,6 +364,8 @@ npm run mpsi -- review approve P5
 npm run mpsi -- review approve ref-123
 ```
 
+For references, this also sets `processingStatus=approved`.
+
 ### review reject \<id\>
 
 Reject a node or reference.
@@ -371,6 +373,8 @@ Reject a node or reference.
 ```
 npm run mpsi -- review reject P5
 ```
+
+For references, this also sets `processingStatus=rejected`.
 
 ---
 

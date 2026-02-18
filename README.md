@@ -156,6 +156,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Hypothesis cards** — Structured candidate correlations/constraints with support/contradiction links and triage status
 - **Constraint edges** — Edge semantics include `requires`, `confounded-by`, `incompatible-with`, and `fails-when`
 - **Run notes** — Structured per-run markdown notes can be generated in `vault/agent-runs`
+- **Review/processing sync** — Reference `processingStatus` is aligned automatically on review approve/reject actions
 
 ## Tech Stack
 

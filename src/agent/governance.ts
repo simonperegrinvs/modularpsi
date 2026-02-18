@@ -8,6 +8,8 @@ export interface GovernanceConfig {
   maxDailyTrustDelta: number;
   requireDescription: boolean;
   requireRefTitleYearDoi: boolean;
+  allowExternalIdLocatorFallback: boolean;
+  allowBibliographicFallback: boolean;
   requireHypothesisEvidence: boolean;
   duplicateRejection: boolean;
   fuzzyDuplicateThreshold: number;
@@ -20,6 +22,8 @@ const DEFAULT_GOVERNANCE: GovernanceConfig = {
   maxDailyTrustDelta: 2.0,
   requireDescription: true,
   requireRefTitleYearDoi: true,
+  allowExternalIdLocatorFallback: true,
+  allowBibliographicFallback: true,
   requireHypothesisEvidence: true,
   duplicateRejection: true,
   fuzzyDuplicateThreshold: 0.85,

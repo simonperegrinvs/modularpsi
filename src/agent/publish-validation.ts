@@ -5,6 +5,8 @@ import { isDuplicate } from './search/dedup';
 export interface PublishGateConfig {
   requireDescription: boolean;
   requireRefTitleYearDoi: boolean;
+  allowExternalIdLocatorFallback: boolean;
+  allowBibliographicFallback: boolean;
   duplicateRejection: boolean;
   fuzzyDuplicateThreshold: number;
   maxDailyNewNodes: number;
@@ -70,8 +72,20 @@ export function validateReferenceForPublish(
     if (!ref.year || ref.year === 0) {
       errors.push('Reference year is required');
     }
-    if ((!ref.doi || ref.doi.trim().length === 0) && (!ref.url || ref.url.trim().length === 0)) {
-      errors.push('Reference requires either DOI or URL');
+    const hasLocator = Boolean(ref.doi?.trim() || ref.url?.trim());
+    const hasExternalId = Boolean(ref.semanticScholarId?.trim() || ref.openAlexId?.trim());
+    const hasBibliographicFallback = Boolean(ref.title?.trim())
+      && Boolean(ref.year && ref.year > 0)
+      && Boolean(ref.authors?.some((author) => author.trim().length > 0));
+
+    if (!hasLocator) {
+      if (config.allowExternalIdLocatorFallback && hasExternalId) {
+        warnings.push('Reference has no DOI/URL, accepted via external ID fallback');
+      } else if (config.allowBibliographicFallback && hasBibliographicFallback) {
+        warnings.push('Reference has no DOI/URL, accepted via bibliographic fallback (title/authors/year)');
+      } else {
+        errors.push('Reference requires DOI or URL (or a configured fallback identity)');
+      }
     }
   }
 

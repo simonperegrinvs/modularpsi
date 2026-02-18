@@ -119,7 +119,7 @@ npm run mpsi -- review approve <id>
 | `literature search` | Search Semantic Scholar or OpenAlex |
 | `literature resolve` | Resolve a DOI to metadata |
 | `literature citations` | Get citing/cited-by papers |
-| `literature enrich` | Enrich existing reference with external API data |
+| `literature enrich` | Enrich one/all references with DOI/URL/external IDs (`--ref-id` or `--all`) |
 | **Agent** | |
 | `agent status` | Last run, pending items, summary |
 | `agent gaps` | Nodes needing references or evidence |
@@ -130,6 +130,7 @@ npm run mpsi -- review approve <id>
 | `agent discovery list` | List latest discovery candidates with filters |
 | `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
 | `agent discovery ingest` | Run gap/frontier/citation discovery ingestion and append registry events |
+| `agent discovery import` | Import queued discovery candidates as draft references |
 | `agent discovery reconcile-state` | Rebuild discovery state counters from registry events |
 | `agent claims extract` | Extract claim-level entries from reference abstracts |
 | `agent run-note generate` | Generate structured run notes in `vault/agent-runs` |
@@ -151,8 +152,10 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Provenance** — Agent-added items track source, agent name, run ID, search query, API source
 - **Review status** — `draft` → `pending-review` → `approved` / `rejected`
 - **External IDs** — References store DOI, Semantic Scholar ID, OpenAlex ID for deduplication
+- **Reference locator fallback** — Governance accepts DOI/URL, external IDs, or bibliographic identity (title/authors/year) with warnings when locators are missing
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
 - **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
+- **Auto-scope filter** — Discovery auto-import can reject out-of-scope candidates using include/exclude keywords plus node-link scoring
 - **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)
 - **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
 - **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references

@@ -9,6 +9,8 @@ import {
 const config: PublishGateConfig = {
   requireDescription: true,
   requireRefTitleYearDoi: true,
+  allowExternalIdLocatorFallback: true,
+  allowBibliographicFallback: true,
   duplicateRejection: true,
   fuzzyDuplicateThreshold: 0.85,
   maxDailyNewNodes: 20,
@@ -88,5 +90,61 @@ describe('publish validation self-duplicate handling', () => {
       config,
     );
     expect(result.errors.some((e) => e.includes('Duplicate reference detected'))).toBe(true);
+  });
+
+  it('warns (not errors) when DOI/URL is missing but external ID is present', () => {
+    const result = validateReferenceForPublish(
+      {
+        id: 'ref-2',
+        title: 'Ganzfeld Meta-Analysis',
+        authors: ['A'],
+        year: 2020,
+        doi: '',
+        url: '',
+        semanticScholarId: 'S2-1',
+      },
+      [],
+      config,
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.warnings.some((w) => w.includes('external ID fallback'))).toBe(true);
+  });
+
+  it('warns (not errors) when DOI/URL is missing but bibliographic fallback is complete', () => {
+    const result = validateReferenceForPublish(
+      {
+        id: 'ref-2',
+        title: 'Ganzfeld Meta-Analysis',
+        authors: ['A'],
+        year: 2020,
+        doi: '',
+        url: '',
+      },
+      [],
+      config,
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.warnings.some((w) => w.includes('bibliographic fallback'))).toBe(true);
+  });
+
+  it('errors when DOI/URL is missing and fallback checks are disabled', () => {
+    const strictConfig: PublishGateConfig = {
+      ...config,
+      allowExternalIdLocatorFallback: false,
+      allowBibliographicFallback: false,
+    };
+    const result = validateReferenceForPublish(
+      {
+        id: 'ref-2',
+        title: 'Ganzfeld Meta-Analysis',
+        authors: ['A'],
+        year: 2020,
+        doi: '',
+        url: '',
+      },
+      [],
+      strictConfig,
+    );
+    expect(result.errors.some((e) => e.includes('configured fallback identity'))).toBe(true);
   });
 });

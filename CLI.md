@@ -551,11 +551,23 @@ npm run mpsi -- literature citations --doi "10.1037/a0021524" --direction citing
 
 ### literature enrich
 
-Enrich an existing reference with external API data (DOI, abstract, S2 ID).
+Enrich reference metadata (DOI, URL, external IDs, abstract) using external APIs.
 
 ```
 npm run mpsi -- literature enrich --ref-id ref-123
+npm run mpsi -- literature enrich --all
+npm run mpsi -- literature enrich --all --api semantic-scholar openalex --limit 8
 ```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--ref-id <id>` | No | Enrich a single reference by ID | |
+| `--all` | No | Enrich multiple references in one run | |
+| `--include-complete` | No | With `--all`, include refs that already have DOI/URL | `false` |
+| `--api <apis...>` | No | Title-search APIs (`semantic-scholar`, `openalex`) | both |
+| `--limit <n>` | No | Max title-search results per API | `5` |
+
+Provide either `--ref-id` or `--all`.
 
 ---
 
@@ -630,6 +642,7 @@ npm run mpsi -- agent discovery list --query "ganzfeld" --date 2026-02-18
 | `--status <status>` | No | `queued`, `parsed`, `imported-draft`, `duplicate`, `rejected`, or `deferred` | none |
 | `--query <query>` | No | Filter by query or title substring | none |
 | `--api <api>` | No | `semantic-scholar`, `openalex`, `crossref`, `arxiv` | none |
+| `--run-id <id>` | No | Filter by source run ID | none |
 
 ### agent discovery retry <candidate-id>
 
@@ -652,6 +665,8 @@ Run discovery ingestion across one or more APIs, append candidates to the discov
 npm run mpsi -- agent discovery ingest
 npm run mpsi -- agent discovery ingest --query "ganzfeld psi" --api semantic-scholar --limit 10
 npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" --max-queries 5 --year-min 2000
+npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --import-limit 8
+npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --scope-keyword "psi" "ganzfeld" --exclude-keyword "microbial" --min-scope-score 3
 ```
 
 When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
@@ -666,6 +681,36 @@ If DOI references exist, citation snowballing also runs (bounded by `citationSno
 | `--year-min <year>` | No | Minimum publication year | none |
 | `--year-max <year>` | No | Maximum publication year | none |
 | `--run-id <id>` | No | Run ID for provenance | auto-generated |
+| `--auto-import` | No | Import queued candidates from this ingestion run into draft references | false |
+| `--import-limit <n>` | No | Max queued candidates to import when `--auto-import` is enabled | `maxNewRefsPerRun` |
+| `--import-review-status <status>` | No | Review status for auto-imported references | `draft` |
+| `--scope-keyword <keywords...>` | No | Include keywords used by auto-import scope filter (combined with agent `focusKeywords`) | none |
+| `--exclude-keyword <keywords...>` | No | Exclude keywords used by auto-import scope filter (combined with agent `excludeKeywords`) | none |
+| `--min-scope-score <n>` | No | Minimum scope score required for auto-import | `2` |
+| `--no-scope-filter` | No | Disable scope filtering for auto-import | scope filter enabled |
+
+### agent discovery import
+
+Import queued discovery candidates directly into references (default status: draft).
+
+```
+npm run mpsi -- agent discovery import
+npm run mpsi -- agent discovery import --run-id real-flow-full-20260218-212350 --limit 10
+npm run mpsi -- agent discovery import --date 2026-02-18 --review-status draft --max-linked-nodes 3
+npm run mpsi -- agent discovery import --run-id run-42 --scope-keyword "psi" "remote viewing" --exclude-keyword "microbial"
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--date <date>` | No | Import queued candidates from `YYYY-MM-DD` only | all dates |
+| `--run-id <id>` | No | Import queued candidates from one source run ID only | all runs |
+| `--limit <n>` | No | Maximum queued candidates to import | `maxNewRefsPerRun` |
+| `--review-status <status>` | No | Review status on imported references | `draft` |
+| `--max-linked-nodes <n>` | No | Max existing nodes to auto-link per imported reference | `2` |
+| `--scope-keyword <keywords...>` | No | Include keywords used by scope filter (combined with agent `focusKeywords`) | none |
+| `--exclude-keyword <keywords...>` | No | Exclude keywords used by scope filter (combined with agent `excludeKeywords`) | none |
+| `--min-scope-score <n>` | No | Minimum scope score required for import | `2` |
+| `--no-scope-filter` | No | Disable scope filtering for import | scope filter enabled |
 
 ### agent discovery reconcile-state
 
@@ -808,7 +853,9 @@ npm run mpsi -- governance config --set requireDescription=false maxDailyTrustDe
 | `maxDailyConstraintEdges` | number | `40` | Max constraint edges (`requires/confounded-by/incompatible-with/fails-when`) per day |
 | `maxDailyTrustDelta` | number | `2.0` | Max sum of absolute trust changes per node per day |
 | `requireDescription` | boolean | `true` | Reject nodes without descriptions |
-| `requireRefTitleYearDoi` | boolean | `true` | Reject references missing title, year, or DOI/URL |
+| `requireRefTitleYearDoi` | boolean | `true` | Enforce title/year checks and locator-or-fallback policy for references |
+| `allowExternalIdLocatorFallback` | boolean | `true` | Accept refs without DOI/URL when Semantic Scholar/OpenAlex ID is present (warning) |
+| `allowBibliographicFallback` | boolean | `true` | Accept refs without DOI/URL when title/authors/year are complete (warning) |
 | `requireHypothesisEvidence` | boolean | `true` | Reject hypotheses without supporting references |
 | `duplicateRejection` | boolean | `true` | Reject duplicate nodes/references |
 | `fuzzyDuplicateThreshold` | number | `0.85` | Fuzzy title match threshold |

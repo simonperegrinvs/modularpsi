@@ -82,16 +82,19 @@ describe('discovery registry', () => {
       query: 'remote viewing',
       decision: 'parsed',
       timestamp: '2026-02-18T12:00:00.000Z',
+      runId: 'run-2',
     }));
 
     const allLatest = listDiscoveryCandidates(baseDir, {});
     const duplicateOnly = listDiscoveryCandidates(baseDir, { status: 'duplicate' });
     const queryFiltered = listDiscoveryCandidates(baseDir, { query: 'remote' });
+    const runFiltered = listDiscoveryCandidates(baseDir, { runId: 'run-2' });
 
     expect(allLatest).toHaveLength(2);
     expect(allLatest.find((c) => c.candidateId === 'cand-1')?.decision).toBe('duplicate');
     expect(duplicateOnly.map((c) => c.candidateId)).toEqual(['cand-1']);
     expect(queryFiltered.map((c) => c.candidateId)).toEqual(['cand-2']);
+    expect(runFiltered.map((c) => c.candidateId)).toEqual(['cand-2']);
   });
 
   it('summarizes by latest decision and supports manual retry', () => {

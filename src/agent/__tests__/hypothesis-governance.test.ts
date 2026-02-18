@@ -60,6 +60,57 @@ describe('hypothesis governance', () => {
     expect(result.errors.some((e) => e.includes('Duplicate hypothesis statements'))).toBe(true);
   });
 
+  it('flags semantic duplicates when statement similarity and linked-node overlap are high', () => {
+    const config = { ...DEFAULT_GOVERNANCE, fuzzyDuplicateThreshold: 0.5, duplicateRejection: true };
+    const refs = [
+      {
+        id: 'ref-1',
+        title: 'R1',
+        authors: [],
+        year: 2020,
+        publication: '',
+        publisher: '',
+        citation: '',
+        pageStart: 0,
+        pageEnd: 0,
+        volume: 0,
+        description: '',
+        doi: '',
+        url: '',
+        semanticScholarId: '',
+        openAlexId: '',
+        abstract: '',
+      },
+    ];
+    const hypotheses = [
+      {
+        id: 'hyp-1',
+        statement: 'Ganzfeld effects depend on strict blinding protocol',
+        linkedNodeIds: ['P6'],
+        supportRefIds: ['ref-1'],
+        contradictRefIds: [],
+        constraintEdgeIds: [],
+        score: 0,
+        status: 'draft' as const,
+        createdAt: '2026-02-18T10:00:00.000Z',
+      },
+      {
+        id: 'hyp-2',
+        statement: 'Ganzfeld effects depend on strict blinding protocol in labs',
+        linkedNodeIds: ['P6'],
+        supportRefIds: ['ref-1'],
+        contradictRefIds: [],
+        constraintEdgeIds: [],
+        score: 0,
+        status: 'draft' as const,
+        createdAt: '2026-02-18T10:00:00.000Z',
+      },
+    ];
+
+    const result = validateHypothesesForGovernance(hypotheses, refs, config);
+    expect(result.errors.some((e) => e.includes('Semantic duplicate hypotheses'))).toBe(true);
+  });
+
   it('enforces daily caps for hypotheses and constraint edges', () => {
     const today = new Date().toISOString().slice(0, 10);
     const hypoCap = checkDailyHypothesisCap([

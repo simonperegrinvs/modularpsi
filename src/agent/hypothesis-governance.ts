@@ -6,6 +6,23 @@ function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
+function tokenize(s: string): Set<string> {
+  return new Set(
+    normalize(s)
+      .replace(/[^a-z0-9 ]/g, ' ')
+      .split(' ')
+      .map((x) => x.trim())
+      .filter((x) => x.length >= 3),
+  );
+}
+
+function jaccard(a: Set<string>, b: Set<string>): number {
+  if (a.size === 0 && b.size === 0) return 1;
+  const inter = [...a].filter((x) => b.has(x)).length;
+  const union = new Set([...a, ...b]).size;
+  return union === 0 ? 0 : inter / union;
+}
+
 export function validateHypothesesForGovernance(
   hypotheses: HypothesisCard[],
   references: Reference[],
@@ -44,6 +61,20 @@ export function validateHypothesesForGovernance(
     for (const [statement, ids] of byStatement.entries()) {
       if (ids.length > 1) {
         errors.push(`Duplicate hypothesis statements (${ids.join(', ')}): "${statement}"`);
+      }
+    }
+
+    for (let i = 0; i < hypotheses.length; i++) {
+      for (let j = i + 1; j < hypotheses.length; j++) {
+        const a = hypotheses[i];
+        const b = hypotheses[j];
+        const similarity = jaccard(tokenize(a.statement), tokenize(b.statement));
+        const linkedOverlap = a.linkedNodeIds.some((id) => b.linkedNodeIds.includes(id));
+        if (similarity >= config.fuzzyDuplicateThreshold && linkedOverlap) {
+          errors.push(
+            `Semantic duplicate hypotheses (${a.id}, ${b.id}) similarity=${similarity.toFixed(2)} with linked-node overlap`,
+          );
+        }
       }
     }
   }

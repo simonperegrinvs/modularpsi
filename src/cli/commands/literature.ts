@@ -1,12 +1,28 @@
 import { Command } from 'commander';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { searchLiterature, resolveDoi, getCitations } from '../../agent/search/index';
 import type { ApiSource } from '../../agent/search/index';
-import { jsonToGraph } from '../../io/json-io';
+import { graphToJson, jsonToGraph } from '../../io/json-io';
+import {
+  enrichReference,
+  enrichReferences,
+  hasReferenceLocator,
+  type TitleSearchApi,
+} from '../../agent/reference-enrichment';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerLiteratureCommands(program: Command) {
   const lit = program.command('literature').description('Search external literature databases');
+
+  function parseTitleApis(input?: string[]): TitleSearchApi[] {
+    if (!input || input.length === 0) return ['semantic-scholar', 'openalex'];
+    const allowed = new Set<TitleSearchApi>(['semantic-scholar', 'openalex']);
+    const invalid = input.filter((api) => !allowed.has(api as TitleSearchApi));
+    if (invalid.length > 0) {
+      throw new Error(`Invalid --api value(s): ${invalid.join(', ')}. Allowed: semantic-scholar, openalex`);
+    }
+    return [...new Set(input as TitleSearchApi[])];
+  }
 
   lit
     .command('search')
@@ -81,46 +97,94 @@ export function registerLiteratureCommands(program: Command) {
 
   lit
     .command('enrich')
-    .requiredOption('--ref-id <id>', 'Reference ID to enrich')
-    .description('Enrich an existing reference with external API data')
-    .action(async (cmdOpts: { refId: string }) => {
+    .option('--ref-id <id>', 'Reference ID to enrich')
+    .option('--all', 'Enrich multiple references in one pass')
+    .option('--include-complete', 'With --all, include references that already have DOI/URL')
+    .option('--api <apis...>', 'APIs to use for title search (semantic-scholar|openalex)')
+    .option('--limit <n>', 'Max title-search results per API', '5')
+    .description('Enrich references with DOI/URL/external IDs/abstract using external APIs')
+    .action(async (cmdOpts: {
+      refId?: string;
+      all?: boolean;
+      includeComplete?: boolean;
+      api?: string[];
+      limit?: string;
+    }) => {
       const opts = program.opts();
       const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
-      const ref = data.references.find((r) => r.id === cmdOpts.refId);
-      if (!ref) {
-        console.error(`Reference ${cmdOpts.refId} not found`);
+      if (!cmdOpts.refId && !cmdOpts.all) {
+        console.error('Specify either --ref-id <id> or --all');
+        process.exit(1);
+      }
+      if (cmdOpts.refId && cmdOpts.all) {
+        console.error('Use either --ref-id or --all, not both');
         process.exit(1);
       }
 
-      const enriched: Record<string, string> = {};
-
-      // Try to resolve by DOI or title search
-      if (ref.doi) {
-        const result = await resolveDoi(ref.doi);
-        if (result) {
-          if (!ref.abstract && result.abstract) { ref.abstract = result.abstract; enriched['abstract'] = 'filled'; }
-          if (!ref.semanticScholarId && result.semanticScholarId) { ref.semanticScholarId = result.semanticScholarId; enriched['semanticScholarId'] = result.semanticScholarId; }
-          if (!ref.url && result.url) { ref.url = result.url; enriched['url'] = result.url; }
-        }
-      } else if (ref.title) {
-        const results = await searchLiterature({ query: ref.title, limit: 3 });
-        const match = results.find((r) =>
-          r.title.toLowerCase().includes(ref.title.toLowerCase().substring(0, 30)),
-        );
-        if (match) {
-          if (match.doi && !ref.doi) { ref.doi = match.doi; enriched['doi'] = match.doi; }
-          if (match.abstract && !ref.abstract) { ref.abstract = match.abstract; enriched['abstract'] = 'filled'; }
-          if (match.semanticScholarId && !ref.semanticScholarId) { ref.semanticScholarId = match.semanticScholarId; enriched['semanticScholarId'] = match.semanticScholarId; }
-          if (match.url && !ref.url) { ref.url = match.url; enriched['url'] = match.url; }
-        }
+      let titleApis: TitleSearchApi[];
+      try {
+        titleApis = parseTitleApis(cmdOpts.api);
+      } catch (error) {
+        console.error((error as Error).message);
+        process.exit(1);
       }
 
-      if (Object.keys(enriched).length > 0) {
-        const { writeFileSync } = await import('fs');
-        const { graphToJson } = await import('../../io/json-io');
+      const limit = cmdOpts.limit ? parseInt(cmdOpts.limit, 10) : 5;
+      if (!Number.isFinite(limit) || limit <= 0) {
+        console.error('Option --limit must be a positive integer');
+        process.exit(1);
+      }
+
+      if (cmdOpts.refId) {
+        const ref = data.references.find((r) => r.id === cmdOpts.refId);
+        if (!ref) {
+          console.error(`Reference ${cmdOpts.refId} not found`);
+          process.exit(1);
+        }
+
+        const result = await enrichReference(
+          ref,
+          {
+            resolveDoi,
+            searchByTitle: searchLiterature,
+          },
+          {
+            apis: titleApis,
+            limit,
+          },
+        );
+
+        if (result.status === 'enriched') {
+          writeFileSync(opts.file, graphToJson(data));
+        }
+
+        console.log(formatOutput(result, opts.format as OutputFormat));
+        return;
+      }
+
+      const includeComplete = !!cmdOpts.includeComplete;
+      const report = await enrichReferences(
+        data.references,
+        {
+          resolveDoi,
+          searchByTitle: searchLiterature,
+        },
+        {
+          apis: titleApis,
+          limit,
+          onlyMissingLocator: !includeComplete,
+        },
+      );
+
+      if (report.enriched > 0) {
         writeFileSync(opts.file, graphToJson(data));
       }
 
-      console.log(formatOutput({ refId: cmdOpts.refId, enriched }, opts.format as OutputFormat));
+      console.log(formatOutput({
+        ...report,
+        skippedComplete: includeComplete
+          ? 0
+          : data.references.filter((ref) => hasReferenceLocator(ref)).length,
+      }, opts.format as OutputFormat));
     });
 }

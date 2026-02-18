@@ -119,7 +119,7 @@ npm run mpsi -- review approve <id>
 | `literature search` | Search Semantic Scholar or OpenAlex |
 | `literature resolve` | Resolve a DOI to metadata |
 | `literature citations` | Get citing/cited-by papers |
-| `literature enrich` | Enrich existing reference with external API data |
+| `literature enrich` | Enrich one/all references with DOI/URL/external IDs (`--ref-id` or `--all`) |
 | **Agent** | |
 | `agent status` | Last run, pending items, summary |
 | `agent gaps` | Nodes needing references or evidence |
@@ -151,6 +151,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Provenance** — Agent-added items track source, agent name, run ID, search query, API source
 - **Review status** — `draft` → `pending-review` → `approved` / `rejected`
 - **External IDs** — References store DOI, Semantic Scholar ID, OpenAlex ID for deduplication
+- **Reference locator fallback** — Governance accepts DOI/URL, external IDs, or bibliographic identity (title/authors/year) with warnings when locators are missing
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
 - **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
 - **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)

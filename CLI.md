@@ -182,7 +182,7 @@ npm run mpsi -- edge delete P1-P3
 
 ### trust show
 
-Show propagated trust values for all nodes or a specific node.
+Show propagated trust values for all nodes or a specific node. Re-propagates in memory without saving to file (use `trust propagate` to save).
 
 ```
 npm run mpsi -- trust show
@@ -438,6 +438,12 @@ Get citing or cited-by papers for a DOI.
 ```
 npm run mpsi -- literature citations --doi "10.1037/a0021524" --direction citing --limit 10
 ```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--doi <doi>` | Yes | DOI to look up | |
+| `--direction <dir>` | No | `citing` or `cited-by` | `citing` |
+| `--limit <n>` | No | Max results | `10` |
 
 ### literature enrich
 

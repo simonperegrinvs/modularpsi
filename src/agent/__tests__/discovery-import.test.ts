@@ -179,4 +179,182 @@ describe('discovery-import', () => {
     expect(rejected).toHaveLength(1);
     expect(rejected[0].decisionReason?.includes('out-of-scope-auto-filter')).toBe(true);
   });
+
+  it('creates a new node when auto node growth is enabled and confidence is high', () => {
+    const baseDir = createDir();
+    const data = createEmptyGraph();
+    data.nodes.push({
+      id: 'P2',
+      name: 'Ganzfeld',
+      description: 'Ganzfeld studies',
+      categoryId: 'general',
+      keywords: ['ganzfeld', 'telepathy'],
+      type: 0,
+      trust: 0.6,
+      referenceIds: [],
+    });
+    writeDiscoveryEvent(baseDir, fakeQueuedEvent({
+      candidateId: 'cand-node-create',
+      title: 'Ganzfeld telepathy signal reliability analysis',
+      query: 'ganzfeld telepathy psi',
+      doi: '10.1000/node-create',
+    }));
+
+    const result = importQueuedDiscoveryCandidates({
+      baseDir,
+      data,
+      governanceConfig: DEFAULT_GOVERNANCE,
+      auditEntries: [],
+      runId: 'import-run-5',
+      reviewStatus: 'draft',
+      maxItems: 10,
+      scopeKeywords: ['psi', 'ganzfeld', 'telepathy'],
+      minScopeScore: 2,
+      enforceScopeFilter: true,
+      autoNodeGrowth: true,
+      maxNewNodes: 2,
+      minNodeConfidence: 0.55,
+    });
+
+    expect(result.imported).toBe(1);
+    expect(result.nodesProposed).toBe(1);
+    expect(result.nodesCreated).toBe(1);
+    expect(result.createdNodeIds).toHaveLength(1);
+    const created = data.nodes.find((node) => node.id === result.createdNodeIds[0]);
+    expect(created).toBeDefined();
+    expect(created?.reviewStatus).toBe('approved');
+    expect(created?.referenceIds).toContain(result.importedRefIds[0]);
+    expect(result.nodeDetails[0].decision).toBe('created');
+  });
+
+  it('uses weak-scope fallback and skips node growth when confidence stays below threshold', () => {
+    const baseDir = createDir();
+    const data = createEmptyGraph();
+    data.nodes.push({
+      id: 'P2',
+      name: 'Ganzfeld',
+      description: 'Ganzfeld studies',
+      categoryId: 'general',
+      keywords: ['ganzfeld', 'telepathy'],
+      type: 0,
+      trust: 0.6,
+      referenceIds: [],
+    });
+    writeDiscoveryEvent(baseDir, fakeQueuedEvent({
+      candidateId: 'cand-node-low-conf',
+      title: 'Methodological factors in replication pipelines',
+      query: 'replication signal',
+      abstract: 'general research methodology and replication concerns',
+      doi: '10.1000/node-low-conf',
+    }));
+
+    const result = importQueuedDiscoveryCandidates({
+      baseDir,
+      data,
+      governanceConfig: DEFAULT_GOVERNANCE,
+      auditEntries: [],
+      runId: 'import-run-6',
+      reviewStatus: 'draft',
+      maxItems: 10,
+      scopeKeywords: ['psi', 'ganzfeld', 'remote viewing'],
+      minScopeScore: 3,
+      enforceScopeFilter: false,
+      autoNodeGrowth: true,
+      maxNewNodes: 2,
+      minNodeConfidence: 0.9,
+    });
+
+    expect(result.imported).toBe(1);
+    expect(result.nodesProposed).toBe(1);
+    expect(result.nodesCreated).toBe(0);
+    expect(result.skipReasons.some((reason) => reason.code === 'low-node-confidence')).toBe(true);
+    expect(result.nodeDetails[0].decision).toBe('skipped');
+  });
+
+  it('marks node growth as duplicate when proposed name matches existing node', () => {
+    const baseDir = createDir();
+    const data = createEmptyGraph();
+    data.nodes.push({
+      id: 'P2',
+      name: 'Meta-analysis of psi ganzfeld research',
+      description: 'Existing node',
+      categoryId: 'general',
+      keywords: ['ganzfeld', 'meta analysis'],
+      type: 0,
+      trust: 0.6,
+      referenceIds: [],
+    });
+    writeDiscoveryEvent(baseDir, fakeQueuedEvent({
+      candidateId: 'cand-node-dup',
+      title: 'Meta-analysis of psi ganzfeld research',
+      query: 'psi ganzfeld meta-analysis',
+      doi: '10.1000/node-dup',
+    }));
+
+    const result = importQueuedDiscoveryCandidates({
+      baseDir,
+      data,
+      governanceConfig: DEFAULT_GOVERNANCE,
+      auditEntries: [],
+      runId: 'import-run-7',
+      reviewStatus: 'draft',
+      maxItems: 10,
+      scopeKeywords: ['psi', 'ganzfeld'],
+      enforceScopeFilter: false,
+      autoNodeGrowth: true,
+      maxNewNodes: 2,
+      minNodeConfidence: 0.5,
+    });
+
+    expect(result.imported).toBe(1);
+    expect(result.nodesCreated).toBe(0);
+    expect(result.nodeDuplicates).toBe(1);
+    expect(result.skipReasons.some((reason) => reason.code === 'node-duplicate')).toBe(true);
+    expect(result.nodeDetails[0].decision).toBe('duplicate');
+  });
+
+  it('rejects node growth when governance daily cap is exceeded', () => {
+    const baseDir = createDir();
+    const data = createEmptyGraph();
+    data.nodes.push({
+      id: 'P2',
+      name: 'Ganzfeld',
+      description: 'Ganzfeld studies',
+      categoryId: 'general',
+      keywords: ['ganzfeld', 'telepathy'],
+      type: 0,
+      trust: 0.6,
+      referenceIds: [],
+    });
+    writeDiscoveryEvent(baseDir, fakeQueuedEvent({
+      candidateId: 'cand-node-cap',
+      title: 'Ganzfeld telepathy signal reliability analysis',
+      query: 'ganzfeld telepathy psi',
+      doi: '10.1000/node-cap',
+    }));
+
+    const result = importQueuedDiscoveryCandidates({
+      baseDir,
+      data,
+      governanceConfig: {
+        ...DEFAULT_GOVERNANCE,
+        maxDailyNewNodes: 0,
+      },
+      auditEntries: [],
+      runId: 'import-run-8',
+      reviewStatus: 'draft',
+      maxItems: 10,
+      scopeKeywords: ['psi', 'ganzfeld', 'telepathy'],
+      enforceScopeFilter: false,
+      autoNodeGrowth: true,
+      maxNewNodes: 2,
+      minNodeConfidence: 0.5,
+    });
+
+    expect(result.imported).toBe(1);
+    expect(result.nodesCreated).toBe(0);
+    expect(result.nodeRejected).toBe(1);
+    expect(result.skipReasons.some((reason) => reason.code === 'node-governance-rejected')).toBe(true);
+    expect(result.nodeDetails[0].decision).toBe('rejected');
+  });
 });

@@ -1,4 +1,11 @@
-import type { GraphData, GraphNode, Reference, ReviewStatus } from '../domain/types';
+import {
+  EDGE_TYPE_IMPLICATION,
+  type GraphData,
+  type GraphNode,
+  type Reference,
+  type ReviewStatus,
+} from '../domain/types';
+import { propagateTrust } from '../domain/trust';
 import type { AuditEntry } from './audit';
 import { createAuditEntry, writeAuditEntry } from './audit';
 import { listDiscoveryCandidates, writeDiscoveryEvent, type DiscoveryEvent } from './discovery';
@@ -19,6 +26,11 @@ export interface DiscoveryImportOptions {
   excludeKeywords?: string[];
   minScopeScore?: number;
   enforceScopeFilter?: boolean;
+  autoNodeGrowth?: boolean;
+  maxNewNodes?: number;
+  minNodeConfidence?: number;
+  nodeReviewStatus?: ReviewStatus;
+  nodeSimilarityThreshold?: number;
 }
 
 export interface DiscoveryImportResult {
@@ -31,7 +43,17 @@ export interface DiscoveryImportResult {
   rejected: number;
   outOfScope: number;
   linkedNodeCount: number;
+  nodesProposed: number;
+  nodesCreated: number;
+  nodeDuplicates: number;
+  nodeRejected: number;
   importedRefIds: string[];
+  createdNodeIds: string[];
+  skipReasons: Array<{
+    code: string;
+    count: number;
+    sampleCandidateIds: string[];
+  }>;
   details: Array<{
     candidateId: string;
     title: string;
@@ -41,6 +63,15 @@ export interface DiscoveryImportResult {
     reason?: string;
     refId?: string;
     linkedNodeIds?: string[];
+  }>;
+  nodeDetails: Array<{
+    candidateId: string;
+    refId: string;
+    decision: 'created' | 'duplicate' | 'rejected' | 'skipped';
+    nodeId?: string;
+    parentNodeId?: string;
+    confidence?: number;
+    reason: string;
   }>;
 }
 
@@ -67,6 +98,39 @@ function uniqNormalizedKeywords(items: string[] | undefined): string[] {
 
 function buildCandidateCorpus(candidate: DiscoveryEvent): string {
   return normalizeText([candidate.query, candidate.title, candidate.abstract ?? ''].join(' '));
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+const STOPWORDS = new Set([
+  'about', 'after', 'against', 'among', 'because', 'before', 'between', 'beyond', 'could', 'during',
+  'effects', 'findings', 'from', 'into', 'might', 'paper', 'review', 'results', 'study', 'their',
+  'there', 'these', 'those', 'through', 'using', 'with', 'within',
+]);
+
+function uniqueTokens(input: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const token of tokenize(input)) {
+    if (STOPWORDS.has(token) || seen.has(token)) continue;
+    seen.add(token);
+    out.push(token);
+  }
+  return out;
+}
+
+function tokenJaccardScore(a: string, b: string): number {
+  const aTokens = new Set(uniqueTokens(a));
+  const bTokens = new Set(uniqueTokens(b));
+  if (aTokens.size === 0 || bTokens.size === 0) return 0;
+  let shared = 0;
+  for (const token of aTokens) {
+    if (bTokens.has(token)) shared++;
+  }
+  const union = aTokens.size + bTokens.size - shared;
+  return union === 0 ? 0 : shared / union;
 }
 
 function candidateToReferenceTemplate(candidate: DiscoveryEvent): Pick<
@@ -115,6 +179,116 @@ export function suggestNodeLinksForCandidate(
     .slice(0, Math.max(0, maxLinkedNodes));
 
   return ranked.map((item) => item.nodeId);
+}
+
+function deriveNodeName(title: string): string {
+  const trimmed = title.replace(/\s+/g, ' ').trim();
+  if (!trimmed) return 'Discovered Psi Topic';
+  const primary = trimmed.split(':')[0].trim();
+  let selected = primary.length >= 12 && primary.length <= 90 ? primary : trimmed;
+  selected = selected.replace(/[.;,:-]+$/, '').trim();
+  if (selected.length <= 100) return selected;
+  const cut = selected.slice(0, 100);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).trim();
+}
+
+function deriveNodeKeywords(candidate: DiscoveryEvent, scopeKeywords: string[]): string[] {
+  const base = uniqueTokens(`${candidate.query} ${candidate.title} ${candidate.abstract ?? ''}`);
+  const matchedScope = scopeKeywords.filter((kw) => buildCandidateCorpus(candidate).includes(kw));
+  return [...new Set([...matchedScope.flatMap((kw) => uniqueTokens(kw)), ...base])].slice(0, 12);
+}
+
+function nextNodeId(data: GraphData): string {
+  data.lastNodeNumber += 1;
+  return `${data.prefix}${data.lastNodeNumber}`;
+}
+
+function nextEdgeId(data: GraphData, parentId: string, childId: string): string {
+  const base = `${parentId}-${childId}`;
+  if (!data.edges.some((edge) => edge.id === base)) return base;
+  let suffix = 2;
+  while (data.edges.some((edge) => edge.id === `${base}-${suffix}`)) {
+    suffix++;
+  }
+  return `${base}-${suffix}`;
+}
+
+function bestParentForCandidate(candidate: DiscoveryEvent, nodes: GraphNode[], rootId: string): GraphNode {
+  const ranked = nodes
+    .filter((node) => node.id !== 'P1' && node.id !== 'M1')
+    .map((node) => ({ node, score: computeNodeLinkScore(candidate, node) }))
+    .sort((a, b) => b.score - a.score);
+  return ranked[0]?.node ?? nodes.find((node) => node.id === rootId) ?? nodes[0];
+}
+
+function detectNodeDuplicate(
+  proposedName: string,
+  proposedKeywords: string[],
+  nodes: GraphNode[],
+  threshold: number,
+): { duplicate: boolean; reason?: string; matchedNodeId?: string } {
+  const proposedNameNorm = normalizeText(proposedName);
+  const proposedAlias = normalizeText(proposedKeywords.join(' '));
+  for (const node of nodes) {
+    const nodeNameNorm = normalizeText(node.name);
+    if (nodeNameNorm === proposedNameNorm) {
+      return {
+        duplicate: true,
+        reason: `node-name-exact-match:${node.id}`,
+        matchedNodeId: node.id,
+      };
+    }
+
+    const aliasSimilarity = tokenJaccardScore(proposedAlias, `${node.name} ${node.keywords.join(' ')}`);
+    if (proposedKeywords.length > 0 && aliasSimilarity >= 0.8) {
+      return {
+        duplicate: true,
+        reason: `node-alias-overlap:${node.id}`,
+        matchedNodeId: node.id,
+      };
+    }
+
+    const semanticSimilarity = tokenJaccardScore(proposedName, node.name);
+    if (semanticSimilarity >= threshold) {
+      return {
+        duplicate: true,
+        reason: `node-semantic-similarity:${node.id}:${semanticSimilarity.toFixed(2)}`,
+        matchedNodeId: node.id,
+      };
+    }
+  }
+  return { duplicate: false };
+}
+
+function computeNodeConfidence(
+  candidate: DiscoveryEvent,
+  scope: { classification: 'in-scope-core' | 'in-scope-adjacent' | 'out-of-scope'; scopeScore: number },
+  parent: GraphNode,
+  scopeKeywords: string[],
+): { confidence: number; weakScopeFallbackUsed: boolean } {
+  const corpus = buildCandidateCorpus(candidate);
+  const scopeMatchCount = scopeKeywords.filter((kw) => corpus.includes(kw)).length;
+  const scopeSignal = clamp(scope.scopeScore / 6, 0, 1);
+  const parentSignal = clamp(computeNodeLinkScore(candidate, parent) / 5, 0, 1);
+  const lexicalSignal = tokenJaccardScore(candidate.title, `${parent.name} ${parent.keywords.join(' ')}`);
+  const keywordSignal = scopeKeywords.length === 0 ? 0 : clamp(scopeMatchCount / Math.max(scopeKeywords.length, 1), 0, 1);
+
+  let confidence = (scopeSignal * 0.35) + (parentSignal * 0.25) + (lexicalSignal * 0.25) + (keywordSignal * 0.15);
+  let weakScopeFallbackUsed = false;
+  if (scope.classification === 'out-of-scope') {
+    weakScopeFallbackUsed = true;
+    confidence = (parentSignal * 0.45) + (lexicalSignal * 0.45) + (keywordSignal * 0.10);
+    confidence *= 0.85;
+  }
+
+  return { confidence: clamp(confidence, 0, 1), weakScopeFallbackUsed };
+}
+
+function addSkipReason(reasons: Map<string, Set<string>>, code: string, candidateId: string): void {
+  const bucket = reasons.get(code) ?? new Set<string>();
+  bucket.add(candidateId);
+  reasons.set(code, bucket);
 }
 
 function writeDecisionUpdate(
@@ -195,6 +369,11 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
   const excludeKeywords = uniqNormalizedKeywords(opts.excludeKeywords);
   const minScopeScore = opts.minScopeScore ?? 2;
   const enforceScopeFilter = opts.enforceScopeFilter ?? true;
+  const autoNodeGrowth = opts.autoNodeGrowth ?? false;
+  const maxNewNodes = opts.maxNewNodes ?? 0;
+  const minNodeConfidence = clamp(opts.minNodeConfidence ?? 0.72, 0, 1);
+  const nodeReviewStatus = opts.nodeReviewStatus ?? 'approved';
+  const nodeSimilarityThreshold = clamp(opts.nodeSimilarityThreshold ?? 0.82, 0, 1);
   const ranked = queued.map((candidate) => ({
     candidate,
     scope: classifyScope(candidate, opts.data.nodes, scopeKeywords, excludeKeywords, minScopeScore),
@@ -210,8 +389,15 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
   let rejected = 0;
   let outOfScope = 0;
   let linkedNodeCount = 0;
+  let nodesProposed = 0;
+  let nodesCreated = 0;
+  let nodeDuplicates = 0;
+  let nodeRejected = 0;
   const importedRefIds: string[] = [];
+  const createdNodeIds: string[] = [];
+  const skipReasons = new Map<string, Set<string>>();
   const details: DiscoveryImportResult['details'] = [];
+  const nodeDetails: DiscoveryImportResult['nodeDetails'] = [];
 
   for (const [index, item] of attempted.entries()) {
     const candidate = item.candidate;
@@ -358,6 +544,199 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
     imported++;
     importedRefIds.push(refId);
 
+    if (!autoNodeGrowth) {
+      addSkipReason(skipReasons, 'node-growth-disabled', candidate.candidateId);
+      nodeDetails.push({
+        candidateId: candidate.candidateId,
+        refId,
+        decision: 'skipped',
+        reason: 'node-growth-disabled',
+      });
+    } else if (nodesCreated >= maxNewNodes) {
+      addSkipReason(skipReasons, 'max-new-nodes-per-run-reached', candidate.candidateId);
+      nodeDetails.push({
+        candidateId: candidate.candidateId,
+        refId,
+        decision: 'skipped',
+        reason: 'max-new-nodes-per-run-reached',
+      });
+    } else {
+      nodesProposed++;
+      const parentNode = bestParentForCandidate(candidate, opts.data.nodes, opts.data.rootId);
+      const proposedName = deriveNodeName(candidate.title);
+      const proposedKeywords = deriveNodeKeywords(candidate, scopeKeywords);
+      const confidenceResult = computeNodeConfidence(candidate, scope, parentNode, scopeKeywords);
+      const effectiveThreshold = confidenceResult.weakScopeFallbackUsed
+        ? clamp(minNodeConfidence + 0.1, 0, 1)
+        : minNodeConfidence;
+
+      if (confidenceResult.confidence < effectiveThreshold) {
+        addSkipReason(skipReasons, 'low-node-confidence', candidate.candidateId);
+        nodeDetails.push({
+          candidateId: candidate.candidateId,
+          refId,
+          decision: 'skipped',
+          parentNodeId: parentNode.id,
+          confidence: confidenceResult.confidence,
+          reason: `low-node-confidence:${confidenceResult.confidence.toFixed(2)}<${effectiveThreshold.toFixed(2)}`,
+        });
+      } else {
+        const duplicateCheck = detectNodeDuplicate(
+          proposedName,
+          proposedKeywords,
+          opts.data.nodes,
+          nodeSimilarityThreshold,
+        );
+        if (duplicateCheck.duplicate) {
+          nodeDuplicates++;
+          addSkipReason(skipReasons, 'node-duplicate', candidate.candidateId);
+          writeAuditEntry(opts.baseDir, createAuditEntry(
+            opts.runId,
+            'discovery-import-node',
+            'node',
+            duplicateCheck.matchedNodeId ?? candidate.candidateId,
+            'skipped-duplicate',
+            { candidateId: candidate.candidateId, title: candidate.title, matchedNodeId: duplicateCheck.matchedNodeId },
+            {
+              reason: duplicateCheck.reason,
+              aiRationale: 'Auto node growth duplicate guard',
+              validationErrors: [],
+            },
+          ));
+          nodeDetails.push({
+            candidateId: candidate.candidateId,
+            refId,
+            decision: 'duplicate',
+            parentNodeId: parentNode.id,
+            confidence: confidenceResult.confidence,
+            reason: duplicateCheck.reason ?? 'node-duplicate',
+          });
+        } else {
+          const nodeDescription = (candidate.abstract ?? '').trim().slice(0, 300);
+          const gate = runPublishGate(
+            {
+              nodes: [{
+                name: proposedName,
+                description: nodeDescription.length > 0 ? nodeDescription : `Discovered from "${candidate.query}"`,
+                categoryId: parentNode.categoryId,
+                keywords: proposedKeywords,
+              }],
+            },
+            {
+              nodes: opts.data.nodes,
+              references: opts.data.references,
+              auditEntries: opts.auditEntries,
+            },
+            opts.governanceConfig,
+          );
+
+          if (!gate.valid) {
+            nodeRejected++;
+            const reason = gate.errors[0] ?? 'node-publish-gate-rejected';
+            addSkipReason(skipReasons, 'node-governance-rejected', candidate.candidateId);
+            writeAuditEntry(opts.baseDir, createAuditEntry(
+              opts.runId,
+              'discovery-import-node',
+              'node',
+              candidate.candidateId,
+              'rejected',
+              { candidateId: candidate.candidateId, title: candidate.title, proposedName },
+              {
+                reason,
+                aiRationale: 'Publish gate rejected auto-grown node',
+                validationErrors: gate.errors,
+              },
+            ));
+            nodeDetails.push({
+              candidateId: candidate.candidateId,
+              refId,
+              decision: 'rejected',
+              parentNodeId: parentNode.id,
+              confidence: confidenceResult.confidence,
+              reason,
+            });
+          } else {
+            const nodeId = nextNodeId(opts.data);
+            const edgeId = nextEdgeId(opts.data, parentNode.id, nodeId);
+            const timestamp = new Date().toISOString();
+            opts.data.nodes.push({
+              id: nodeId,
+              name: proposedName,
+              description: nodeDescription.length > 0 ? nodeDescription : `Discovered from "${candidate.query}"`,
+              categoryId: parentNode.categoryId,
+              keywords: proposedKeywords,
+              type: 0,
+              trust: -1,
+              referenceIds: [refId],
+              provenance: {
+                source: 'agent',
+                agent: 'discovery-import-node-growth',
+                timestamp,
+                runId: opts.runId,
+                searchQuery: candidate.query,
+                apiSource: candidate.source,
+                aiClassification: scope.classification,
+                mappingConfidence: confidenceResult.confidence,
+              },
+              reviewStatus: nodeReviewStatus,
+              status: 'active',
+            });
+            opts.data.edges.push({
+              id: edgeId,
+              sourceId: parentNode.id,
+              targetId: nodeId,
+              trust: -1,
+              type: EDGE_TYPE_IMPLICATION,
+              combinedTrust: -1,
+              provenance: {
+                source: 'agent',
+                agent: 'discovery-import-node-growth',
+                timestamp,
+                runId: opts.runId,
+                searchQuery: candidate.query,
+                apiSource: candidate.source,
+                aiClassification: scope.classification,
+                mappingConfidence: confidenceResult.confidence,
+              },
+            });
+            const propagated = propagateTrust(opts.data.nodes, opts.data.edges, opts.data.rootId);
+            opts.data.nodes = propagated.nodes;
+            opts.data.edges = propagated.edges;
+
+            nodesCreated++;
+            createdNodeIds.push(nodeId);
+            writeAuditEntry(opts.baseDir, createAuditEntry(
+              opts.runId,
+              'discovery-import-node',
+              'node',
+              nodeId,
+              'accepted',
+              {
+                nodeId,
+                parentNodeId: parentNode.id,
+                fromCandidateId: candidate.candidateId,
+                refId,
+                confidence: confidenceResult.confidence,
+              },
+              {
+                aiRationale: 'Auto-created node from imported discovery candidate',
+                validationErrors: gate.warnings,
+              },
+            ));
+            nodeDetails.push({
+              candidateId: candidate.candidateId,
+              refId,
+              decision: 'created',
+              nodeId,
+              parentNodeId: parentNode.id,
+              confidence: confidenceResult.confidence,
+              reason: `created-node:${nodeId}`,
+            });
+          }
+        }
+      }
+    }
+
     writeDecisionUpdate(
       opts.baseDir,
       candidate,
@@ -401,7 +780,18 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
     rejected,
     outOfScope,
     linkedNodeCount,
+    nodesProposed,
+    nodesCreated,
+    nodeDuplicates,
+    nodeRejected,
     importedRefIds,
+    createdNodeIds,
+    skipReasons: [...skipReasons.entries()].map(([code, ids]) => ({
+      code,
+      count: ids.size,
+      sampleCandidateIds: [...ids].slice(0, 5),
+    })),
     details,
+    nodeDetails,
   };
 }

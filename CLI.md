@@ -642,6 +642,7 @@ npm run mpsi -- agent discovery list --query "ganzfeld" --date 2026-02-18
 | `--status <status>` | No | `queued`, `parsed`, `imported-draft`, `duplicate`, `rejected`, or `deferred` | none |
 | `--query <query>` | No | Filter by query or title substring | none |
 | `--api <api>` | No | `semantic-scholar`, `openalex`, `crossref`, `arxiv` | none |
+| `--run-id <id>` | No | Filter by source run ID | none |
 
 ### agent discovery retry <candidate-id>
 
@@ -664,6 +665,7 @@ Run discovery ingestion across one or more APIs, append candidates to the discov
 npm run mpsi -- agent discovery ingest
 npm run mpsi -- agent discovery ingest --query "ganzfeld psi" --api semantic-scholar --limit 10
 npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" --max-queries 5 --year-min 2000
+npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --import-limit 8
 ```
 
 When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
@@ -678,6 +680,27 @@ If DOI references exist, citation snowballing also runs (bounded by `citationSno
 | `--year-min <year>` | No | Minimum publication year | none |
 | `--year-max <year>` | No | Maximum publication year | none |
 | `--run-id <id>` | No | Run ID for provenance | auto-generated |
+| `--auto-import` | No | Import queued candidates from this ingestion run into draft references | false |
+| `--import-limit <n>` | No | Max queued candidates to import when `--auto-import` is enabled | `maxNewRefsPerRun` |
+| `--import-review-status <status>` | No | Review status for auto-imported references | `draft` |
+
+### agent discovery import
+
+Import queued discovery candidates directly into references (default status: draft).
+
+```
+npm run mpsi -- agent discovery import
+npm run mpsi -- agent discovery import --run-id real-flow-full-20260218-212350 --limit 10
+npm run mpsi -- agent discovery import --date 2026-02-18 --review-status draft --max-linked-nodes 3
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--date <date>` | No | Import queued candidates from `YYYY-MM-DD` only | all dates |
+| `--run-id <id>` | No | Import queued candidates from one source run ID only | all runs |
+| `--limit <n>` | No | Maximum queued candidates to import | `maxNewRefsPerRun` |
+| `--review-status <status>` | No | Review status on imported references | `draft` |
+| `--max-linked-nodes <n>` | No | Max existing nodes to auto-link per imported reference | `2` |
 
 ### agent discovery reconcile-state
 

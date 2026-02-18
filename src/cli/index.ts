@@ -18,6 +18,7 @@ import { registerReviewCommands } from './commands/review';
 import { registerBatchCommands } from './commands/batch';
 import { registerLiteratureCommands } from './commands/literature';
 import { registerAgentCommands } from './commands/agent';
+import { registerVaultCommands } from './commands/vault';
 
 // ── Last-used file persistence ────────────────────────────────
 const RC_PATH = resolve(homedir(), '.mpsirc');
@@ -81,5 +82,6 @@ registerReviewCommands(program);
 registerBatchCommands(program);
 registerLiteratureCommands(program);
 registerAgentCommands(program);
+registerVaultCommands(program);
 
 program.parse();

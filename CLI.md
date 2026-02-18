@@ -493,6 +493,47 @@ npm run mpsi -- agent config --set focusKeywords=ganzfeld,precognition,psi
 
 ---
 
+### vault init
+
+Initialize an Obsidian vault directory structure.
+
+```
+npm run mpsi -- vault init --path ~/data/modularpsi/vault
+```
+
+### vault sync
+
+Sync between graph and Obsidian vault. Preserves human-written `## Notes` sections.
+
+```
+npm run mpsi -- vault sync --path ~/data/modularpsi/vault
+npm run mpsi -- vault sync --path ~/data/modularpsi/vault --direction vault-to-graph
+npm run mpsi -- vault sync --path ~/data/modularpsi/vault --direction both
+```
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--path <dir>` | Yes | Vault directory | |
+| `--direction <dir>` | No | `graph-to-vault`, `vault-to-graph`, or `both` | `graph-to-vault` |
+
+Vault structure:
+```
+vault/
+  nodes/{category}/{node-id}-{slug}.md
+  references/{year}/{ref-id}-{author}-{year}.md
+  agent-runs/
+```
+
+### vault status
+
+Show vault file counts and categories.
+
+```
+npm run mpsi -- vault status --path ~/data/modularpsi/vault
+```
+
+---
+
 ### import \<dir\>
 
 Import a legacy ModularPsi data directory containing `.mpsi`, `.graphml`, and optionally `.xsql` files.

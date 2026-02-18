@@ -547,6 +547,28 @@ npm run mpsi -- agent discovery retry cand-123 --run-id manual-retry-20260218
 |--------|----------|-------------|---------|
 | `--run-id <id>` | No | Run ID to record for retry event | auto-generated |
 
+### agent discovery ingest
+
+Run discovery ingestion across one or more APIs, append candidates to the discovery registry, and update agent state.
+
+```
+npm run mpsi -- agent discovery ingest
+npm run mpsi -- agent discovery ingest --query "ganzfeld psi" --api semantic-scholar --limit 10
+npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" --max-queries 5 --year-min 2000
+```
+
+When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
+
+| Option | Required | Description | Default |
+|--------|----------|-------------|---------|
+| `--query <queries...>` | No | Explicit discovery queries | auto-generated |
+| `--api <apis...>` | No | API set (`semantic-scholar`, `openalex`) | from agent config |
+| `--limit <n>` | No | Max results per query/API | from agent config |
+| `--max-queries <n>` | No | Max number of queries this run | from agent config |
+| `--year-min <year>` | No | Minimum publication year | none |
+| `--year-max <year>` | No | Maximum publication year | none |
+| `--run-id <id>` | No | Run ID for provenance | auto-generated |
+
 ---
 
 ### vault init

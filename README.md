@@ -120,6 +120,7 @@ npm run mpsi -- review approve <id>
 | `agent discovery status` | Discovery registry summary (events, candidates, status counts) |
 | `agent discovery list` | List latest discovery candidates with filters |
 | `agent discovery retry <candidate-id>` | Re-queue a discovery candidate |
+| `agent discovery ingest` | Run gap/frontier discovery ingestion and append registry events |
 | **Vault** | |
 | `vault init` | Initialize Obsidian vault directory |
 | `vault sync` | Sync graph to/from vault (`--direction`) |

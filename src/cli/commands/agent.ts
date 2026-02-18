@@ -2,14 +2,16 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
 import { jsonToGraph } from '../../io/json-io';
-import { loadAgentState, resetAgentState } from '../../agent/state';
+import { loadAgentState, resetAgentState, saveAgentState } from '../../agent/state';
 import { loadAgentConfig, saveAgentConfig } from '../../agent/config';
+import { searchLiterature, type ApiSource } from '../../agent/search';
 import {
   listDiscoveryCandidates,
   listDiscoveryDates,
   retryDiscoveryCandidate,
   summarizeDiscovery,
 } from '../../agent/discovery';
+import { runDiscoveryIngestion } from '../../agent/discovery-run';
 import { formatOutput, type OutputFormat } from '../format';
 
 export function registerAgentCommands(program: Command) {
@@ -184,5 +186,60 @@ export function registerAgentCommands(program: Command) {
         process.exit(1);
       }
       console.log(formatOutput({ status: 'ok', candidate: event }, opts.format as OutputFormat));
+    });
+
+  discovery
+    .command('ingest')
+    .option('--query <queries...>', 'One or more explicit discovery queries')
+    .option('--api <apis...>', 'APIs to use (semantic-scholar|openalex)')
+    .option('--limit <n>', 'Max results per query/API')
+    .option('--max-queries <n>', 'Maximum query count for this run')
+    .option('--year-min <year>', 'Minimum publication year')
+    .option('--year-max <year>', 'Maximum publication year')
+    .option('--run-id <id>', 'Run ID for provenance')
+    .description('Run discovery ingestion and append candidates to discovery registry')
+    .action(async (cmdOpts: {
+      query?: string[];
+      api?: string[];
+      limit?: string;
+      maxQueries?: string;
+      yearMin?: string;
+      yearMax?: string;
+      runId?: string;
+    }) => {
+      const opts = program.opts();
+      const baseDir = dirname(opts.file);
+      const data = jsonToGraph(readFileSync(opts.file, 'utf-8'));
+      const state = loadAgentState(opts.file);
+      const config = loadAgentConfig(opts.file);
+
+      const result = await runDiscoveryIngestion({
+        baseDir,
+        data,
+        references: data.references,
+        config,
+        state,
+        searchFn: searchLiterature,
+        runId: cmdOpts.runId,
+        queries: cmdOpts.query,
+        apis: cmdOpts.api as ApiSource[] | undefined,
+        limit: cmdOpts.limit ? parseInt(cmdOpts.limit, 10) : undefined,
+        maxQueries: cmdOpts.maxQueries ? parseInt(cmdOpts.maxQueries, 10) : undefined,
+        yearMin: cmdOpts.yearMin ? parseInt(cmdOpts.yearMin, 10) : undefined,
+        yearMax: cmdOpts.yearMax ? parseInt(cmdOpts.yearMax, 10) : undefined,
+      });
+
+      const nextState = result.nextState;
+      saveAgentState(opts.file, nextState);
+
+      console.log(formatOutput({
+        status: 'ok',
+        runId: result.runId,
+        queries: result.queries,
+        apis: result.apis,
+        totalResults: result.totalResults,
+        eventsWritten: result.eventsWritten,
+        byDecision: result.byDecision,
+      }, opts.format as OutputFormat));
     });
 }

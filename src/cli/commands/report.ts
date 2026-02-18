@@ -28,6 +28,7 @@ function buildMarkdownBrief(
   items: Array<{
     id: string;
     name: string;
+    description: string;
     trust: number;
     evidenceCount: number;
     evidenceScore: number;
@@ -40,6 +41,9 @@ function buildMarkdownBrief(
   lines.push('');
   for (const item of items) {
     lines.push(`## ${item.id} — ${item.name}`);
+    if (item.description.trim() !== '') {
+      lines.push(`- Description: ${item.description}`);
+    }
     lines.push(`- Trust: ${item.trust.toFixed(2)} | Evidence score: ${item.evidenceScore.toFixed(2)} | Rank score: ${item.rankScore.toFixed(2)} | References: ${item.evidenceCount}`);
     if (item.references.length === 0) {
       lines.push('- No linked references.');
@@ -125,6 +129,7 @@ export function registerReportCommands(program: Command) {
           hypotheses: enriched.map((item) => ({
             id: item.id,
             name: item.name,
+            description: item.description,
             trust: item.trust,
             evidenceCount: item.evidenceCount,
             evidenceScore: item.evidenceScore,
@@ -148,6 +153,7 @@ export function registerReportCommands(program: Command) {
       const rows = enriched.map((item) => ({
         id: item.id,
         name: item.name,
+        description: item.description,
         rankScore: item.rankScore,
         evidenceScore: item.evidenceScore,
         evidenceCount: item.evidenceCount,
@@ -156,4 +162,3 @@ export function registerReportCommands(program: Command) {
       console.log(formatOutput(rows, opts.format as OutputFormat));
     });
 }
-

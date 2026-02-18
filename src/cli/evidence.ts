@@ -3,6 +3,7 @@ import type { GraphData, GraphNode, Reference } from '../domain/types';
 export interface RankedHypothesis {
   id: string;
   name: string;
+  description: string;
   trust: number;
   evidenceCount: number;
   evidenceScore: number;
@@ -135,6 +136,7 @@ export function rankHypotheses(
     return {
       id: node.id,
       name: node.name,
+      description: node.description ?? '',
       trust: node.trust,
       evidenceCount: refs.length,
       evidenceScore,

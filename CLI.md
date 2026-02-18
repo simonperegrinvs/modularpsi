@@ -72,6 +72,7 @@ Add a new node connected to a parent.
 ```
 npm run mpsi -- node add --parent P1 --name "Telepathy evidence"
 npm run mpsi -- node add --parent P1 --name "Options" --type chooser --category bio
+npm run mpsi -- node add --parent P1 --name "Hypothesis with summary" --description "Short explanation" --require-description
 ```
 
 | Option | Required | Description | Default |
@@ -80,6 +81,8 @@ npm run mpsi -- node add --parent P1 --name "Options" --type chooser --category 
 | `--name <name>` | Yes | Node name | |
 | `--type <type>` | No | `regular`, `chooser`, or `holder` | `regular` |
 | `--category <cat>` | No | Category ID | `general` |
+| `--description <desc>` | No | Node description | `""` |
+| `--require-description` | No | Fail if `--description` is empty | `false` |
 
 **Output fields:** `id`, `name`
 
@@ -93,12 +96,14 @@ Update one or more fields on an existing node.
 npm run mpsi -- node update P2 --name "Updated name" --description "New desc"
 npm run mpsi -- node update P2 --keywords "telepathy;evidence;meta-analysis"
 npm run mpsi -- node update P2 --type chooser
+npm run mpsi -- node update P2 --description-file ./notes/p2.txt
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--name <name>` | New name |
 | `--description <desc>` | New description |
+| `--description-file <path>` | Read new description from a file |
 | `--category <cat>` | New category ID |
 | `--keywords <kw>` | Semicolon-separated keywords |
 | `--type <type>` | `regular`, `chooser`, or `holder` |
@@ -295,11 +300,13 @@ Import references from CSV.
 
 ```
 npm run mpsi -- ref import --csv ./references.csv
+npm run mpsi -- ref import --csv ./references.csv --require-node-description
 ```
 
 Supported CSV headers: `id,title,authors,year,publication,publisher,citation,pageStart,pageEnd,volume,doi,url,abstract,studyType,domainTags,qualityScore,effectDirection,replicationStatus,nodeIds`.
 
 `nodeIds` can include semicolon/comma-separated node IDs to auto-link each imported reference.
+Use `--require-node-description` to fail import if any linked node has an empty description.
 
 ### ref link \<ref-id\> \<node-id\>
 
@@ -338,6 +345,8 @@ Generate concise hypothesis briefs with top linked references.
 npm run mpsi -- report brief --top 10 --max-refs 4 --format json
 npm run mpsi -- report brief --node P13 --markdown
 ```
+
+Brief output includes node descriptions when available.
 
 ---
 

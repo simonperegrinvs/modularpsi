@@ -321,8 +321,9 @@ export function registerRefCommands(program: Command) {
     .requiredOption('--csv <file>', 'CSV file path')
     .option('--allow-duplicates', 'Allow duplicate DOI/title+year references', false)
     .option('--dry-run', 'Parse and validate without writing', false)
+    .option('--require-node-description', 'Fail when linking to nodes with empty descriptions', false)
     .description('Import references from CSV')
-    .action((cmdOpts: { csv: string; allowDuplicates: boolean; dryRun: boolean }) => {
+    .action((cmdOpts: { csv: string; allowDuplicates: boolean; dryRun: boolean; requireNodeDescription: boolean }) => {
       try {
         const opts = program.opts();
         const data = loadGraph(opts.file);
@@ -375,6 +376,9 @@ export function registerRefCommands(program: Command) {
             for (const nodeId of parseList(rawNodeIds)) {
               const node = data.nodes.find((n) => n.id === nodeId);
               if (!node) continue;
+              if (cmdOpts.requireNodeDescription && node.description.trim() === '') {
+                throw new Error(`Node ${nodeId} has empty description. Use node update before linking, or disable --require-node-description.`);
+              }
               if (!node.referenceIds.includes(refItem.id)) {
                 node.referenceIds.push(refItem.id);
                 linked += 1;

@@ -59,13 +59,19 @@ export function registerNodeCommands(program: Command) {
     .requiredOption('--name <name>', 'Node name')
     .option('--type <type>', 'Node type (regular|chooser|holder)', 'regular')
     .option('--category <cat>', 'Category ID', 'general')
+    .option('--description <desc>', 'Node description', '')
+    .option('--require-description', 'Require a non-empty description', false)
     .description('Add a new node')
-    .action((cmdOpts: { parent: string; name: string; type: string; category: string }) => {
+    .action((cmdOpts: { parent: string; name: string; type: string; category: string; description: string; requireDescription: boolean }) => {
       const opts = program.opts();
       const data = loadGraph(opts.file);
       const parent = data.nodes.find((n) => n.id === cmdOpts.parent);
       if (!parent) {
         console.error(`Parent node ${cmdOpts.parent} not found`);
+        process.exit(1);
+      }
+      if (cmdOpts.requireDescription && cmdOpts.description.trim() === '') {
+        console.error('Description is required (--description) when --require-description is enabled.');
         process.exit(1);
       }
 
@@ -76,7 +82,7 @@ export function registerNodeCommands(program: Command) {
       const newNode: GraphNode = {
         id: newId,
         name: cmdOpts.name,
-        description: '',
+        description: cmdOpts.description.trim(),
         categoryId: cmdOpts.category,
         keywords: [],
         type: nodeType,
@@ -108,11 +114,12 @@ export function registerNodeCommands(program: Command) {
     .argument('<id>', 'Node ID')
     .option('--name <name>', 'New name')
     .option('--description <desc>', 'New description')
+    .option('--description-file <path>', 'Path to file containing description text')
     .option('--category <cat>', 'New category ID')
     .option('--keywords <keywords>', 'New keywords (semicolon-separated)')
     .option('--type <type>', 'New type (regular|chooser|holder)')
     .description('Update a node')
-    .action((id: string, cmdOpts: { name?: string; description?: string; category?: string; keywords?: string; type?: string }) => {
+    .action((id: string, cmdOpts: { name?: string; description?: string; descriptionFile?: string; category?: string; keywords?: string; type?: string }) => {
       const opts = program.opts();
       const data = loadGraph(opts.file);
       const node = data.nodes.find((n) => n.id === id);
@@ -122,7 +129,11 @@ export function registerNodeCommands(program: Command) {
       }
 
       if (cmdOpts.name !== undefined) node.name = cmdOpts.name;
-      if (cmdOpts.description !== undefined) node.description = cmdOpts.description;
+      if (cmdOpts.descriptionFile !== undefined) {
+        node.description = readFileSync(cmdOpts.descriptionFile, 'utf-8').trim();
+      } else if (cmdOpts.description !== undefined) {
+        node.description = cmdOpts.description;
+      }
       if (cmdOpts.category !== undefined) node.categoryId = cmdOpts.category;
       if (cmdOpts.keywords !== undefined) node.keywords = cmdOpts.keywords.split(';').map((k) => k.trim()).filter(Boolean);
       if (cmdOpts.type !== undefined) node.type = parseNodeType(cmdOpts.type);

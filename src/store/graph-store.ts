@@ -46,6 +46,15 @@ export interface GraphState {
   mode: InteractionMode;
   edgeSourceId: string | null; // for add-edge-target mode
   rankDir: RankDir;
+  familyFilter: string;
+  effectFilter: 'all' | 'supports' | 'mixed' | 'null' | 'challenges';
+  studyTypeFilter: 'all' | 'meta-analysis' | 'rct' | 'observational' | 'theory' | 'review' | 'replication';
+  replicationFilter: 'all' | 'single' | 'independent-replication' | 'failed-replication' | 'multi-lab';
+  edgeTrustThreshold: number;
+  focusMode: boolean;
+  focusDepth: number;
+  recentDays: number;
+  recentOnly: boolean;
 
   // Node positions (from layout)
   nodePositions: Map<string, { x: number; y: number }>;
@@ -66,6 +75,15 @@ export interface GraphState {
   setMode: (mode: InteractionMode) => void;
   setEdgeSource: (nodeId: string | null) => void;
   setRankDir: (dir: RankDir) => void;
+  setFamilyFilter: (family: string) => void;
+  setEffectFilter: (value: GraphState['effectFilter']) => void;
+  setStudyTypeFilter: (value: GraphState['studyTypeFilter']) => void;
+  setReplicationFilter: (value: GraphState['replicationFilter']) => void;
+  setEdgeTrustThreshold: (value: number) => void;
+  setFocusMode: (value: boolean) => void;
+  setFocusDepth: (value: number) => void;
+  setRecentDays: (value: number) => void;
+  setRecentOnly: (value: boolean) => void;
   runLayout: () => void;
   runTrustPropagation: () => void;
   updateNodePosition: (nodeId: string, x: number, y: number) => void;
@@ -100,6 +118,15 @@ export const useGraphStore = create<GraphState>()(
       mode: 'normal' as InteractionMode,
       edgeSourceId: null,
       rankDir: 'TB' as RankDir,
+      familyFilter: 'all',
+      effectFilter: 'all',
+      studyTypeFilter: 'all',
+      replicationFilter: 'all',
+      edgeTrustThreshold: -1,
+      focusMode: false,
+      focusDepth: 2,
+      recentDays: 30,
+      recentOnly: false,
       nodePositions: new Map(),
       fileHandle: null,
 
@@ -287,6 +314,15 @@ export const useGraphStore = create<GraphState>()(
         const layout = computeLayout(state.nodes, state.edges, dir);
         set({ rankDir: dir, nodePositions: layout.nodePositions });
       },
+      setFamilyFilter: (familyFilter) => set({ familyFilter }),
+      setEffectFilter: (effectFilter) => set({ effectFilter }),
+      setStudyTypeFilter: (studyTypeFilter) => set({ studyTypeFilter }),
+      setReplicationFilter: (replicationFilter) => set({ replicationFilter }),
+      setEdgeTrustThreshold: (edgeTrustThreshold) => set({ edgeTrustThreshold }),
+      setFocusMode: (focusMode) => set({ focusMode }),
+      setFocusDepth: (focusDepth) => set({ focusDepth: Math.max(1, Math.min(6, focusDepth)) }),
+      setRecentDays: (recentDays) => set({ recentDays: Math.max(1, Math.min(365, recentDays)) }),
+      setRecentOnly: (recentOnly) => set({ recentOnly }),
 
       runLayout: () => {
         const state = get();

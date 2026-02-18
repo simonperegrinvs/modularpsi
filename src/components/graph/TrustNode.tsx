@@ -8,25 +8,31 @@ export type TrustNodeData = {
   graphNode: GraphNode;
   categoryColor: string;
   selected: boolean;
+  recent?: boolean;
 };
 
 function TrustNodeComponent({ data }: NodeProps & { data: TrustNodeData }) {
-  const { graphNode, categoryColor, selected } = data;
+  const { graphNode, categoryColor, selected, recent } = data;
   const fillColor = trustToHex(graphNode.trust);
   const textColor = trustToTextColor(graphNode.trust);
   const isEllipse = graphNode.type === NODE_TYPE_REGULAR;
+  const borderColor = selected ? '#8080FF' : recent ? '#0ea5e9' : categoryColor;
+  const tooltip = graphNode.description?.trim()
+    ? `${graphNode.name}\n${graphNode.description}`
+    : graphNode.name;
 
   return (
     <div
       className="w-full h-full flex items-center justify-center text-center px-3 py-2 cursor-pointer"
+      title={tooltip}
       style={{
         background: fillColor,
         color: textColor,
-        border: `3px solid ${selected ? '#8080FF' : categoryColor}`,
+        border: `3px solid ${borderColor}`,
         borderRadius: isEllipse ? '50%' : '12px',
         fontSize: '12px',
         fontWeight: 500,
-        boxShadow: selected ? '0 0 0 2px #8080FF44' : undefined,
+        boxShadow: selected ? '0 0 0 2px #8080FF44' : recent ? '0 0 0 2px #0ea5e944' : undefined,
       }}
     >
       <Handle type="target" position={Position.Top} className="!bg-gray-400 !w-2 !h-2" />

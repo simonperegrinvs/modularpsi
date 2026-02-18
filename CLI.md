@@ -666,6 +666,7 @@ npm run mpsi -- agent discovery ingest
 npm run mpsi -- agent discovery ingest --query "ganzfeld psi" --api semantic-scholar --limit 10
 npm run mpsi -- agent discovery ingest --query "remote viewing" "presentiment" --max-queries 5 --year-min 2000
 npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --import-limit 8
+npm run mpsi -- agent discovery ingest --query "psi ganzfeld" --auto-import --scope-keyword "psi" "ganzfeld" --exclude-keyword "microbial" --min-scope-score 3
 ```
 
 When `--query` is omitted, queries are auto-generated from graph gaps (high-trust/no-reference or unclassified nodes) plus `focusKeywords`.
@@ -683,6 +684,10 @@ If DOI references exist, citation snowballing also runs (bounded by `citationSno
 | `--auto-import` | No | Import queued candidates from this ingestion run into draft references | false |
 | `--import-limit <n>` | No | Max queued candidates to import when `--auto-import` is enabled | `maxNewRefsPerRun` |
 | `--import-review-status <status>` | No | Review status for auto-imported references | `draft` |
+| `--scope-keyword <keywords...>` | No | Include keywords used by auto-import scope filter (combined with agent `focusKeywords`) | none |
+| `--exclude-keyword <keywords...>` | No | Exclude keywords used by auto-import scope filter (combined with agent `excludeKeywords`) | none |
+| `--min-scope-score <n>` | No | Minimum scope score required for auto-import | `2` |
+| `--no-scope-filter` | No | Disable scope filtering for auto-import | scope filter enabled |
 
 ### agent discovery import
 
@@ -692,6 +697,7 @@ Import queued discovery candidates directly into references (default status: dra
 npm run mpsi -- agent discovery import
 npm run mpsi -- agent discovery import --run-id real-flow-full-20260218-212350 --limit 10
 npm run mpsi -- agent discovery import --date 2026-02-18 --review-status draft --max-linked-nodes 3
+npm run mpsi -- agent discovery import --run-id run-42 --scope-keyword "psi" "remote viewing" --exclude-keyword "microbial"
 ```
 
 | Option | Required | Description | Default |
@@ -701,6 +707,10 @@ npm run mpsi -- agent discovery import --date 2026-02-18 --review-status draft -
 | `--limit <n>` | No | Maximum queued candidates to import | `maxNewRefsPerRun` |
 | `--review-status <status>` | No | Review status on imported references | `draft` |
 | `--max-linked-nodes <n>` | No | Max existing nodes to auto-link per imported reference | `2` |
+| `--scope-keyword <keywords...>` | No | Include keywords used by scope filter (combined with agent `focusKeywords`) | none |
+| `--exclude-keyword <keywords...>` | No | Exclude keywords used by scope filter (combined with agent `excludeKeywords`) | none |
+| `--min-scope-score <n>` | No | Minimum scope score required for import | `2` |
+| `--no-scope-filter` | No | Disable scope filtering for import | scope filter enabled |
 
 ### agent discovery reconcile-state
 

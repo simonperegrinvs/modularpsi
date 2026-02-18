@@ -24,6 +24,16 @@ import { buildMetricsReport, type MetricsPeriod } from '../../agent/metrics';
 import { formatOutput, type OutputFormat } from '../format';
 import type { ReviewStatus } from '../../domain/types';
 
+function uniqStrings(items: Array<string | undefined>): string[] {
+  const set = new Set<string>();
+  for (const item of items) {
+    const trimmed = (item ?? '').trim();
+    if (!trimmed) continue;
+    set.add(trimmed);
+  }
+  return [...set];
+}
+
 export function registerAgentCommands(program: Command) {
   const agent = program.command('agent').description('Agent management and diagnostics');
 
@@ -212,6 +222,10 @@ export function registerAgentCommands(program: Command) {
     .option('--auto-import', 'Automatically import queued candidates from this run as draft references')
     .option('--import-limit <n>', 'Maximum queued candidates to import when --auto-import is set')
     .option('--import-review-status <status>', 'Review status for auto-imported references', 'draft')
+    .option('--scope-keyword <keywords...>', 'Include keywords for auto-import scope matching')
+    .option('--exclude-keyword <keywords...>', 'Exclude keywords for auto-import scope matching')
+    .option('--min-scope-score <n>', 'Minimum scope score required for auto-import', '2')
+    .option('--no-scope-filter', 'Disable scope filtering for auto-import')
     .description('Run discovery ingestion and append candidates to discovery registry')
     .action(async (cmdOpts: {
       query?: string[];
@@ -224,6 +238,10 @@ export function registerAgentCommands(program: Command) {
       autoImport?: boolean;
       importLimit?: string;
       importReviewStatus?: string;
+      scopeKeyword?: string[];
+      excludeKeyword?: string[];
+      minScopeScore?: string;
+      scopeFilter?: boolean;
     }) => {
       const opts = program.opts();
       const baseDir = dirname(opts.file);
@@ -258,6 +276,9 @@ export function registerAgentCommands(program: Command) {
         const todayAudit = readTodayAuditEntries(baseDir);
         const maxItems = cmdOpts.importLimit ? parseInt(cmdOpts.importLimit, 10) : config.maxNewRefsPerRun;
         const reviewStatus = (cmdOpts.importReviewStatus ?? config.defaultReviewStatus) as ReviewStatus;
+        const scopeKeywords = uniqStrings([...(config.focusKeywords ?? []), ...(cmdOpts.scopeKeyword ?? [])]);
+        const excludeKeywords = uniqStrings([...(config.excludeKeywords ?? []), ...(cmdOpts.excludeKeyword ?? [])]);
+        const minScopeScore = cmdOpts.minScopeScore ? parseInt(cmdOpts.minScopeScore, 10) : 2;
         autoImportSummary = importQueuedDiscoveryCandidates({
           baseDir,
           data,
@@ -267,6 +288,10 @@ export function registerAgentCommands(program: Command) {
           sourceRunId: result.runId,
           maxItems,
           reviewStatus,
+          scopeKeywords,
+          excludeKeywords,
+          minScopeScore,
+          enforceScopeFilter: cmdOpts.scopeFilter !== false,
         });
         if (autoImportSummary.imported > 0) {
           writeFileSync(opts.file, graphToJson(data));
@@ -302,6 +327,10 @@ export function registerAgentCommands(program: Command) {
     .option('--limit <n>', 'Maximum queued candidates to import')
     .option('--review-status <status>', 'Review status for imported references', 'draft')
     .option('--max-linked-nodes <n>', 'Maximum existing nodes to link per imported reference', '2')
+    .option('--scope-keyword <keywords...>', 'Include keywords for auto-import scope matching')
+    .option('--exclude-keyword <keywords...>', 'Exclude keywords for auto-import scope matching')
+    .option('--min-scope-score <n>', 'Minimum scope score required for import', '2')
+    .option('--no-scope-filter', 'Disable scope filtering for import')
     .description('Import queued discovery candidates into draft references')
     .action((cmdOpts: {
       date?: string;
@@ -309,6 +338,10 @@ export function registerAgentCommands(program: Command) {
       limit?: string;
       reviewStatus?: string;
       maxLinkedNodes?: string;
+      scopeKeyword?: string[];
+      excludeKeyword?: string[];
+      minScopeScore?: string;
+      scopeFilter?: boolean;
     }) => {
       const opts = program.opts();
       const baseDir = dirname(opts.file);
@@ -320,6 +353,9 @@ export function registerAgentCommands(program: Command) {
       const maxItems = cmdOpts.limit ? parseInt(cmdOpts.limit, 10) : config.maxNewRefsPerRun;
       const maxLinkedNodes = cmdOpts.maxLinkedNodes ? parseInt(cmdOpts.maxLinkedNodes, 10) : 2;
       const reviewStatus = (cmdOpts.reviewStatus ?? config.defaultReviewStatus) as ReviewStatus;
+      const scopeKeywords = uniqStrings([...(config.focusKeywords ?? []), ...(cmdOpts.scopeKeyword ?? [])]);
+      const excludeKeywords = uniqStrings([...(config.excludeKeywords ?? []), ...(cmdOpts.excludeKeyword ?? [])]);
+      const minScopeScore = cmdOpts.minScopeScore ? parseInt(cmdOpts.minScopeScore, 10) : 2;
       const runId = `discovery-import-${Date.now()}`;
       const summary = importQueuedDiscoveryCandidates({
         baseDir,
@@ -332,6 +368,10 @@ export function registerAgentCommands(program: Command) {
         maxItems,
         maxLinkedNodes,
         reviewStatus,
+        scopeKeywords,
+        excludeKeywords,
+        minScopeScore,
+        enforceScopeFilter: cmdOpts.scopeFilter !== false,
       });
 
       if (summary.imported > 0) {

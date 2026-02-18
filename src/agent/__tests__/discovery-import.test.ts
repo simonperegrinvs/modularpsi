@@ -111,6 +111,7 @@ describe('discovery-import', () => {
       runId: 'import-run-2',
       reviewStatus: 'draft',
       maxItems: 10,
+      enforceScopeFilter: false,
     });
 
     expect(result.imported).toBe(0);
@@ -135,11 +136,47 @@ describe('discovery-import', () => {
       sourceRunId: 'run-a',
       reviewStatus: 'draft',
       maxItems: 10,
+      enforceScopeFilter: false,
     });
 
     expect(result.scannedQueued).toBe(1);
     expect(result.imported).toBe(1);
     expect(data.references).toHaveLength(1);
     expect(data.references[0].discoveryCandidateId).toBe('cand-a');
+  });
+
+  it('rejects out-of-scope candidates when scope filter is enabled', () => {
+    const baseDir = createDir();
+    const data = createEmptyGraph();
+    writeDiscoveryEvent(baseDir, fakeQueuedEvent({
+      candidateId: 'cand-noise',
+      query: 'methodological artifacts',
+      title: 'Effects of error, chimera, bias on amplicon sequencing',
+      abstract: 'microbial sequencing error and chimera artifacts in ecology',
+      doi: '10.1000/noise',
+    }));
+
+    const result = importQueuedDiscoveryCandidates({
+      baseDir,
+      data,
+      governanceConfig: DEFAULT_GOVERNANCE,
+      auditEntries: [],
+      runId: 'import-run-4',
+      reviewStatus: 'draft',
+      maxItems: 10,
+      scopeKeywords: ['psi', 'ganzfeld', 'remote viewing'],
+      excludeKeywords: ['microbial', 'sequencing'],
+      minScopeScore: 2,
+      enforceScopeFilter: true,
+    });
+
+    expect(result.imported).toBe(0);
+    expect(result.rejected).toBe(1);
+    expect(result.outOfScope).toBe(1);
+    expect(data.references).toHaveLength(0);
+
+    const rejected = listDiscoveryCandidates(baseDir, { status: 'rejected', runId: 'import-run-4' });
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0].decisionReason?.includes('out-of-scope-auto-filter')).toBe(true);
   });
 });

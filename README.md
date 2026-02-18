@@ -155,6 +155,7 @@ Global options: `-f, --file <path>` (default: `./modularpsi.json`), `--format js
 - **Reference locator fallback** — Governance accepts DOI/URL, external IDs, or bibliographic identity (title/authors/year) with warnings when locators are missing
 - **Trust values** — `-1` (unclassified), `0` (falsified), `0.0–1.0` (confidence), `1.0` (certain)
 - **Discovery registry** — Candidate exploration events are append-only JSONL files in `research/discovery/YYYY-MM-DD/candidates.jsonl`
+- **Auto-scope filter** — Discovery auto-import can reject out-of-scope candidates using include/exclude keywords plus node-link scoring
 - **Candidate identity** — Discovery IDs are deterministic (`doi` → `semanticScholarId` → `openAlexId` → normalized `title+year` hash)
 - **Schema migration marker** — `metadata.schemaVersion` is backfilled on load for compatibility-aware upgrades
 - **Reference processing lifecycle** — `processingStatus` tracks imported draft / approved / rejected state for references

@@ -15,6 +15,10 @@ export interface DiscoveryImportOptions {
   date?: string;
   maxItems: number;
   maxLinkedNodes?: number;
+  scopeKeywords?: string[];
+  excludeKeywords?: string[];
+  minScopeScore?: number;
+  enforceScopeFilter?: boolean;
 }
 
 export interface DiscoveryImportResult {
@@ -25,12 +29,15 @@ export interface DiscoveryImportResult {
   imported: number;
   duplicates: number;
   rejected: number;
+  outOfScope: number;
   linkedNodeCount: number;
   importedRefIds: string[];
   details: Array<{
     candidateId: string;
     title: string;
     decision: 'imported-draft' | 'duplicate' | 'rejected';
+    classification?: 'in-scope-core' | 'in-scope-adjacent' | 'out-of-scope';
+    scopeScore?: number;
     reason?: string;
     refId?: string;
     linkedNodeIds?: string[];
@@ -43,6 +50,19 @@ function normalizeText(input: string): string {
 
 function tokenize(input: string): string[] {
   return normalizeText(input).split(' ').filter((token) => token.length >= 4);
+}
+
+function uniqNormalizedKeywords(items: string[] | undefined): string[] {
+  if (!items || items.length === 0) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of items) {
+    const normalized = normalizeText(item);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    out.push(normalized);
+  }
+  return out;
 }
 
 function buildCandidateCorpus(candidate: DiscoveryEvent): string {
@@ -103,6 +123,7 @@ function writeDecisionUpdate(
   runId: string,
   decision: DiscoveryEvent['decision'],
   decisionReason: string,
+  classification?: DiscoveryEvent['classification'],
 ): void {
   const now = new Date().toISOString();
   writeDiscoveryEvent(baseDir, {
@@ -112,6 +133,7 @@ function writeDecisionUpdate(
     runId,
     decision,
     decisionReason,
+    classification: classification ?? candidate.classification,
     discoveredAt: candidate.discoveredAt || now,
   });
 }
@@ -122,23 +144,103 @@ function processingStatusForReview(status: ReviewStatus): Reference['processingS
   return 'imported-draft';
 }
 
+function classifyScope(
+  candidate: DiscoveryEvent,
+  nodes: GraphNode[],
+  scopeKeywords: string[],
+  excludeKeywords: string[],
+  minScopeScore: number,
+): {
+  classification: 'in-scope-core' | 'in-scope-adjacent' | 'out-of-scope';
+  scopeScore: number;
+  reason?: string;
+} {
+  const corpus = buildCandidateCorpus(candidate);
+  const matchedScope = scopeKeywords.filter((kw) => corpus.includes(kw));
+  const matchedExclude = excludeKeywords.filter((kw) => corpus.includes(kw));
+  const topNodeScore = nodes
+    .filter((node) => node.id !== 'P1' && node.id !== 'M1')
+    .map((node) => computeNodeLinkScore(candidate, node))
+    .sort((a, b) => b - a)[0] ?? 0;
+
+  const scopeScore = (matchedScope.length * 2) + Math.min(3, topNodeScore);
+  if (matchedExclude.length > 0) {
+    return {
+      classification: 'out-of-scope',
+      scopeScore,
+      reason: `matched exclude keywords: ${matchedExclude.join(', ')}`,
+    };
+  }
+  if (scopeScore >= minScopeScore + 2) {
+    return { classification: 'in-scope-core', scopeScore };
+  }
+  if (scopeScore >= minScopeScore) {
+    return { classification: 'in-scope-adjacent', scopeScore };
+  }
+  return {
+    classification: 'out-of-scope',
+    scopeScore,
+    reason: `scope score ${scopeScore} below minimum ${minScopeScore}`,
+  };
+}
+
 export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): DiscoveryImportResult {
   const queued = listDiscoveryCandidates(opts.baseDir, {
     date: opts.date,
     status: 'queued',
     runId: opts.sourceRunId,
   });
-  const attempted = queued.slice(0, Math.max(0, opts.maxItems));
   const maxLinkedNodes = opts.maxLinkedNodes ?? 2;
+  const scopeKeywords = uniqNormalizedKeywords(opts.scopeKeywords);
+  const excludeKeywords = uniqNormalizedKeywords(opts.excludeKeywords);
+  const minScopeScore = opts.minScopeScore ?? 2;
+  const enforceScopeFilter = opts.enforceScopeFilter ?? true;
+  const ranked = queued.map((candidate) => ({
+    candidate,
+    scope: classifyScope(candidate, opts.data.nodes, scopeKeywords, excludeKeywords, minScopeScore),
+  }));
+  ranked.sort((a, b) => {
+    if (b.scope.scopeScore !== a.scope.scopeScore) return b.scope.scopeScore - a.scope.scopeScore;
+    return b.candidate.timestamp.localeCompare(a.candidate.timestamp);
+  });
+  const attempted = ranked.slice(0, Math.max(0, opts.maxItems));
 
   let imported = 0;
   let duplicates = 0;
   let rejected = 0;
+  let outOfScope = 0;
   let linkedNodeCount = 0;
   const importedRefIds: string[] = [];
   const details: DiscoveryImportResult['details'] = [];
 
-  for (const [index, candidate] of attempted.entries()) {
+  for (const [index, item] of attempted.entries()) {
+    const candidate = item.candidate;
+    const scope = item.scope;
+    if (enforceScopeFilter && scope.classification === 'out-of-scope') {
+      outOfScope++;
+      rejected++;
+      const reason = `out-of-scope-auto-filter: ${scope.reason ?? 'scope policy rejected candidate'}`;
+      writeDecisionUpdate(opts.baseDir, candidate, opts.runId, 'rejected', reason, 'out-of-scope');
+      writeAuditEntry(opts.baseDir, createAuditEntry(
+        opts.runId,
+        'discovery-import-reference',
+        'reference',
+        candidate.candidateId,
+        'rejected',
+        { candidateId: candidate.candidateId, title: candidate.title },
+        { reason, aiRationale: 'Auto-scope filter rejected candidate before import', validationErrors: [] },
+      ));
+      details.push({
+        candidateId: candidate.candidateId,
+        title: candidate.title,
+        decision: 'rejected',
+        classification: 'out-of-scope',
+        scopeScore: scope.scopeScore,
+        reason,
+      });
+      continue;
+    }
+
     const refTemplate = candidateToReferenceTemplate(candidate);
     const gate = runPublishGate(
       {
@@ -166,7 +268,7 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
 
       if (duplicateError) {
         duplicates++;
-        writeDecisionUpdate(opts.baseDir, candidate, opts.runId, 'duplicate', reason);
+        writeDecisionUpdate(opts.baseDir, candidate, opts.runId, 'duplicate', reason, scope.classification);
         writeAuditEntry(opts.baseDir, createAuditEntry(
           opts.runId,
           'discovery-import-reference',
@@ -180,13 +282,15 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
           candidateId: candidate.candidateId,
           title: candidate.title,
           decision: 'duplicate',
+          classification: scope.classification,
+          scopeScore: scope.scopeScore,
           reason,
         });
         continue;
       }
 
       rejected++;
-      writeDecisionUpdate(opts.baseDir, candidate, opts.runId, 'rejected', reason);
+      writeDecisionUpdate(opts.baseDir, candidate, opts.runId, 'rejected', reason, scope.classification);
       writeAuditEntry(opts.baseDir, createAuditEntry(
         opts.runId,
         'discovery-import-reference',
@@ -200,6 +304,8 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
         candidateId: candidate.candidateId,
         title: candidate.title,
         decision: 'rejected',
+        classification: scope.classification,
+        scopeScore: scope.scopeScore,
         reason,
       });
       continue;
@@ -231,7 +337,7 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
         runId: opts.runId,
         searchQuery: candidate.query,
         apiSource: candidate.source,
-        aiClassification: candidate.classification,
+        aiClassification: scope.classification,
       },
       reviewStatus: opts.reviewStatus,
       processingStatus: processingStatusForReview(opts.reviewStatus),
@@ -252,7 +358,14 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
     imported++;
     importedRefIds.push(refId);
 
-    writeDecisionUpdate(opts.baseDir, candidate, opts.runId, 'imported-draft', `imported as ${refId}`);
+    writeDecisionUpdate(
+      opts.baseDir,
+      candidate,
+      opts.runId,
+      'imported-draft',
+      `imported as ${refId}`,
+      scope.classification,
+    );
     writeAuditEntry(opts.baseDir, createAuditEntry(
       opts.runId,
       'discovery-import-reference',
@@ -270,6 +383,8 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
       candidateId: candidate.candidateId,
       title: candidate.title,
       decision: 'imported-draft',
+      classification: scope.classification,
+      scopeScore: scope.scopeScore,
       reason: `imported as ${refId}`,
       refId,
       linkedNodeIds,
@@ -284,6 +399,7 @@ export function importQueuedDiscoveryCandidates(opts: DiscoveryImportOptions): D
     imported,
     duplicates,
     rejected,
+    outOfScope,
     linkedNodeCount,
     importedRefIds,
     details,

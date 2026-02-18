@@ -1,0 +1,374 @@
+{
+  "generatedAt": "2026-02-18T09:28:00.812Z",
+  "file": "research/psi-map-2026.json",
+  "hypotheses": [
+    {
+      "id": "P53",
+      "name": "Publication bias and selective reporting",
+      "trust": 0.8,
+      "evidenceCount": 5,
+      "evidenceScore": 0.7000000000000001,
+      "rankScore": 0.775,
+      "references": [
+        {
+          "id": "ref-1771406775048-18",
+          "title": "Publication bias is bad for science if not necessarily scientists",
+          "year": 2025,
+          "studyType": "theory",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Metascience analysis reinforcing why weak-effect literatures require strong anti-bias infrastructure.",
+          "url": "https://doi.org/10.1098/rsos.240688"
+        },
+        {
+          "id": "ref-1771406775048-5",
+          "title": "Why psychologists must change the way they analyze their data: the case of psi",
+          "year": 2011,
+          "studyType": "review",
+          "effectDirection": "challenges",
+          "replicationStatus": "independent-replication",
+          "summary": "Statistical critique highlighting exploratory flexibility and arguing that one-sided p-values overstated evidential strength.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21280965/"
+        },
+        {
+          "id": "ref-1771406775048-11",
+          "title": "Examining psychokinesis: the interaction of human intention with random number generators--a meta-analysis",
+          "year": 2006,
+          "studyType": "meta-analysis",
+          "effectDirection": "mixed",
+          "replicationStatus": "independent-replication",
+          "summary": "Classic RNG-PK synthesis often interpreted as evidence of weak effects but strong vulnerability to publication and selection bias.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16822162/"
+        },
+        {
+          "id": "ref-1771406775048-6",
+          "title": "A Bayes factor meta-analysis of Bem's ESP claim",
+          "year": 2011,
+          "studyType": "meta-analysis",
+          "effectDirection": "mixed",
+          "replicationStatus": "independent-replication",
+          "summary": "Meta-analytic Bayes factor approach showing how prior choices and aggregation strategy materially alter inference strength.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21573926/"
+        }
+      ]
+    },
+    {
+      "id": "P59",
+      "name": "Bell nonlocality does not imply controllable signaling",
+      "trust": 0.5599999999999999,
+      "evidenceCount": 2,
+      "evidenceScore": 0.9475000000000001,
+      "rankScore": 0.6876249999999999,
+      "references": [
+        {
+          "id": "ref-1771406775048-12",
+          "title": "Loophole-free Bell inequality violation using electron spins separated by 1.3 kilometres",
+          "year": 2015,
+          "studyType": "observational",
+          "effectDirection": "supports",
+          "replicationStatus": "multi-lab",
+          "summary": "Confirms nonlocal quantum correlations while not establishing controllable faster-than-light communication channels.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26503041/"
+        },
+        {
+          "id": "ref-1771406775048-13",
+          "title": "Quantum field theory cannot provide faster-than-light communication",
+          "year": 1989,
+          "studyType": "theory",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Theoretical no-signaling constraint often cited to distinguish correlation nonlocality from actionable communication.",
+          "url": "https://cds.cern.ch/record/188617"
+        }
+      ]
+    },
+    {
+      "id": "P55",
+      "name": "Illusory control and reasoning-bias pathway",
+      "trust": 0.5599999999999999,
+      "evidenceCount": 2,
+      "evidenceScore": 0.885,
+      "rankScore": 0.66575,
+      "references": [
+        {
+          "id": "ref-1771406775048-16",
+          "title": "Paranormal beliefs and core knowledge confusions: A meta-analysis",
+          "year": 2024,
+          "studyType": "meta-analysis",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Supports cognitive-style pathways that can explain paranormal conviction without requiring real anomalous information transfer.",
+          "url": "https://www.sciencedirect.com/science/article/pii/S019188692400240X"
+        },
+        {
+          "id": "ref-1771406775048-17",
+          "title": "Superstition predicts perception of illusory control",
+          "year": 2019,
+          "studyType": "observational",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Shows a measurable cognitive mechanism linking superstition with over-attribution of control in random environments.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30144046/"
+        }
+      ]
+    },
+    {
+      "id": "P57",
+      "name": "Null-heavy replication outcomes",
+      "trust": 0.6400000000000001,
+      "evidenceCount": 3,
+      "evidenceScore": 0.6666666666666666,
+      "rankScore": 0.6473333333333334,
+      "references": [
+        {
+          "id": "ref-1771406775048-7",
+          "title": "Raising the value of research studies in psychological science by increasing the credibility of research reports: the transparent Psi project",
+          "year": 2023,
+          "studyType": "replication",
+          "effectDirection": "challenges",
+          "replicationStatus": "multi-lab",
+          "summary": "Demonstrates an intensive transparency protocol and reports null replication for the flagship Bem task.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36756055/"
+        },
+        {
+          "id": "ref-1771406775048-4",
+          "title": "Correcting the past: failures to replicate ψ",
+          "year": 2012,
+          "studyType": "replication",
+          "effectDirection": "challenges",
+          "replicationStatus": "multi-lab",
+          "summary": "High-powered replication program that failed to reproduce key retroactive facilitation findings from Bem (2011).",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22924750/"
+        },
+        {
+          "id": "ref-1771406775048-15",
+          "title": "AWAreness during REsuscitation - II: A multi-center study of consciousness and awareness in cardiac arrest",
+          "year": 2023,
+          "studyType": "observational",
+          "effectDirection": "null",
+          "replicationStatus": "single",
+          "summary": "High-control prospective design in extreme-consciousness context with very limited objective target-identification support.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37423492/"
+        }
+      ]
+    },
+    {
+      "id": "P56",
+      "name": "False memory and magical ideation pathway",
+      "trust": 0.52,
+      "evidenceCount": 1,
+      "evidenceScore": 0.89,
+      "rankScore": 0.6335,
+      "references": [
+        {
+          "id": "ref-1771406775048-16",
+          "title": "Paranormal beliefs and core knowledge confusions: A meta-analysis",
+          "year": 2024,
+          "studyType": "meta-analysis",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Supports cognitive-style pathways that can explain paranormal conviction without requiring real anomalous information transfer.",
+          "url": "https://www.sciencedirect.com/science/article/pii/S019188692400240X"
+        }
+      ]
+    },
+    {
+      "id": "P52",
+      "name": "Protocol quality and transparency as effect moderators",
+      "trust": 0.5249999999999999,
+      "evidenceCount": 3,
+      "evidenceScore": 0.7899999999999999,
+      "rankScore": 0.6214999999999999,
+      "references": [
+        {
+          "id": "ref-1771406775048-7",
+          "title": "Raising the value of research studies in psychological science by increasing the credibility of research reports: the transparent Psi project",
+          "year": 2023,
+          "studyType": "replication",
+          "effectDirection": "challenges",
+          "replicationStatus": "multi-lab",
+          "summary": "Demonstrates an intensive transparency protocol and reports null replication for the flagship Bem task.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/36756055/"
+        },
+        {
+          "id": "ref-1771406775048",
+          "title": "Stage 2 Registered Report: Anomalous perception in a Ganzfeld condition - A meta-analysis of more than 40 years investigation",
+          "year": 2024,
+          "studyType": "meta-analysis",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Large registered-report synthesis finding a small but nonzero overall effect in Ganzfeld databases and stronger effects in selected participants.",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11134153/"
+        },
+        {
+          "id": "ref-1771406775048-8",
+          "title": "Stage 1 Registered Report: Anomalous perception in a Ganzfeld condition - A meta-analysis of more than 40 years investigation",
+          "year": 2020,
+          "studyType": "review",
+          "effectDirection": "supports",
+          "replicationStatus": "single",
+          "summary": "Protocol-first phase that improves auditability of inclusion criteria and analyses before final synthesis.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33628430/"
+        }
+      ]
+    },
+    {
+      "id": "P35",
+      "name": "Causality",
+      "trust": 0.8,
+      "evidenceCount": 1,
+      "evidenceScore": 0.36,
+      "rankScore": 0.616,
+      "references": [
+        {
+          "id": "2",
+          "title": "Magical thinking in formal operational adults",
+          "year": 1985,
+          "summary": "Lesser, R. & Paisner, M. (1985). Magical thinking in formal operational adults.Human Development, 28, 57-70."
+        }
+      ]
+    },
+    {
+      "id": "P36",
+      "name": "Cognitive Bias",
+      "trust": 0.8,
+      "evidenceCount": 1,
+      "evidenceScore": 0.36,
+      "rankScore": 0.616,
+      "references": [
+        {
+          "id": "3",
+          "title": "Wings of Illusion",
+          "year": 1990,
+          "summary": "Schumaker, J.F. (1990). Wings of Illusion. Cambridge: Polity Press."
+        }
+      ]
+    },
+    {
+      "id": "P37",
+      "name": "Illusion of Control",
+      "trust": 0.8,
+      "evidenceCount": 1,
+      "evidenceScore": 0.36,
+      "rankScore": 0.616,
+      "references": [
+        {
+          "id": "4",
+          "title": "Illusion of control for self and others in depressed and non-depressed college students",
+          "year": 1984,
+          "summary": "Martin, D.J. ; Abramson, L.Y. & Alloy, L.B. (1984). Illusion of control for self and others in depressed and non-depressed college students.Journal of Personality and Social Psy..."
+        }
+      ]
+    },
+    {
+      "id": "P48",
+      "name": "Ganzfeld: small positive signal in registered-report synthesis",
+      "trust": 0.5249999999999999,
+      "evidenceCount": 3,
+      "evidenceScore": 0.72,
+      "rankScore": 0.597,
+      "references": [
+        {
+          "id": "ref-1771406775048",
+          "title": "Stage 2 Registered Report: Anomalous perception in a Ganzfeld condition - A meta-analysis of more than 40 years investigation",
+          "year": 2024,
+          "studyType": "meta-analysis",
+          "effectDirection": "supports",
+          "replicationStatus": "independent-replication",
+          "summary": "Large registered-report synthesis finding a small but nonzero overall effect in Ganzfeld databases and stronger effects in selected participants.",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11134153/"
+        },
+        {
+          "id": "ref-1771406775048-2",
+          "title": "Meta-analysis that conceals more than it reveals: comment on Storm et al. (2010)",
+          "year": 2010,
+          "studyType": "review",
+          "effectDirection": "challenges",
+          "replicationStatus": "independent-replication",
+          "summary": "Methodological critique emphasizing that meta-analytic significance alone is insufficient without robust independent replication.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20565165/"
+        },
+        {
+          "id": "ref-1771406775048-1",
+          "title": "Meta-analysis of free-response studies, 1992-2008: assessing the noise reduction model in parapsychology",
+          "year": 2010,
+          "studyType": "meta-analysis",
+          "effectDirection": "supports",
+          "replicationStatus": "single",
+          "summary": "Influential synthesis suggesting positive free-response effects but later challenged on randomization and robustness grounds.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20565164/"
+        }
+      ]
+    },
+    {
+      "id": "P54",
+      "name": "Expectation/order artifacts",
+      "trust": 0.6000000000000001,
+      "evidenceCount": 1,
+      "evidenceScore": 0.615,
+      "rankScore": 0.58525,
+      "references": [
+        {
+          "id": "ref-1771406775048-10",
+          "title": "We should have seen this coming",
+          "year": 2014,
+          "studyType": "review",
+          "effectDirection": "challenges",
+          "replicationStatus": "independent-replication",
+          "summary": "Argues that extraordinary temporal claims require stronger controls and direct tests of conventional artifact explanations.",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4034337/"
+        }
+      ]
+    },
+    {
+      "id": "P60",
+      "name": "Retrocausal claims challenged by modern replications",
+      "trust": 0.4,
+      "evidenceCount": 4,
+      "evidenceScore": 0.66625,
+      "rankScore": 0.5131875,
+      "references": [
+        {
+          "id": "ref-1771406775048-4",
+          "title": "Correcting the past: failures to replicate ψ",
+          "year": 2012,
+          "studyType": "replication",
+          "effectDirection": "challenges",
+          "replicationStatus": "multi-lab",
+          "summary": "High-powered replication program that failed to reproduce key retroactive facilitation findings from Bem (2011).",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22924750/"
+        },
+        {
+          "id": "ref-1771406775048-5",
+          "title": "Why psychologists must change the way they analyze their data: the case of psi",
+          "year": 2011,
+          "studyType": "review",
+          "effectDirection": "challenges",
+          "replicationStatus": "independent-replication",
+          "summary": "Statistical critique highlighting exploratory flexibility and arguing that one-sided p-values overstated evidential strength.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21280965/"
+        },
+        {
+          "id": "ref-1771406775048-6",
+          "title": "A Bayes factor meta-analysis of Bem's ESP claim",
+          "year": 2011,
+          "studyType": "meta-analysis",
+          "effectDirection": "mixed",
+          "replicationStatus": "independent-replication",
+          "summary": "Meta-analytic Bayes factor approach showing how prior choices and aggregation strategy materially alter inference strength.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21573926/"
+        },
+        {
+          "id": "ref-1771406775048-3",
+          "title": "Feeling the future: experimental evidence for anomalous retroactive influences on cognition and affect",
+          "year": 2011,
+          "studyType": "observational",
+          "effectDirection": "supports",
+          "replicationStatus": "single",
+          "summary": "Landmark controversial paper reporting retroactive facilitation effects and motivating large-scale replication efforts.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21280961/"
+        }
+      ]
+    }
+  ]
+}

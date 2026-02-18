@@ -18,7 +18,7 @@ function TrustNodeComponent({ data }: NodeProps & { data: TrustNodeData }) {
 
   return (
     <div
-      className="flex items-center justify-center text-center px-3 py-2 min-w-[140px] min-h-[48px] cursor-pointer"
+      className="w-full h-full flex items-center justify-center text-center px-3 py-2 cursor-pointer"
       style={{
         background: fillColor,
         color: textColor,
@@ -30,7 +30,7 @@ function TrustNodeComponent({ data }: NodeProps & { data: TrustNodeData }) {
       }}
     >
       <Handle type="target" position={Position.Top} className="!bg-gray-400 !w-2 !h-2" />
-      <span className="leading-tight">{graphNode.name}</span>
+      <span className="leading-tight whitespace-normal break-words">{graphNode.name}</span>
       <Handle type="source" position={Position.Bottom} className="!bg-gray-400 !w-2 !h-2" />
     </div>
   );

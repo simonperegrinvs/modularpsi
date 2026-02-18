@@ -1,0 +1,1903 @@
+{
+  "version": 1,
+  "prefix": "P",
+  "rootId": "P1",
+  "lastNodeNumber": 61,
+  "nodes": [
+    {
+      "id": "P12",
+      "name": "Radiational Psi",
+      "description": "Psi have field properties and have radiational behavior",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.2,
+      "referenceIds": []
+    },
+    {
+      "id": "P13",
+      "name": "Non-local Psi",
+      "description": "Psi have non-local behavior.",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P14",
+      "name": "Unconscious Psi",
+      "description": "Psi is a unconscious process",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P15",
+      "name": "Magnetic Influence",
+      "description": "Magnetism have influence over psi phenomena",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P16",
+      "name": "Friend Psi",
+      "description": "Nonintentional psi would be greater when helping a friend than when helping a stranger.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.12800000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P17",
+      "name": "Cost-effetive psi",
+      "description": "Nonintentional psi would be greater when the cost of helping was low than when the cost of helping was high.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.12800000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P18",
+      "name": "Psi Conductive Variables",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P19",
+      "name": "Good Luck Belief",
+      "description": "Belief in good luck is psi conductive.",
+      "categoryId": "cultural",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P20",
+      "name": "Unintentional Psi",
+      "description": "Psi phenomena can occour unintentionaly",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P21",
+      "name": "Openness",
+      "description": "Openness would correlate positively with psi.",
+      "categoryId": "cultural",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P22",
+      "name": "Defensiveness (negative)",
+      "description": "Neuroticism/Defensiveness would correlate negatively with psi.",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P23",
+      "name": "ELF",
+      "description": "",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.16000000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P25",
+      "name": "Holographic",
+      "description": "",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P26",
+      "name": "Sensorial Noise (negative)",
+      "description": "",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P27",
+      "name": "Belief in Psi",
+      "description": "Belief in Psi is psi conductive.",
+      "categoryId": "cultural",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P28",
+      "name": "Extraversion",
+      "description": "Extraversion is psi conductive",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P29",
+      "name": "Defensiveness",
+      "description": "Defensiveness if psi-conductive",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P30",
+      "name": "Goal-Oriented",
+      "description": "Psi process is intrinsically goal-oriented\r\r\r\r\r\r\r\r\r\r\r\r\nand that it, thereby, acts independently of task complexity",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P31",
+      "name": "Tag Scanning",
+      "description": "The activity of extrasensorially scanning the potentially relevant environment for potentially relevant information would, even if done unconsciously, seem to be formidable and costly in terms of processing capacity.",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P32",
+      "name": "Needsubserving",
+      "description": "Nonintentional psi is needsubserving",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.48,
+      "referenceIds": []
+    },
+    {
+      "id": "P34",
+      "name": "Psychosis",
+      "description": "Paranormal experiences are sign of psychosis",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.4,
+      "referenceIds": []
+    },
+    {
+      "id": "P35",
+      "name": "Causality",
+      "description": "a paranormal belief system could for some people, be used, as a cognitive defence against acceptance of the uncertainty of life events by creating meaningfulness out of coincidences or it could be indicative of psychopathology.",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "2"
+      ]
+    },
+    {
+      "id": "P36",
+      "name": "Cognitive Bias",
+      "description": "paranormal belief systems help sustain psychic integrity and to do so they operate in practice as a cognitive bias",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "3"
+      ]
+    },
+    {
+      "id": "P37",
+      "name": "Illusion of Control",
+      "description": "Persons who believe they can control an event they in reality cannot control, might then be expected to show a healthier psychological\nfunctioning than persons who (rightly) do not think they can control chance events",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "4"
+      ]
+    },
+    {
+      "id": "P38",
+      "name": "Reasoning Skills",
+      "description": "It has been suggested that paranormal beliefs might be correlated with reasoning ability, especially when the reasoning task contains apparent paranormal content",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P39",
+      "name": "Tachyon",
+      "description": "",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.08000000000000002,
+      "referenceIds": []
+    },
+    {
+      "id": "P40",
+      "name": "Local Sideral Time",
+      "description": "The local sidereal time (the time at which a particular part of the sky is directly overhead) may correlate with psi score",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P41",
+      "name": "Shannon Entropy",
+      "description": "The gradient of Shannon entropy of targets (images or videos) may correlate with psi",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P42",
+      "name": "Quality of Randomness",
+      "description": "The Quality of Randomness of the target may affect psi score.",
+      "categoryId": "physical",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6,
+      "referenceIds": []
+    },
+    {
+      "id": "P1",
+      "name": "Second Proposition",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P43",
+      "name": "Emotional Bound",
+      "description": "Emotional bount between people is conductive to \"extrassensorial communication\"",
+      "categoryId": "psichological",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P2",
+      "name": "Non-Psi Hypothesis",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P44",
+      "name": "Inacurate Recall",
+      "description": "Cognitive Psychologists that people recall of everyday events can be highly inaccurate. Once a particular interpretation is placed in the event, features of the experience consistent with that interpretation tend to be recalled but inconsistente features will tend to be forgotten",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P3",
+      "name": "Psi Hypothesis",
+      "description": "",
+      "categoryId": "general",
+      "keywords": [],
+      "type": 0,
+      "trust": 1,
+      "referenceIds": []
+    },
+    {
+      "id": "P45",
+      "name": "Subconcious perception",
+      "description": "",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P5",
+      "name": "Human Psi",
+      "description": "Some humans can produce psi phenomena.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P46",
+      "name": "New Proposition",
+      "description": "",
+      "categoryId": "na",
+      "keywords": [],
+      "type": 0,
+      "trust": -1,
+      "referenceIds": []
+    },
+    {
+      "id": "P6",
+      "name": "All Humans",
+      "description": "All Humans can produce psi phenomena.\r\r\r\r\r\r\r\r\r\r\r\n\r\r\r\r\r\r\r\r\r\r\r\nSome surveys points that a great percentage of people acknoledged some psi experience.",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P7",
+      "name": "Gifted Human",
+      "description": "Only some gifted people can produce psi phenomena",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.16000000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P8",
+      "name": "Animal Psi",
+      "description": "Some animals can produce psi phenomena",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": []
+    },
+    {
+      "id": "P9",
+      "name": "Evolutive Psi",
+      "description": "Psi was created in the evolutionary process",
+      "categoryId": "bio",
+      "keywords": [],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": []
+    },
+    {
+      "id": "P47",
+      "name": "Context-Dependent Anomalous Cognition",
+      "description": "Umbrella hypothesis that psi-like effects, if real, are weak, probabilistic, and strongly dependent on participant selection, protocol quality, and context.",
+      "categoryId": "general",
+      "keywords": [
+        "psi",
+        "context",
+        "moderators",
+        "weak effects"
+      ],
+      "type": 0,
+      "trust": 0.75,
+      "referenceIds": []
+    },
+    {
+      "id": "P48",
+      "name": "Ganzfeld: small positive signal in registered-report synthesis",
+      "description": "Represents Ganzfeld evidence suggesting a small aggregate positive signal under some designs, with ongoing debate about robustness and moderators.",
+      "categoryId": "general",
+      "keywords": [
+        "ganzfeld",
+        "meta-analysis",
+        "signal"
+      ],
+      "type": 0,
+      "trust": 0.5249999999999999,
+      "referenceIds": [
+        "ref-1771406775048",
+        "ref-1771406775048-1",
+        "ref-1771406775048-2"
+      ]
+    },
+    {
+      "id": "P49",
+      "name": "Presentiment: anticipatory physiology claims",
+      "description": "Represents presentiment claims where pre-stimulus physiology appears to anticipate random future stimuli, with unresolved artifact and preprocessing concerns.",
+      "categoryId": "general",
+      "keywords": [
+        "presentiment",
+        "physiology",
+        "anticipation",
+        "artifacts"
+      ],
+      "type": 0,
+      "trust": 0.3375,
+      "referenceIds": [
+        "ref-1771406775048-9",
+        "ref-1771406775048-10"
+      ]
+    },
+    {
+      "id": "P50",
+      "name": "RNG micro-PK: tiny effects with fragility concerns",
+      "description": "Represents RNG micro-PK findings with very small effects that are sensitive to study design, publication bias, and replication quality.",
+      "categoryId": "general",
+      "keywords": [
+        "rng",
+        "micro-pk",
+        "publication bias",
+        "replication"
+      ],
+      "type": 0,
+      "trust": 0.26249999999999996,
+      "referenceIds": [
+        "ref-1771406775048-11"
+      ]
+    },
+    {
+      "id": "P51",
+      "name": "Non-signaling constrained nonlocal models",
+      "description": "Represents nonlocal models constrained by no-signaling: correlation-like effects without controllable faster-than-light information transfer.",
+      "categoryId": "general",
+      "keywords": [
+        "nonlocal",
+        "no-signaling",
+        "correlation"
+      ],
+      "type": 0,
+      "trust": 0.41250000000000003,
+      "referenceIds": []
+    },
+    {
+      "id": "P52",
+      "name": "Protocol quality and transparency as effect moderators",
+      "description": "Represents the claim that preregistration, blinding, randomization quality, and transparency strongly modulate observed effect size estimates.",
+      "categoryId": "general",
+      "keywords": [
+        "preregistration",
+        "transparency",
+        "methodology",
+        "moderators"
+      ],
+      "type": 0,
+      "trust": 0.5249999999999999,
+      "referenceIds": [
+        "ref-1771406775048",
+        "ref-1771406775048-7",
+        "ref-1771406775048-8"
+      ]
+    },
+    {
+      "id": "P53",
+      "name": "Publication bias and selective reporting",
+      "description": "Represents inflation risks from selective reporting, analytic flexibility, and publication bias in weak-signal literatures.",
+      "categoryId": "general",
+      "keywords": [
+        "publication bias",
+        "researcher degrees of freedom",
+        "metascience"
+      ],
+      "type": 0,
+      "trust": 0.8,
+      "referenceIds": [
+        "ref-1771406775048-2",
+        "ref-1771406775048-5",
+        "ref-1771406775048-6",
+        "ref-1771406775048-11",
+        "ref-1771406775048-18"
+      ]
+    },
+    {
+      "id": "P54",
+      "name": "Expectation/order artifacts",
+      "description": "Represents conventional expectation, order, and preprocessing artifacts that can mimic anticipatory or anomalous effects.",
+      "categoryId": "general",
+      "keywords": [
+        "expectation bias",
+        "order effects",
+        "preprocessing"
+      ],
+      "type": 0,
+      "trust": 0.6000000000000001,
+      "referenceIds": [
+        "ref-1771406775048-10"
+      ]
+    },
+    {
+      "id": "P55",
+      "name": "Illusory control and reasoning-bias pathway",
+      "description": "Represents cognitive mechanisms such as illusory control and reasoning errors that increase anomalous interpretation without anomalous transfer.",
+      "categoryId": "general",
+      "keywords": [
+        "illusory control",
+        "reasoning bias",
+        "cognition"
+      ],
+      "type": 0,
+      "trust": 0.5599999999999999,
+      "referenceIds": [
+        "ref-1771406775048-16",
+        "ref-1771406775048-17"
+      ]
+    },
+    {
+      "id": "P56",
+      "name": "False memory and magical ideation pathway",
+      "description": "Represents memory distortion and ontological confusion pathways associated with stronger paranormal belief.",
+      "categoryId": "general",
+      "keywords": [
+        "memory bias",
+        "ontological confusion",
+        "belief"
+      ],
+      "type": 0,
+      "trust": 0.52,
+      "referenceIds": [
+        "ref-1771406775048-16"
+      ]
+    },
+    {
+      "id": "P57",
+      "name": "Null-heavy replication outcomes",
+      "description": "Represents the empirical pattern of null or near-null outcomes in many high-powered and transparent replications.",
+      "categoryId": "general",
+      "keywords": [
+        "replication",
+        "null results",
+        "multilab"
+      ],
+      "type": 0,
+      "trust": 0.6400000000000001,
+      "referenceIds": [
+        "ref-1771406775048-4",
+        "ref-1771406775048-7",
+        "ref-1771406775048-15"
+      ]
+    },
+    {
+      "id": "P58",
+      "name": "Classical carrier constraints: attenuation and shielding",
+      "description": "Represents physical constraints such as attenuation, shielding, energetic plausibility, and gravity-speed bounds on classical carrier psi models.",
+      "categoryId": "general",
+      "keywords": [
+        "attenuation",
+        "shielding",
+        "physics constraints"
+      ],
+      "type": 0,
+      "trust": 0.06,
+      "referenceIds": [
+        "ref-1771406775048-14"
+      ]
+    },
+    {
+      "id": "P59",
+      "name": "Bell nonlocality does not imply controllable signaling",
+      "description": "Represents the distinction that Bell nonlocality supports nonlocal correlations but not controllable signaling channels.",
+      "categoryId": "general",
+      "keywords": [
+        "bell",
+        "nonlocality",
+        "no signaling"
+      ],
+      "type": 0,
+      "trust": 0.5599999999999999,
+      "referenceIds": [
+        "ref-1771406775048-12",
+        "ref-1771406775048-13"
+      ]
+    },
+    {
+      "id": "P60",
+      "name": "Retrocausal claims challenged by modern replications",
+      "description": "Represents retrocausal and precognition claims weighed against modern replication failures and statistical critiques.",
+      "categoryId": "general",
+      "keywords": [
+        "precognition",
+        "retrocausal",
+        "replication"
+      ],
+      "type": 0,
+      "trust": 0.4,
+      "referenceIds": [
+        "ref-1771406775048-3",
+        "ref-1771406775048-4",
+        "ref-1771406775048-5",
+        "ref-1771406775048-6"
+      ]
+    },
+    {
+      "id": "P61",
+      "name": "Holographic/holorresonance framing as heuristic",
+      "description": "Represents holographic and holorresonance-style frameworks as heuristic organizing models pending stronger discriminative predictions.",
+      "categoryId": "general",
+      "keywords": [
+        "holographic",
+        "holorresonance",
+        "theory"
+      ],
+      "type": 0,
+      "trust": 0.32000000000000006,
+      "referenceIds": []
+    }
+  ],
+  "edges": [
+    {
+      "id": "P12-P39",
+      "sourceId": "P12",
+      "targetId": "P39",
+      "trust": 0.4,
+      "type": 0,
+      "combinedTrust": 0.08000000000000002
+    },
+    {
+      "id": "P12-P23",
+      "sourceId": "P12",
+      "targetId": "P23",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.16000000000000003
+    },
+    {
+      "id": "P13-P25",
+      "sourceId": "P13",
+      "targetId": "P25",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P14-P9",
+      "sourceId": "P14",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P14-P31",
+      "sourceId": "P14",
+      "targetId": "P31",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P18-P42",
+      "sourceId": "P18",
+      "targetId": "P42",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P43",
+      "sourceId": "P18",
+      "targetId": "P43",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P18-P26",
+      "sourceId": "P18",
+      "targetId": "P26",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P18-P27",
+      "sourceId": "P18",
+      "targetId": "P27",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P18-P28",
+      "sourceId": "P18",
+      "targetId": "P28",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P29",
+      "sourceId": "P18",
+      "targetId": "P29",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P19",
+      "sourceId": "P18",
+      "targetId": "P19",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P21",
+      "sourceId": "P18",
+      "targetId": "P21",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P22",
+      "sourceId": "P18",
+      "targetId": "P22",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P40",
+      "sourceId": "P18",
+      "targetId": "P40",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P18-P41",
+      "sourceId": "P18",
+      "targetId": "P41",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.6
+    },
+    {
+      "id": "P20-P32",
+      "sourceId": "P20",
+      "targetId": "P32",
+      "trust": 0.6,
+      "type": 0,
+      "combinedTrust": 0.48
+    },
+    {
+      "id": "P20-P9",
+      "sourceId": "P20",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P34-P46",
+      "sourceId": "P34",
+      "targetId": "P46",
+      "trust": -1,
+      "type": 0,
+      "combinedTrust": -1
+    },
+    {
+      "id": "P1-P2",
+      "sourceId": "P1",
+      "targetId": "P2",
+      "trust": 1,
+      "type": 0,
+      "combinedTrust": 1
+    },
+    {
+      "id": "P1-P3",
+      "sourceId": "P1",
+      "targetId": "P3",
+      "trust": 1,
+      "type": 0,
+      "combinedTrust": 1
+    },
+    {
+      "id": "P2-P44",
+      "sourceId": "P2",
+      "targetId": "P44",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P34",
+      "sourceId": "P2",
+      "targetId": "P34",
+      "trust": 0.4,
+      "type": 0,
+      "combinedTrust": 0.4
+    },
+    {
+      "id": "P2-P45",
+      "sourceId": "P2",
+      "targetId": "P45",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P35",
+      "sourceId": "P2",
+      "targetId": "P35",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P36",
+      "sourceId": "P2",
+      "targetId": "P36",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P37",
+      "sourceId": "P2",
+      "targetId": "P37",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P2-P38",
+      "sourceId": "P2",
+      "targetId": "P38",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P30",
+      "sourceId": "P3",
+      "targetId": "P30",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P20",
+      "sourceId": "P3",
+      "targetId": "P20",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P12",
+      "sourceId": "P3",
+      "targetId": "P12",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.2
+    },
+    {
+      "id": "P3-P13",
+      "sourceId": "P3",
+      "targetId": "P13",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P14",
+      "sourceId": "P3",
+      "targetId": "P14",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P15",
+      "sourceId": "P3",
+      "targetId": "P15",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P18",
+      "sourceId": "P3",
+      "targetId": "P18",
+      "trust": 1,
+      "type": 0,
+      "combinedTrust": 1
+    },
+    {
+      "id": "P3-P5",
+      "sourceId": "P3",
+      "targetId": "P5",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P3-P8",
+      "sourceId": "P3",
+      "targetId": "P8",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P5-P6",
+      "sourceId": "P5",
+      "targetId": "P6",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P5-P7",
+      "sourceId": "P5",
+      "targetId": "P7",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.16000000000000003
+    },
+    {
+      "id": "P6-P9",
+      "sourceId": "P6",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.5120000000000001
+    },
+    {
+      "id": "P8-P9",
+      "sourceId": "P8",
+      "targetId": "P9",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P9-P16",
+      "sourceId": "P9",
+      "targetId": "P16",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.12800000000000003
+    },
+    {
+      "id": "P9-P17",
+      "sourceId": "P9",
+      "targetId": "P17",
+      "trust": 0.2,
+      "type": 0,
+      "combinedTrust": 0.12800000000000003
+    },
+    {
+      "id": "P3-P47",
+      "sourceId": "P3",
+      "targetId": "P47",
+      "trust": 0.75,
+      "type": 0,
+      "combinedTrust": 0.75
+    },
+    {
+      "id": "P47-P48",
+      "sourceId": "P47",
+      "targetId": "P48",
+      "trust": 0.7,
+      "type": 0,
+      "combinedTrust": 0.5249999999999999
+    },
+    {
+      "id": "P47-P49",
+      "sourceId": "P47",
+      "targetId": "P49",
+      "trust": 0.45,
+      "type": 0,
+      "combinedTrust": 0.3375
+    },
+    {
+      "id": "P47-P50",
+      "sourceId": "P47",
+      "targetId": "P50",
+      "trust": 0.35,
+      "type": 0,
+      "combinedTrust": 0.26249999999999996
+    },
+    {
+      "id": "P47-P51",
+      "sourceId": "P47",
+      "targetId": "P51",
+      "trust": 0.55,
+      "type": 0,
+      "combinedTrust": 0.41250000000000003
+    },
+    {
+      "id": "P47-P52",
+      "sourceId": "P47",
+      "targetId": "P52",
+      "trust": 0.7,
+      "type": 0,
+      "combinedTrust": 0.5249999999999999
+    },
+    {
+      "id": "P2-P53",
+      "sourceId": "P2",
+      "targetId": "P53",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.8
+    },
+    {
+      "id": "P53-P54",
+      "sourceId": "P53",
+      "targetId": "P54",
+      "trust": 0.75,
+      "type": 0,
+      "combinedTrust": 0.6000000000000001
+    },
+    {
+      "id": "P53-P55",
+      "sourceId": "P53",
+      "targetId": "P55",
+      "trust": 0.7,
+      "type": 0,
+      "combinedTrust": 0.5599999999999999
+    },
+    {
+      "id": "P53-P56",
+      "sourceId": "P53",
+      "targetId": "P56",
+      "trust": 0.65,
+      "type": 0,
+      "combinedTrust": 0.52
+    },
+    {
+      "id": "P53-P57",
+      "sourceId": "P53",
+      "targetId": "P57",
+      "trust": 0.8,
+      "type": 0,
+      "combinedTrust": 0.6400000000000001
+    },
+    {
+      "id": "P12-P58",
+      "sourceId": "P12",
+      "targetId": "P58",
+      "trust": 0.3,
+      "type": 0,
+      "combinedTrust": 0.06
+    },
+    {
+      "id": "P13-P59",
+      "sourceId": "P13",
+      "targetId": "P59",
+      "trust": 0.7,
+      "type": 0,
+      "combinedTrust": 0.5599999999999999
+    },
+    {
+      "id": "P35-P60",
+      "sourceId": "P35",
+      "targetId": "P60",
+      "trust": 0.5,
+      "type": 0,
+      "combinedTrust": 0.4
+    },
+    {
+      "id": "P25-P61",
+      "sourceId": "P25",
+      "targetId": "P61",
+      "trust": 0.5,
+      "type": 0,
+      "combinedTrust": 0.32000000000000006
+    }
+  ],
+  "categories": [
+    {
+      "id": "general",
+      "name": "General Aspects of Psi",
+      "color": "#000000",
+      "description": ""
+    },
+    {
+      "id": "bio",
+      "name": "Fisiological Aspects of Psi",
+      "color": "#00ff00",
+      "description": ""
+    },
+    {
+      "id": "physical",
+      "name": "Physical Aspects of Psi",
+      "color": "#0000ff",
+      "description": ""
+    },
+    {
+      "id": "psichological",
+      "name": "Psychological Aspects of Psi",
+      "color": "#ff0000",
+      "description": ""
+    },
+    {
+      "id": "cultural",
+      "name": "Cultural Aspects of Psi",
+      "color": "#00ffff",
+      "description": ""
+    },
+    {
+      "id": "na",
+      "name": "N/C",
+      "color": "#b4b4b4",
+      "description": ""
+    }
+  ],
+  "references": [
+    {
+      "id": "1",
+      "title": "Parapsychological phenomena and the absorption domain",
+      "authors": [
+        "Irwin, Harvey J."
+      ],
+      "year": 1985,
+      "publication": "Journal of the American Society for Psychical Research",
+      "publisher": "",
+      "citation": "Irwin, Harvey J. (1985). Parapsychological phenomena and the absorption domain. Journal of the American Society for Psychical Research, 79, 1-11.",
+      "pageStart": 1,
+      "pageEnd": 11,
+      "volume": 79,
+      "domainTags": []
+    },
+    {
+      "id": "2",
+      "title": "Magical thinking in formal operational adults",
+      "authors": [
+        "Lesser, R.",
+        "Paisner, M."
+      ],
+      "year": 1985,
+      "publication": "Human Development",
+      "publisher": "",
+      "citation": "Lesser, R. & Paisner, M. (1985). Magical thinking in formal operational adults.Human Development, 28, 57-70.",
+      "pageStart": 57,
+      "pageEnd": 70,
+      "volume": 28,
+      "domainTags": []
+    },
+    {
+      "id": "3",
+      "title": "Wings of Illusion",
+      "authors": [
+        "Schumaker, J. F."
+      ],
+      "year": 1990,
+      "publication": "",
+      "publisher": "Polity Press",
+      "citation": "Schumaker, J.F. (1990). Wings of Illusion. Cambridge: Polity Press.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "domainTags": []
+    },
+    {
+      "id": "4",
+      "title": "Illusion of control for self and others in depressed and non-depressed college students",
+      "authors": [
+        "Martin, D.J.",
+        "Abramson, L.Y.",
+        "Alloy, L.B."
+      ],
+      "year": 1984,
+      "publication": "Journal of Personality and Social Psychology",
+      "publisher": "",
+      "citation": "Martin, D.J. ; Abramson, L.Y. & Alloy, L.B. (1984). Illusion of control for self and others in depressed and non-depressed college students.Journal of Personality and Social Psychology, 46, 125-136.",
+      "pageStart": 125,
+      "pageEnd": 136,
+      "volume": 46,
+      "domainTags": []
+    },
+    {
+      "id": "5",
+      "title": "Reasoning errors and belief in the paranormal",
+      "authors": [],
+      "year": 1985,
+      "publication": "Journal of Social Psychology",
+      "publisher": "",
+      "citation": "Wierzbicki, M. (1985). Reasoning errors and belief in the paranormal.Journal of Social Psychology, 125, 489-494.",
+      "pageStart": 489,
+      "pageEnd": 494,
+      "volume": 125,
+      "domainTags": []
+    },
+    {
+      "id": "6",
+      "title": "Diagnostic and Statistical Manual of Mental\r\nDisorders",
+      "authors": [],
+      "year": 1994,
+      "publication": "",
+      "publisher": "American Psychiatric Association",
+      "citation": "American Psychiatric Association. (1994). Diagnostic and Statistical Manual of Mental Disorders.Washington, DC:American Psychiatric Association.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "domainTags": []
+    },
+    {
+      "id": "7",
+      "title": "Conscious vs. unconscious clairvoyance in the context of an academic examination",
+      "authors": [
+        "Braud, W. G."
+      ],
+      "year": 1975,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Braud, W. G. (1975). Conscious vs. unconscious clairvoyance in the context of an academic examination.Journal of Parapsychology, 39, 277-288.",
+      "pageStart": 277,
+      "pageEnd": 288,
+      "volume": 39,
+      "domainTags": []
+    },
+    {
+      "id": "8",
+      "title": "Comparison of PK action on two different random number generators",
+      "authors": [
+        "Schmidt, H."
+      ],
+      "year": 1974,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Schmidt, H. (1974). Comparison of PK action on two different random number generators.Journal of Parapsychology, 38, 47-55.",
+      "pageStart": 47,
+      "pageEnd": 55,
+      "volume": 38,
+      "domainTags": []
+    },
+    {
+      "id": "9",
+      "title": "Toward a mathematical theory of psi",
+      "authors": [
+        "Schmidt, H."
+      ],
+      "year": 1975,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Schmidt, H. (1975). Toward a mathematical theory of psi.Journal of Parapsychology, 69, 301-319.",
+      "pageStart": 301,
+      "pageEnd": 319,
+      "volume": 69,
+      "domainTags": []
+    },
+    {
+      "id": "10",
+      "title": "Experimental study of complexity dependence in precognition",
+      "authors": [
+        "Vassy, Z."
+      ],
+      "year": 1986,
+      "publication": "Journal of Parapsychology",
+      "publisher": "",
+      "citation": "Vassy, Z. (1986). Experimental study of complexity dependence in precognition.Journal of Parapsychology, 50, 235-270.",
+      "pageStart": 235,
+      "pageEnd": 270,
+      "volume": 50,
+      "domainTags": []
+    },
+    {
+      "id": "ref-1771406775048",
+      "title": "Stage 2 Registered Report: Anomalous perception in a Ganzfeld condition - A meta-analysis of more than 40 years investigation",
+      "authors": [
+        "Tressoldi",
+        "Patrizio E.",
+        "Storm",
+        "Lance"
+      ],
+      "year": 2024,
+      "publication": "F1000Research",
+      "publisher": "F1000",
+      "citation": "Meta-analysis of 113 studies (1974-2020) reports small positive effect (~0.08) with moderator effects and bias checks.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.12688/f1000research.51746.4",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11134153/",
+      "abstract": "Large registered-report synthesis finding a small but nonzero overall effect in Ganzfeld databases and stronger effects in selected participants.",
+      "studyType": "meta-analysis",
+      "domainTags": [
+        "ganzfeld",
+        "meta-analysis",
+        "psi"
+      ],
+      "qualityScore": 0.82,
+      "effectDirection": "supports",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-1",
+      "title": "Meta-analysis of free-response studies, 1992-2008: assessing the noise reduction model in parapsychology",
+      "authors": [
+        "Storm",
+        "Lance",
+        "Tressoldi",
+        "Patrizio E.",
+        "Di Risio",
+        "Lorenzo"
+      ],
+      "year": 2010,
+      "publication": "Psychological Bulletin",
+      "publisher": "APA",
+      "citation": "Meta-analysis reports positive effects in ganzfeld and some noise-reduction paradigms.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1037/a0019457",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/20565164/",
+      "abstract": "Influential synthesis suggesting positive free-response effects but later challenged on randomization and robustness grounds.",
+      "studyType": "meta-analysis",
+      "domainTags": [
+        "ganzfeld",
+        "free-response",
+        "psi"
+      ],
+      "qualityScore": 0.65,
+      "effectDirection": "supports",
+      "replicationStatus": "single"
+    },
+    {
+      "id": "ref-1771406775048-2",
+      "title": "Meta-analysis that conceals more than it reveals: comment on Storm et al. (2010)",
+      "authors": [
+        "Hyman",
+        "Ray"
+      ],
+      "year": 2010,
+      "publication": "Psychological Bulletin",
+      "publisher": "APA",
+      "citation": "Critical commentary arguing evidence remains unpersuasive absent independently replicable results.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1037/a0019676",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/20565165/",
+      "abstract": "Methodological critique emphasizing that meta-analytic significance alone is insufficient without robust independent replication.",
+      "studyType": "review",
+      "domainTags": [
+        "methodology",
+        "replication",
+        "skeptical"
+      ],
+      "qualityScore": 0.75,
+      "effectDirection": "challenges",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-3",
+      "title": "Feeling the future: experimental evidence for anomalous retroactive influences on cognition and affect",
+      "authors": [
+        "Bem",
+        "Daryl J."
+      ],
+      "year": 2011,
+      "publication": "Journal of Personality and Social Psychology",
+      "publisher": "APA",
+      "citation": "Nine experiments reported mean effect size d=0.22 for retroactive influence claims.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1037/a0021524",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21280961/",
+      "abstract": "Landmark controversial paper reporting retroactive facilitation effects and motivating large-scale replication efforts.",
+      "studyType": "observational",
+      "domainTags": [
+        "precognition",
+        "retrocausation"
+      ],
+      "qualityScore": 0.55,
+      "effectDirection": "supports",
+      "replicationStatus": "single"
+    },
+    {
+      "id": "ref-1771406775048-4",
+      "title": "Correcting the past: failures to replicate ψ",
+      "authors": [
+        "Galak",
+        "Jeff",
+        "LeBoeuf",
+        "Robyn A.",
+        "Nelson",
+        "Leif D.",
+        "Simmons",
+        "Joseph P."
+      ],
+      "year": 2012,
+      "publication": "Journal of Personality and Social Psychology",
+      "publisher": "APA",
+      "citation": "Seven replication studies and follow-up meta-analysis reported average effect d=0.04, not different from zero.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1037/a0029709",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/22924750/",
+      "abstract": "High-powered replication program that failed to reproduce key retroactive facilitation findings from Bem (2011).",
+      "studyType": "replication",
+      "domainTags": [
+        "precognition",
+        "replication"
+      ],
+      "qualityScore": 0.9,
+      "effectDirection": "challenges",
+      "replicationStatus": "multi-lab"
+    },
+    {
+      "id": "ref-1771406775048-5",
+      "title": "Why psychologists must change the way they analyze their data: the case of psi",
+      "authors": [
+        "Wagenmakers",
+        "Eric-Jan",
+        "Wetzels",
+        "Ruud",
+        "Borsboom",
+        "Denny",
+        "van der Maas",
+        "Han L. J."
+      ],
+      "year": 2011,
+      "publication": "Journal of Personality and Social Psychology",
+      "publisher": "APA",
+      "citation": "Bayesian reanalysis argues evidence in Bem's data is weak to nonexistent.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1037/a0022790",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21280965/",
+      "abstract": "Statistical critique highlighting exploratory flexibility and arguing that one-sided p-values overstated evidential strength.",
+      "studyType": "review",
+      "domainTags": [
+        "bayesian",
+        "methodology",
+        "precognition"
+      ],
+      "qualityScore": 0.84,
+      "effectDirection": "challenges",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-6",
+      "title": "A Bayes factor meta-analysis of Bem's ESP claim",
+      "authors": [
+        "Rouder",
+        "Jeffrey N.",
+        "Morey",
+        "Richard D."
+      ],
+      "year": 2011,
+      "publication": "Psychonomic Bulletin & Review",
+      "publisher": "Springer",
+      "citation": "Bayesian assessment across experiments; interpretation differs from both strong-pro and strong-con readings.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.3758/s13423-011-0088-7",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21573926/",
+      "abstract": "Meta-analytic Bayes factor approach showing how prior choices and aggregation strategy materially alter inference strength.",
+      "studyType": "meta-analysis",
+      "domainTags": [
+        "bayesian",
+        "precognition",
+        "methodology"
+      ],
+      "qualityScore": 0.78,
+      "effectDirection": "mixed",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-7",
+      "title": "Raising the value of research studies in psychological science by increasing the credibility of research reports: the transparent Psi project",
+      "authors": [
+        "Kekecs",
+        "Zoltan",
+        "Palfi",
+        "Bence",
+        "Szaszi",
+        "Barnabas",
+        "et al."
+      ],
+      "year": 2023,
+      "publication": "Royal Society Open Science",
+      "publisher": "The Royal Society",
+      "citation": "Multi-lab transparent replication of Bem Experiment 1 found 49.89% hits vs 50% chance.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1098/rsos.191375",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36756055/",
+      "abstract": "Demonstrates an intensive transparency protocol and reports null replication for the flagship Bem task.",
+      "studyType": "replication",
+      "domainTags": [
+        "transparency",
+        "multilab",
+        "replication"
+      ],
+      "qualityScore": 0.94,
+      "effectDirection": "challenges",
+      "replicationStatus": "multi-lab"
+    },
+    {
+      "id": "ref-1771406775048-8",
+      "title": "Stage 1 Registered Report: Anomalous perception in a Ganzfeld condition - A meta-analysis of more than 40 years investigation",
+      "authors": [
+        "Tressoldi",
+        "Patrizio E.",
+        "Storm",
+        "Lance"
+      ],
+      "year": 2020,
+      "publication": "F1000Research",
+      "publisher": "F1000",
+      "citation": "Pre-registered protocol and analysis plan for long-horizon Ganzfeld synthesis.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.12688/f1000research.24868.3",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/33628430/",
+      "abstract": "Protocol-first phase that improves auditability of inclusion criteria and analyses before final synthesis.",
+      "studyType": "review",
+      "domainTags": [
+        "registered-report",
+        "ganzfeld",
+        "methods"
+      ],
+      "qualityScore": 0.8,
+      "effectDirection": "supports",
+      "replicationStatus": "single"
+    },
+    {
+      "id": "ref-1771406775048-9",
+      "title": "Predictive physiological anticipation preceding seemingly unpredictable stimuli: a meta-analysis",
+      "authors": [
+        "Mossbridge",
+        "Julia",
+        "Tressoldi",
+        "Patrizio",
+        "Utts",
+        "Jessica"
+      ],
+      "year": 2012,
+      "publication": "Frontiers in Psychology",
+      "publisher": "Frontiers",
+      "citation": "Meta-analysis of 26 reports suggests pre-stimulus physiological differences before random events.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.3389/fpsyg.2012.00390",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23109927/",
+      "abstract": "Frequently cited presentiment synthesis reporting anomalous anticipatory physiological effects.",
+      "studyType": "meta-analysis",
+      "domainTags": [
+        "presentiment",
+        "physiology"
+      ],
+      "qualityScore": 0.62,
+      "effectDirection": "supports",
+      "replicationStatus": "single"
+    },
+    {
+      "id": "ref-1771406775048-10",
+      "title": "We should have seen this coming",
+      "authors": [
+        "Schwarzkopf",
+        "D. Samuel"
+      ],
+      "year": 2014,
+      "publication": "Frontiers in Human Neuroscience",
+      "publisher": "Frontiers",
+      "citation": "Editorial critique of presentiment analyses emphasizing expectation, trial-order and preprocessing artifacts.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.3389/fnhum.2014.00332",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4034337/",
+      "abstract": "Argues that extraordinary temporal claims require stronger controls and direct tests of conventional artifact explanations.",
+      "studyType": "review",
+      "domainTags": [
+        "presentiment",
+        "critique",
+        "methodology"
+      ],
+      "qualityScore": 0.85,
+      "effectDirection": "challenges",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-11",
+      "title": "Examining psychokinesis: the interaction of human intention with random number generators--a meta-analysis",
+      "authors": [
+        "Bösch",
+        "Holger",
+        "Steinkamp",
+        "Fiona",
+        "Boller",
+        "Emil"
+      ],
+      "year": 2006,
+      "publication": "Psychological Bulletin",
+      "publisher": "APA",
+      "citation": "380 RNG studies showed tiny overall effect with heterogeneity and small-study patterns consistent with bias.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1037/0033-2909.132.4.497",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/16822162/",
+      "abstract": "Classic RNG-PK synthesis often interpreted as evidence of weak effects but strong vulnerability to publication and selection bias.",
+      "studyType": "meta-analysis",
+      "domainTags": [
+        "rng",
+        "micro-pk",
+        "publication-bias"
+      ],
+      "qualityScore": 0.83,
+      "effectDirection": "mixed",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-12",
+      "title": "Loophole-free Bell inequality violation using electron spins separated by 1.3 kilometres",
+      "authors": [
+        "Hensen",
+        "Bas",
+        "Bernien",
+        "Hannes",
+        "Dréau",
+        "Andreas",
+        "et al."
+      ],
+      "year": 2015,
+      "publication": "Nature",
+      "publisher": "Nature Publishing Group",
+      "citation": "Loophole-free Bell test rejected local realism under strict conditions.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1038/nature15759",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/26503041/",
+      "abstract": "Confirms nonlocal quantum correlations while not establishing controllable faster-than-light communication channels.",
+      "studyType": "observational",
+      "domainTags": [
+        "quantum",
+        "nonlocality",
+        "bell"
+      ],
+      "qualityScore": 0.97,
+      "effectDirection": "supports",
+      "replicationStatus": "multi-lab"
+    },
+    {
+      "id": "ref-1771406775048-13",
+      "title": "Quantum field theory cannot provide faster-than-light communication",
+      "authors": [
+        "Eberhard",
+        "Philippe H.",
+        "Ross",
+        "Ronald R."
+      ],
+      "year": 1989,
+      "publication": "Foundations of Physics Letters",
+      "publisher": "Springer",
+      "citation": "Formal argument that QFT cannot be used for superluminal signaling.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1007/BF00696109",
+      "url": "https://cds.cern.ch/record/188617",
+      "abstract": "Theoretical no-signaling constraint often cited to distinguish correlation nonlocality from actionable communication.",
+      "studyType": "theory",
+      "domainTags": [
+        "no-signaling",
+        "qft",
+        "causality"
+      ],
+      "qualityScore": 0.9,
+      "effectDirection": "supports",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-14",
+      "title": "Gravitational Waves and Gamma-rays from a Binary Neutron Star Merger: GW170817 and GRB 170817A",
+      "authors": [
+        "LIGO Scientific Collaboration",
+        "Virgo Collaboration",
+        "Fermi GBM",
+        "INTEGRAL"
+      ],
+      "year": 2017,
+      "publication": "The Astrophysical Journal Letters",
+      "publisher": "AAS",
+      "citation": "Joint detection constrains speed difference between gravity and light to around 10^-15.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.3847/2041-8213/aa920c",
+      "url": "https://arxiv.org/abs/1710.05834",
+      "abstract": "Multi-messenger constraints substantially reduce plausibility of many superluminal or exotic carrier models.",
+      "studyType": "observational",
+      "domainTags": [
+        "physics",
+        "gw170817",
+        "constraints"
+      ],
+      "qualityScore": 0.95,
+      "effectDirection": "challenges",
+      "replicationStatus": "multi-lab"
+    },
+    {
+      "id": "ref-1771406775048-15",
+      "title": "AWAreness during REsuscitation - II: A multi-center study of consciousness and awareness in cardiac arrest",
+      "authors": [
+        "Parnia",
+        "Sam",
+        "Keshavarz Shirazi",
+        "Tara",
+        "Patel",
+        "Jignesh",
+        "et al."
+      ],
+      "year": 2023,
+      "publication": "Resuscitation",
+      "publisher": "Elsevier",
+      "citation": "In-hospital arm: no correct visual target identifications; limited auditory hit.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1016/j.resuscitation.2023.109903",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37423492/",
+      "abstract": "High-control prospective design in extreme-consciousness context with very limited objective target-identification support.",
+      "studyType": "observational",
+      "domainTags": [
+        "nde",
+        "consciousness",
+        "target-testing"
+      ],
+      "qualityScore": 0.8,
+      "effectDirection": "null",
+      "replicationStatus": "single"
+    },
+    {
+      "id": "ref-1771406775048-16",
+      "title": "Paranormal beliefs and core knowledge confusions: A meta-analysis",
+      "authors": [
+        "Gallyamova",
+        "Albina A.",
+        "Komyaginskaya",
+        "Elizaveta S.",
+        "Grigoryev",
+        "Dmitry"
+      ],
+      "year": 2024,
+      "publication": "Personality and Individual Differences",
+      "publisher": "Elsevier",
+      "citation": "Meta-analysis across 25 effects found robust association (r≈0.40) between paranormal belief and ontological confusions.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1016/j.paid.2024.112780",
+      "url": "https://www.sciencedirect.com/science/article/pii/S019188692400240X",
+      "abstract": "Supports cognitive-style pathways that can explain paranormal conviction without requiring real anomalous information transfer.",
+      "studyType": "meta-analysis",
+      "domainTags": [
+        "belief",
+        "cognition",
+        "ontological-confusion"
+      ],
+      "qualityScore": 0.86,
+      "effectDirection": "supports",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-17",
+      "title": "Superstition predicts perception of illusory control",
+      "authors": [
+        "Griffiths",
+        "Oren",
+        "Shehabi",
+        "Noor",
+        "Murphy",
+        "Robin A.",
+        "Le Pelley",
+        "Mike E."
+      ],
+      "year": 2019,
+      "publication": "British Journal of Psychology",
+      "publisher": "BPS/Wiley",
+      "citation": "Laboratory contingency task: superstition scores predicted stronger illusion of causality.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1111/bjop.12344",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30144046/",
+      "abstract": "Shows a measurable cognitive mechanism linking superstition with over-attribution of control in random environments.",
+      "studyType": "observational",
+      "domainTags": [
+        "superstition",
+        "illusory-control",
+        "cognition"
+      ],
+      "qualityScore": 0.84,
+      "effectDirection": "supports",
+      "replicationStatus": "independent-replication"
+    },
+    {
+      "id": "ref-1771406775048-18",
+      "title": "Publication bias is bad for science if not necessarily scientists",
+      "authors": [
+        "Heesen",
+        "Remco",
+        "Bright",
+        "Liam Kofi"
+      ],
+      "year": 2025,
+      "publication": "Royal Society Open Science",
+      "publisher": "The Royal Society",
+      "citation": "Bayesian modeling paper clarifies why publication bias distorts field-level inference even with partially rational readers.",
+      "pageStart": 0,
+      "pageEnd": 0,
+      "volume": 0,
+      "doi": "10.1098/rsos.240688",
+      "url": "https://doi.org/10.1098/rsos.240688",
+      "abstract": "Metascience analysis reinforcing why weak-effect literatures require strong anti-bias infrastructure.",
+      "studyType": "theory",
+      "domainTags": [
+        "publication-bias",
+        "metascience"
+      ],
+      "qualityScore": 0.88,
+      "effectDirection": "supports",
+      "replicationStatus": "independent-replication"
+    }
+  ]
+}

@@ -51,8 +51,12 @@ See [CLI.md](CLI.md) for complete CLI documentation.
 | `category update <id>` | Update a category |
 | `ref list` | List references |
 | `ref add` | Add a reference |
+| `ref update <id>` | Update reference metadata |
+| `ref import --csv <file>` | Import references from CSV |
 | `ref link <ref-id> <node-id>` | Link reference to node |
 | `ref unlink <ref-id> <node-id>` | Unlink reference from node |
+| `hypothesis rank` | Evidence-weighted hypothesis ranking |
+| `report brief` | Generate concise evidence briefs |
 | `import <dir>` | Import legacy XML data directory |
 | `export dot` | Export as Graphviz DOT |
 | `export png` | Render as PNG (requires Graphviz) |

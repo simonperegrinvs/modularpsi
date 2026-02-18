@@ -129,6 +129,14 @@ export interface Reference {
   pageStart: number;
   pageEnd: number;
   volume: number;
+  doi?: string;
+  url?: string;
+  abstract?: string;
+  studyType?: 'meta-analysis' | 'rct' | 'observational' | 'theory' | 'review' | 'replication';
+  domainTags?: string[];
+  qualityScore?: number; // 0..1
+  effectDirection?: 'supports' | 'null' | 'challenges' | 'mixed';
+  replicationStatus?: 'single' | 'independent-replication' | 'failed-replication' | 'multi-lab';
 }
 
 // ── Default Categories (from legacy cats.mpsi) ──────────────

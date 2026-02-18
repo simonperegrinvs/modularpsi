@@ -205,7 +205,8 @@ export const useGraphStore = create<GraphState>()(
         }
 
         const { nodes, edges } = propagateTrust(newNodes, newEdges, state.rootId);
-        set({ nodes, edges });
+        const layout = computeLayout(nodes, edges, state.rankDir);
+        set({ nodes, edges, nodePositions: layout.nodePositions });
       },
 
       addEdge: (sourceId: string, targetId: string, trust?: number, type?: EdgeType) => {

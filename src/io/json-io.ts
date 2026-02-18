@@ -58,6 +58,17 @@ export function jsonToGraph(json: string): GraphData {
   }
   // Ensure references exist
   if (!data.references) data.references = [];
+  for (const ref of data.references) {
+    if (!ref.authors) ref.authors = [];
+    if (ref.year === undefined) ref.year = 0;
+    if (!ref.publication) ref.publication = '';
+    if (!ref.publisher) ref.publisher = '';
+    if (!ref.citation) ref.citation = '';
+    if (ref.pageStart === undefined) ref.pageStart = 0;
+    if (ref.pageEnd === undefined) ref.pageEnd = 0;
+    if (ref.volume === undefined) ref.volume = 0;
+    if (!ref.domainTags) ref.domainTags = [];
+  }
   return data;
 }
 

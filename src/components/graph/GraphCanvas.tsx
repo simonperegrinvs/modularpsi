@@ -14,6 +14,7 @@ import { useGraphStore } from '../../store/graph-store';
 import { TrustNode, type TrustNodeData } from './TrustNode';
 import { TrustEdge, type TrustEdgeData } from './TrustEdge';
 import { trustToHex } from '../../lib/colors';
+import { getNodeDimensions } from '../../lib/layout';
 
 const nodeTypes = { trust: TrustNode };
 const edgeTypes = { trust: TrustEdge };
@@ -48,10 +49,12 @@ export function GraphCanvas() {
     () =>
       nodes.map((n) => {
         const pos = nodePositions.get(n.id) ?? { x: 0, y: 0 };
+        const dim = getNodeDimensions(n);
         return {
           id: n.id,
           type: 'trust',
           position: pos,
+          style: { width: dim.width, height: dim.height },
           data: {
             graphNode: n,
             categoryColor: categoryColorMap.get(n.categoryId) ?? '#000000',

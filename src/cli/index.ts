@@ -14,6 +14,8 @@ import { registerCategoryCommands } from './commands/category';
 import { registerImportCommands } from './commands/import';
 import { registerExportCommands } from './commands/export';
 import { registerRefCommands } from './commands/ref';
+import { registerHypothesisCommands } from './commands/hypothesis';
+import { registerReportCommands } from './commands/report';
 
 // ── Last-used file persistence ────────────────────────────────
 const RC_PATH = resolve(homedir(), '.mpsirc');
@@ -73,5 +75,7 @@ registerCategoryCommands(program);
 registerImportCommands(program);
 registerExportCommands(program);
 registerRefCommands(program);
+registerHypothesisCommands(program);
+registerReportCommands(program);
 
 program.parse();

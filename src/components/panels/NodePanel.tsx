@@ -42,6 +42,11 @@ export function NodePanel() {
   const outgoing = edges.filter((e) => e.sourceId === node.id);
   const incoming = edges.filter((e) => e.targetId === node.id);
   const trustItem = float2TrustItem(node.trust);
+  const descriptionReady = description.trim().length > 0;
+  const keywordCount = keywordsStr.split(';').map((k) => k.trim()).filter(Boolean).length;
+  const refCount = node.referenceIds.length;
+  const completenessParts = [descriptionReady, keywordCount > 0, refCount > 0];
+  const completenessPct = Math.round((completenessParts.filter(Boolean).length / completenessParts.length) * 100);
 
   function commit() {
     updateNode(node!.id, {
@@ -64,6 +69,25 @@ export function NodePanel() {
         >
           {node.trust < 0 ? 'N/C' : node.trust.toFixed(2)} ({TRUST_LABELS[trustItem]})
         </span>
+      </div>
+
+      {/* Metadata completeness */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="text-gray-600">Metadata completeness</span>
+          <span className="text-xs font-medium">{completenessPct}%</span>
+        </div>
+        <div className="h-2 rounded bg-gray-200 overflow-hidden">
+          <div
+            className="h-full bg-blue-500"
+            style={{ width: `${completenessPct}%` }}
+          />
+        </div>
+        {!descriptionReady && (
+          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+            Missing description: add a short summary before linking more references.
+          </div>
+        )}
       </div>
 
       {/* Name */}
